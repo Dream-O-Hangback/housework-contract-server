@@ -16,7 +16,7 @@ export default class Housework {
     @Column({ type: 'varchar', length: 255 })
     description: string;
 
-    @Column({ type: 'tinyint' })
+    @Column({ type: 'tinyint', name: 'deploy_count' })
     deployCount: number;
 
     @Column({ type: 'int' })

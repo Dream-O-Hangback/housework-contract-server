@@ -20,10 +20,10 @@ export default class AwardLog {
     @JoinColumn({ name: 'award_id' })
     awardId: string;
 
-    @Column('uuid', { name: 'award_worker_id', nullable: true })
+    @Column('uuid', { nullable: true, name: 'award_worker_id' })
     awardWorkerId: string;
 
-    @Column('uuid', { name: 'penalty_worker_id', nullable: true })
+    @Column('uuid', { nullable: true, name: 'penalty_worker_id' })
     penaltyWorkerId: string;
 
     @Column({ type: 'varchar', length: 255 })

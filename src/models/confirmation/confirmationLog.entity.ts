@@ -1,5 +1,6 @@
 import { Column, CreateDateColumn, PrimaryGeneratedColumn, Entity, ManyToOne, JoinColumn } from 'typeorm';
 import Confirmation from './confirmation.entity';
+import Group from '../group/group.entity';
 import GroupMember from '../groupMember/groupMember.entity';
 
 @Entity('confirmation_log')
@@ -9,7 +10,11 @@ export default class ConfirmationLog {
 
     @ManyToOne(type => Confirmation, confirmation => confirmation.id)
     @JoinColumn({ name: 'confirmation_id' })
-    confirmationId: string;    
+    confirmationId: string;
+
+    @ManyToOne(type => Group, group => group.id)
+    @JoinColumn({ name: 'group_id' })
+    groupId: string;
 
     @ManyToOne(type => GroupMember, groupMember => groupMember.id)
     @JoinColumn({ name: 'group_member_id' })
