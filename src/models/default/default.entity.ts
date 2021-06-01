@@ -26,10 +26,3 @@ export class DefaultAward extends DefaultContent {
     @Column({ type: 'varchar', length: 30 })
     type: string;
 }
-
-@Entity('default_penalty')
-export class DefaultPenalty extends DefaultContent {
-    @Column({ type: 'varchar', length: 30 })
-    type: string;
-}
-

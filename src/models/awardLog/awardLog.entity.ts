@@ -1,7 +1,6 @@
-import { Column, CreateDateColumn, PrimaryGeneratedColumn, Entity, ManyToOne, JoinColumn } from 'typeorm';
+import { Column, CreateDateColumn, PrimaryGeneratedColumn, Entity, ManyToOne, OneToOne, JoinColumn } from 'typeorm';
 import Group from '../group/group.entity';
-import GroupMember from '../groupMember/groupMember.entity';
-import Housework from '../housework/housework.entity';
+import HouseworkLog from '../houseworkLog/houseworkLog.entity';
 import Award from '../award/award.entity';
 
 @Entity('award_log')
@@ -13,17 +12,22 @@ export default class AwardLog {
     @JoinColumn({ name: 'group_id' })
     groupId: string;
 
-    @ManyToOne(type => GroupMember, groupMember => groupMember.id)
-    @JoinColumn({ name: 'worker_id' })
-    workerId: string;
-
-    @ManyToOne(type => Housework, housework => housework.id)
-    @JoinColumn({ name: 'housework_id' })
-    houseworkId: string;
+    @OneToOne(type => HouseworkLog, houseworkLog => houseworkLog.id)
+    @JoinColumn({ name: 'housework_log_id' })
+    houseworkLogId: string;
 
     @ManyToOne(type => Award, award => award.id)
     @JoinColumn({ name: 'award_id' })
     awardId: string;
+
+    @Column('uuid', { name: 'award_worker_id', nullable: true })
+    awardWorkerId: string;
+
+    @Column('uuid', { name: 'penalty_worker_id', nullable: true })
+    penaltyWorkerId: string;
+
+    @Column({ type: 'varchar', length: 255 })
+    content: string;
 
     @Column({ default: false, name: 'is_receive' })
     isReceive: boolean;

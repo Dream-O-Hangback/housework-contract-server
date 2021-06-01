@@ -22,15 +22,12 @@ export default class Award {
     @Column({ nullable: true, type: 'bigint', name: 'default_award_id' })
     defaultAwardId: number;
 
+    @Column({ default: false, name: 'include_content' })
+    includeContent: boolean;
+
     @CreateDateColumn({ name: 'create_date' })
     createDate: Date;
 
     @Column({ default: true })
     active: boolean;
-
-    @Column({ type: 'varchar', length: 20, nullable: true, name: 'input_title' })
-    inputTitle: string;
-
-    @Column({ type: 'varchar', length: 255, nullable: true, name: 'input_content' })
-    inputContent: string;
 }
