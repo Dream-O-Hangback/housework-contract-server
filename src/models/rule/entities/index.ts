@@ -1,5 +1,5 @@
 import { Column, UpdateDateColumn, CreateDateColumn, PrimaryGeneratedColumn, Entity, ManyToOne, JoinColumn } from 'typeorm';
-import Group from '../group/group.entity';
+import Group from '../../group/entities';
 
 @Entity('rule')
 export default class Rule {

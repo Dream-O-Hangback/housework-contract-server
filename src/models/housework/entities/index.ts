@@ -1,8 +1,8 @@
 import { Column, CreateDateColumn, PrimaryGeneratedColumn, Entity, ManyToOne, JoinColumn } from 'typeorm';
-import Group from '../group/group.entity';
+import Group from '../../group/entities';
 
-@Entity('award')
-export default class Award {
+@Entity('housework')
+export default class Housework {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
@@ -10,20 +10,17 @@ export default class Award {
     @JoinColumn({ name: 'group_id' })
     groupId: string;
 
-    @Column({ type: 'varchar', length: 30 })
-    type: string;
-
     @Column({ type: 'varchar', length: 40 })
     title: string;
 
     @Column({ type: 'varchar', length: 255 })
     description: string;
 
-    @Column({ nullable: true, type: 'bigint', name: 'default_award_id' })
-    defaultAwardId: number;
+    @Column({ type: 'tinyint', name: 'deploy_count' })
+    deployCount: number;
 
-    @Column({ default: false, name: 'include_content' })
-    includeContent: boolean;
+    @Column({ type: 'int' })
+    frequency: string;
 
     @CreateDateColumn({ name: 'create_date' })
     createDate: Date;

@@ -1,10 +1,11 @@
 import { Column, CreateDateColumn, PrimaryGeneratedColumn, Entity, ManyToOne, OneToOne, JoinColumn } from 'typeorm';
-import Group from '../group/group.entity';
-import HouseworkLog from '../houseworkLog/houseworkLog.entity';
-import Award from '../award/award.entity';
+import Group from '../../group/entities';
+import HouseworkLog from '../../houseworkLog/entities';
+import Award from '../../award/entities';
+import AlternativePayment from '../../alternativePayment/entities';
 
-@Entity('award_log')
-export default class AwardLog {
+@Entity('alternative_payment_log')
+export default class AlternativePaymentLog {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
@@ -20,14 +21,15 @@ export default class AwardLog {
     @JoinColumn({ name: 'award_id' })
     awardId: string;
 
-    @Column('uuid', { nullable: true, name: 'award_worker_id' })
+    @ManyToOne(type => AlternativePayment, alternativePayment => alternativePayment.id)
+    @JoinColumn({ name: 'alternative_payment_id' })
+    alternativePaymentId: string;
+
+    @Column('uuid', { name: 'award_worker_id', nullable: true })
     awardWorkerId: string;
 
-    @Column('uuid', { nullable: true, name: 'penalty_worker_id' })
+    @Column('uuid', { name: 'penalty_worker_id', nullable: true })
     penaltyWorkerId: string;
-
-    @Column({ type: 'varchar', length: 255 })
-    content: string;
 
     @Column({ default: false, name: 'is_receive' })
     isReceive: boolean;

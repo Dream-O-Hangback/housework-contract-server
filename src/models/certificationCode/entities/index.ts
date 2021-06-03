@@ -1,5 +1,5 @@
 import { Column, PrimaryGeneratedColumn, Entity, ManyToOne, JoinColumn } from 'typeorm';
-import Account from '../account/account.entity';
+import Account from '../../account/entities';
 
 @Entity('certification_code')
 export default class CertificationCode {

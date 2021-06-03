@@ -1,8 +1,8 @@
 import { Column, CreateDateColumn, PrimaryGeneratedColumn, Entity, ManyToOne, OneToOne, JoinColumn } from 'typeorm';
-import Group from '../group/group.entity';
-import GroupMember from '../groupMember/groupMember.entity';
-import HouseworkLog from '../houseworkLog/houseworkLog.entity';
-import Award from '../award/award.entity';
+import Group from '../../group/entities';
+import GroupMember from '../../groupMember/entities';
+import HouseworkLog from '../../houseworkLog/entities';
+import Award from '../../award/entities';
 
 @Entity('housework_dump_log')
 export default class HouseworkDumpLog {

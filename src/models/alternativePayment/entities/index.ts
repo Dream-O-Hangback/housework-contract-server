@@ -1,5 +1,5 @@
 import { Column, CreateDateColumn, PrimaryGeneratedColumn, Entity, ManyToOne, JoinColumn } from 'typeorm';
-import Group from '../group/group.entity';
+import Group from '../../group/entities';
 
 @Entity('alternative_payment')
 export default class AlternativePayment {

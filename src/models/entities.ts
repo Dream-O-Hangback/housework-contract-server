@@ -1,27 +1,22 @@
-import Account from './account/account.entity';
-import AlternativePayment from './alternativePayment/alternativePayment.entity';
-import AlternativePaymentLog from './alternativePaymentLog/alternativePaymentLog.entity';
-import Award from './award/award.entity';
-import AwardLog from './awardLog/awardLog.entity';
-import CertificationCode from './certificationCode/certificationCode.entity';
-import CoinBankLog from './coinBanklog/coinBankLog.entity';
-import Confirmation from './confirmation/confirmation.entity';
-import ConfirmationShareId from './confirmationShareId/confirmationShareId.entity';
-import { DefaultAward, DefaultHousework, DefaultPenalty } from './default/default.entity';
-import DefaultGroupType from './default/defaultGroupType.entity';
-import Group from './group/group.entity';
-import GroupMember from './groupMember/groupMember.entity';
-import Housework from './housework/housework.entity';
-import HouseworkDumpLog from './houseworkDumpLog/houseworkDumpLog.entity';
-import HouseworkLog from './houseworkLog/houseworkLog.entity';
-import Penalty from './penalty/penalty.entity';
-import PenaltyLog from './penaltyLog/penaltyLog.entity';
-import Routine from './routine/routine.entity';
-import RoutineFullCharge from './routine/routineFullCharge.entity';
-import RoutineRotation from './routine/routineRotation.entity';
-import Rule from './rule/rule.entity';
-import RuleLog from './ruleLog/ruleLog.entity';
-import Withdraw from './withdraw/withdraw.entity';
+import Account from './account/entities';
+import AlternativePayment from './alternativePayment/entities';
+import AlternativePaymentLog from './alternativePaymentLog/entities';
+import Award from './award/entities';
+import AwardLog from './awardLog/entities';
+import CertificationCode from './certificationCode/entities';
+import CoinBankLog from './coinBanklog/entities';
+import Confirmation from './confirmation/entities';
+import ConfirmationShareId from './confirmationShareId/entities';
+import { DefaultAward, DefaultHousework, DefaultGroupType } from './default/entities';
+import Group from './group/entities';
+import GroupMember from './groupMember/entities';
+import Housework from './housework/entities';
+import HouseworkDumpLog from './houseworkDumpLog/entities';
+import HouseworkLog from './houseworkLog/entities';
+import { Routine, RoutineFullCharge, RoutineRotation } from './routine/entities';
+import Rule from './rule/entities';
+import RuleLog from './ruleLog/entities';
+import Withdraw from './withdraw/entities';
 
 export default [
     Account,
