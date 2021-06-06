@@ -16,9 +16,6 @@ export default class Confirmation {
     @Column('uuid', { name: 'confirmation_process_id' })
     confirmationProcessId: string;
 
-    @Column({ nullable: true,  name: 'confirm_date' })
-    confirmDate: Date;
-
     @CreateDateColumn({ name: 'create_date' })
     createDate: Date;
 }

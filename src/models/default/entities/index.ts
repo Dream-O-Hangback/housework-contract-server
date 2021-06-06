@@ -21,7 +21,7 @@ abstract class DefaultContent {
 export class DefaultHousework extends DefaultContent {
 }
 
-@Entity('defualt_award')
+@Entity('default_award')
 export class DefaultAward extends DefaultContent {
     @Column({ type: 'varchar', length: 30 })
     type: string;
