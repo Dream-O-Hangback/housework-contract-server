@@ -7,7 +7,7 @@ import CertificationCode from './certificationCode/entities';
 import CoinBankLog from './coinBanklog/entities';
 import Confirmation from './confirmation/entities';
 import ConfirmationShareId from './confirmationShareId/entities';
-import { DefaultAward, DefaultHousework, DefaultGroupType } from './default/entities';
+import { DefaultAward, DefaultHousework, DefaultAlternativePaymentType, DefaultGroupType } from './default/entities';
 import Group from './group/entities';
 import GroupMember from './groupMember/entities';
 import Housework from './housework/entities';
@@ -31,6 +31,7 @@ export default [
     DefaultAward,
     DefaultHousework,
     DefaultGroupType,
+    DefaultAlternativePaymentType,
     Group,
     GroupMember,
     Housework,

@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, PrimaryGeneratedColumn, Entity, ManyToOne, JoinColumn, OneToOne } from 'typeorm';
+import { Column, UpdateDateColumn, CreateDateColumn, PrimaryGeneratedColumn, Entity, ManyToOne, JoinColumn, OneToOne } from 'typeorm';
 import Group from '../../group/entities';
 import Award from '../../award/entities';
 
@@ -23,6 +23,9 @@ export default class GroupMember {
 
     @Column({ default: true })
     active: boolean;
+
+    @UpdateDateColumn({ name: 'update_date' })
+    updateDate: Date;
 
     @CreateDateColumn({ name: 'create_date' })
     createDate: Date;

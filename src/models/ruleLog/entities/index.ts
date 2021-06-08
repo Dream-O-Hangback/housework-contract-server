@@ -21,8 +21,11 @@ export default class RuleLog {
     @Column({ type: 'varchar', length: 255 })
     reason: string;
 
-    @Column({ default: false, name: 'is_canceled' })
-    isCanceled: boolean;
+    @Column({ default: false, name: 'is_confirm' })
+    isConfirm: boolean;
+
+    @Column({ default: false, name: 'is_cancel' })
+    isCancel: boolean;
 
     @CreateDateColumn({ name: 'create_date' })
     createDate: Date;
