@@ -44,7 +44,6 @@ jobs:
           
       - name: Create env file
         run: |
-          cd shared	
           touch .env	
           cat << EOF >> .env	
           ${{ secrets.ENV }}
@@ -64,7 +63,7 @@ jobs:
         run: |
           aws s3 cp \
             --region ap-northeast-2 \
-            ./$GITHUB_SHA.tgz s3://bmart5-s3-bucket/$PROJECT_NAME/$GITHUB_SHA.tgz
+            ./$GITHUB_SHA.tgz s3://housework-contract-s3-bucket/$PROJECT_NAME/$GITHUB_SHA.tgz
 
       - name: Code Deploy
-        run: aws deploy create-deployment --application-name bmart5-deploy --file-exists-behavior OVERWRITE --deployment-config-name CodeDeployDefault.OneAtATime --deployment-group-name bmart5-deploy-group --s3-location bucket=bmart5-s3-bucket,bundleType=tgz,key=$PROJECT_NAME/$GITHUB_SHA.tgz
+        run: aws deploy create-deployment --application-name housework-contract-codedeploy --file-exists-behavior OVERWRITE --deployment-config-name CodeDeployDefault.OneAtATime --deployment-group-name housework-contract-deploygroup --s3-location bucket=housework-contract-s3-bucket,bundleType=tgz,key=$PROJECT_NAME/$GITHUB_SHA.tgz
