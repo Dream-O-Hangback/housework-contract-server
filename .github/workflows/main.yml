@@ -49,7 +49,7 @@ jobs:
           cat << EOF >> .env	
           ${{ secrets.ENV }}
           
-                - name: Make tar file
+      - name: Make tar file
         run: tar -cpvzf ./$GITHUB_SHA.tgz *
         shell: bash
 
