@@ -1,5 +1,5 @@
 #!/bin/bash
-REPOSITORY=/home/ubuntu/housework-contract-server
+REPOSITORY=/home/ec2-user/housework-contract-server
 cd $REPOSITORY
 
 mkdir client/logs
