@@ -5,4 +5,4 @@ cd $REPOSITORY
 mkdir client/logs
 mkdir server/logs
 
-pm2 start npm --name "housework-contract-server" --run "npm run build && npm run start:prod"
+pm2 start dist/main.js
