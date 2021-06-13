@@ -2,7 +2,7 @@ version: 0.0
 os: linux
 files:
   - source: /
-    destination: /home/ec2-user/housework-contract
+    destination: /home/ec2-user/housework-contract-server
 permissions:
   - object: /home/ec2-user/
     pattern: '**'
