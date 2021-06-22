@@ -11,19 +11,16 @@ export class AuthService {
   ) {
     this.accountRepository = accountRepository;
   }
-  create(account: Account): Account {
-    return this.accountRepository.create(account);
-  }
-  findAll(): Promise<Account[]> {
+  findAll() {
     return this.accountRepository.find();
   }
-  findOne(id: string): Promise<Account> {
+  findOne(id: string) {
     return this.accountRepository.findOne({ id: id });
   }
-  save(accountDto: AccountDto): Promise<Account> {
-    return this.accountRepository.save({ ...accountDto as DeepPartial<Account> });
+  save(accountDto: AccountDto) {
+    return this.accountRepository.save(accountDto);
   }
-  delete(id: string): Promise<DeleteResult> {
+  delete(id: string) {
     return this.accountRepository.delete({ id: id });
   }
 }
