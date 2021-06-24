@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { AuthService } from './auth.service';
 import Account from '../models/account/entities';
 import AccountDto from './dto/account.dto';
+import * as bcrypt from 'bcrypt';
 
 type MockRepository<T = any> = Partial<Record<keyof Repository<T>, jest.Mock>>;
 
@@ -59,6 +60,23 @@ describe('AuthService', () => {
 
             expect(result).toBe(newAccount as Account);
             expect(saveAccount).toBeCalledTimes(1);
+        });
+
+        it('should get a encrypted password', async () => {
+            const accountDto: AccountDto = {
+                "email": "kyw017763@gmail.com",
+                "name": "A",
+                "password": "ABCDE",
+                "nickname": "A",
+                "profile": "A",
+                "type": "local",
+                "notificationOpen": true,
+                "emailOpen": true,
+            };
+            const originalPassword = accountDto.password;
+            accountDto.password = await bcrypt.hash('SeCrEtPaSsWoRd', 10);
+            
+            expect(accountDto.password).not.toBe(originalPassword);
         });
     });
 });

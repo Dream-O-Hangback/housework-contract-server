@@ -1,7 +1,7 @@
 export default class AccountDto {
     readonly email: string;
     readonly name: string;
-    readonly password: string;
+    password: string;
     readonly nickname: string;
     readonly profile: string;
     readonly type: string;

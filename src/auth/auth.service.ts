@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DeepPartial, DeleteResult, Repository } from 'typeorm/index';
+import { Repository } from 'typeorm/index';
+import * as bcrypt from 'bcrypt';
 import Account from '../models/account/entities';
 import AccountDto from './dto/account.dto';
 
@@ -17,7 +18,8 @@ export class AuthService {
   findOne(id: string) {
     return this.accountRepository.findOne({ id: id });
   }
-  save(accountDto: AccountDto) {
+  async save(accountDto: AccountDto) {
+    accountDto.password = await bcrypt.hash('SeCrEtPaSsWoRd', 10);
     return this.accountRepository.save(accountDto);
   }
   delete(id: string) {
