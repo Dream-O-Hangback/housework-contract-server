@@ -3,7 +3,7 @@ export default class AccountDto {
     readonly name: string;
     password: string;
     readonly nickname: string;
-    readonly profile: string;
+    readonly profile!: string;
     readonly type: string;
     readonly notificationOpen: boolean;
     readonly emailOpen: boolean;
