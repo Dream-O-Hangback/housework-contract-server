@@ -74,9 +74,9 @@ describe('AuthService', () => {
                 "emailOpen": true,
             };
             const originalPassword = accountDto.password;
-            accountDto.password = await bcrypt.hash('SeCrEtPaSsWoRd', 10);
-            
-            expect(accountDto.password).not.toBe(originalPassword);
+            accountDto.password = await bcrypt.hash(originalPassword, 10);
+
+            expect(await bcrypt.compare(originalPassword, accountDto.password)).toBe(true);
         });
     });
 });
