@@ -1,11 +1,37 @@
+import { IsBoolean, IsEmail, IsNotEmpty, IsString, IsOptional } from 'class-validator';
+
 export default class AccountDto {
+    @IsNotEmpty()
+    @IsEmail()
+    @IsString()
     readonly email: string;
+
+    @IsNotEmpty()
+    @IsString()
     readonly name: string;
+
+    @IsNotEmpty()
+    @IsString()
     password: string;
+
+    @IsNotEmpty()
+    @IsString()
     readonly nickname: string;
-    readonly profile!: string;
+
+    @IsOptional()
+    @IsString()
+    readonly profile?: string;
+    
+    @IsNotEmpty()
+    @IsString()
     readonly type: string;
+
+    @IsNotEmpty()
+    @IsBoolean()
     readonly notificationOpen: boolean;
+
+    @IsNotEmpty()
+    @IsBoolean()
     readonly emailOpen: boolean;
 
     constructor(
