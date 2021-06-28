@@ -19,23 +19,26 @@ export class AuthController {
         try {
             if (!accountDto.password) {
                 throw new HttpException({
-                    success: false,
-                    message: 'ERR_INVALID_PARAM',
+                    message: 'fail',
+                    errorCode: 'ERR_INVALID_PARAM',
+                    description: '...'
                 }, HttpStatus.BAD_REQUEST);
             }
 
             await this.authService.save(accountDto);
             
             return {
-                success: true,
-                message: 'SUCCESS',
+                message: 'success',
             };
         } catch (err) {
-            console.log(err);
-
+            if (err instanceof HttpException) {
+                throw err;
+            }
+            
             throw new HttpException({
-                success: false,
-                message: 'ERR_INTERVER_SERVER',
+                message: 'fail',
+                errorCode: 'ERR_INTERVER_SERVER',
+                description: '...'
             }, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
