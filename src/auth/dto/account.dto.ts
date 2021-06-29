@@ -12,7 +12,7 @@ export default class AccountDto {
 
     @IsNotEmpty()
     @IsString()
-    password: string;
+    readonly password: string;
 
     @IsNotEmpty()
     @IsString()

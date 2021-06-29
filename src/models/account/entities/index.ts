@@ -50,6 +50,6 @@ export default class Account {
     @Column({ type: 'varbinary', length: 16, name: 'create_ip' })
     createIp: string;
 
-    @Column({ default: true })
+    @Column({ default: false })
     active: boolean;
 }
