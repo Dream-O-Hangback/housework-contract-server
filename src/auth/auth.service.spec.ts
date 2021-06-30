@@ -52,8 +52,13 @@ describe('AuthService', () => {
             };
 
             const currentDate = new Date();
+
+            const originalPassword = accountDto.password;
+            const hashedPassword = await bcrypt.hash(originalPassword, 10);
+
             const newAccount = {
                 ...accountDto,
+                "password": hashedPassword,
                 "profileImageUrl": "",
                 "notificationOpenDate": currentDate,
                 "emailOpenDate": currentDate,
@@ -64,25 +69,9 @@ describe('AuthService', () => {
             const saveAccount = jest.spyOn(accountRepository, 'save').mockResolvedValueOnce(newAccount as Account);
             const result = await authService.saveAccount(accountDto);
 
+            expect(await bcrypt.compare(originalPassword, hashedPassword)).toBe(true);
             expect(result).toBe(newAccount as Account);
             expect(saveAccount).toBeCalledTimes(1);
-        });
-
-        it('should get a encrypted password', async () => {
-            const accountDto: AccountDto = {
-                "email": "kyw017763@gmail.com",
-                "name": "A",
-                "password": "ABCDE",
-                "nickname": "A",
-                "profile": "A",
-                "type": "local",
-                "notificationOpen": true,
-                "emailOpen": true,
-            };
-            const originalPassword = accountDto.password;
-            const hashedPassword = await bcrypt.hash(originalPassword, 10);
-
-            expect(await bcrypt.compare(originalPassword, hashedPassword)).toBe(true);
         });
     });
 
