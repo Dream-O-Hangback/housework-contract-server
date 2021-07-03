@@ -25,8 +25,15 @@ export class AuthService {
   }
   async saveAccount(accountDto: AccountDto) {
     const hashedPassword = await bcrypt.hash('SeCrEtPaSsWoRd', 10);
+    const currentDate = new Date();
 
-    return this.accountRepository.save({ ...accountDto, password: hashedPassword });
+    return this.accountRepository.save({
+      ...accountDto,
+      password: hashedPassword,
+      notificationOpenDate: currentDate,
+      emailOpenDate: currentDate,
+      lastUpdateDate: currentDate
+    });
   }
   deleteAccount(id: string) {
     return this.accountRepository.delete({ id: id });
@@ -43,33 +50,18 @@ export class AuthService {
     const expireDate = new Date();
     expireDate.setDate(expireDate.getDate() + 1);
 
-    return this.certificationCodeRepository.query(`
-        INSERT INTO certification_code (
-          "account_id",
-          "email",
-          "key",
-          "expire_date"
-        )
-        VALUES (
-          $1,
-          $2,
-          $3,
-          $4
-        )
-        ON CONFLICT("email")
-          DO UPDATE
-            SET
-              "account_id" = $1,
-              "key" = $3,
-              "expire_date" = $4
-            WHERE
-              "certification_code"."email" = $2
-        RETURNING *
-    `, [
+    const duplicatedCertificationCode = await this.certificationCodeRepository.findOne({ email });
+    
+    if (duplicatedCertificationCode) {
+      duplicatedCertificationCode.key = key;
+      duplicatedCertificationCode.expireDate = expireDate;
+      return await this.certificationCodeRepository.save(duplicatedCertificationCode);
+    }
+    return this.certificationCodeRepository.save({
       accountId,
       email,
       key,
       expireDate
-    ]);
+    });
   }
 }

@@ -30,6 +30,7 @@ export class AuthController {
                 message: 'success'
             };
         } catch (err) {
+            console.log(err);
             if (err instanceof HttpException) {
                 throw err;
             }
@@ -54,15 +55,16 @@ export class AuthController {
                 }, HttpStatus.BAD_REQUEST);
             }
 
-            const { code, createdAt } = certificationCode;
+            const { key, createDate } = certificationCode;
 
-            this.mailService.sendEmailCodeEmail(new MailCodeDto(emailCodeDto.email, code, createdAt));
+            this.mailService.sendEmailCodeEmail(new MailCodeDto(emailCodeDto.email, key, createDate)).catch((err) => console.log(err));
             
             return {
                 message: 'success',
-                code
+                code: key
             };
         } catch (err) {
+            console.log(err);
             if (err instanceof HttpException) {
                 throw err;
             }

@@ -7,7 +7,7 @@ MailCodeDto from './dto/mailCode.dto';
 const mailOption = {
   to: undefined,
   subject: undefined,
-  template: undefined,
+  html: undefined,
 };
 
 @Injectable()
@@ -15,15 +15,12 @@ export class MailService {
   constructor(private readonly mailerService: MailerService) {
     this.mailerService = mailerService;
   }
-  public sendEmailCodeEmail(emailCodeDto: MailCodeDto): void {
+  public async sendEmailCodeEmail(emailCodeDto: MailCodeDto): Promise<void> {
     const { email, code } = emailCodeDto;
     mailOption.to = email;
     mailOption.subject = `[집안일 계약서] 인증코드 [${code}]를 입력해주세요!`;
-    mailOption.template = mailTemplate.emailCode(emailCodeDto);
+    mailOption.html = mailTemplate.emailCode(emailCodeDto);
 
-    this.mailerService
-      .sendMail(mailOption)
-      .then(() => {})
-      .catch(() => {});
+    return this.mailerService.sendMail(mailOption)
   }
 }

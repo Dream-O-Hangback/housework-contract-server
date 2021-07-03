@@ -557,7 +557,7 @@ export default (mailCodeDto: MailCodeDto) => {
             
                 <div style="Margin-left: 20px;Margin-right: 20px;">
         <div style="mso-line-height-rule: exactly;mso-text-raise: 11px;vertical-align: middle;">
-            <p class="size-15" style="Margin-top: 0;Margin-bottom: 20px;font-family: ubuntu,sans-serif;font-size: 15px;line-height: 23px;text-align: center;user-select: auto;" lang="x-size-15"><span class="font-ubuntu">아래의 <strong style="user-select:auto">인증번호 10자리를 입력</strong>인증을 완료해주세요.</span></p>
+            <p class="size-15" style="Margin-top: 0;Margin-bottom: 20px;font-family: ubuntu,sans-serif;font-size: 15px;line-height: 23px;text-align: center;user-select: auto;" lang="x-size-15"><span class="font-ubuntu">아래의 <strong style="user-select:auto">인증번호 10자리를 입력</strong>하고 인증을 완료해주세요.</span></p>
         </div>
         </div>
             
