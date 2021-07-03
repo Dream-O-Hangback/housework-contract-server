@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { MailerService } from '@nestjs-modules/mailer';
 import mailTemplate from '../mails/templates';
-import EmailCodeDto from './dto/emailCode.dto';
+import 
+MailCodeDto from './dto/mailCode.dto';
 
 const mailOption = {
   to: undefined,
@@ -14,7 +15,7 @@ export class MailService {
   constructor(private readonly mailerService: MailerService) {
     this.mailerService = mailerService;
   }
-  public sendEmailCodeEmail(emailCodeDto: EmailCodeDto): void {
+  public sendEmailCodeEmail(emailCodeDto: MailCodeDto): void {
     const { email, code } = emailCodeDto;
     mailOption.to = email;
     mailOption.subject = `[집안일 계약서] 인증코드 [${code}]를 입력해주세요!`;

@@ -7,12 +7,18 @@ import {
 } from '@nestjs/common';
 import AccountDto from './dto/account.dto';
 import EmailCodeDto from './dto/emailCode.dto';
+import MailCodeDto from '../mails/dto/mailCode.dto';
 import { AuthService } from './auth.service';
+import { MailService } from '../mails/mails.service';
 
 @Controller('auth')
 export class AuthController {
-    constructor(private authService: AuthService) {
+    constructor(
+        private authService: AuthService,
+        private mailService: MailService
+    ) {
         this.authService = authService;
+        this.mailService = mailService;
     }
 
     @Post('/sign-up')
@@ -48,7 +54,9 @@ export class AuthController {
                 }, HttpStatus.BAD_REQUEST);
             }
 
-            const { code } = certificationCode;
+            const { code, createdAt } = certificationCode;
+
+            this.mailService.sendEmailCodeEmail(new MailCodeDto(emailCodeDto.email, code, createdAt));
             
             return {
                 message: 'success',

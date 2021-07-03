@@ -1,6 +1,6 @@
 import { IsEmail, IsString, IsNotEmpty, IsDate } from 'class-validator';
 
-export default class EmailCodeDto {
+export default class MailCodeDto {
     @IsNotEmpty()
     @IsEmail()
     @IsString()
