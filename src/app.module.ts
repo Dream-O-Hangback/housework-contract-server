@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { MailerModule } from '@nestjs-modules/mailer';
+import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
@@ -21,6 +23,27 @@ import entities from './models';
       database: process.env.DB_DATABASE,
       entities,
       synchronize: true,
+    }),
+    MailerModule.forRoot({
+      transport: {
+        service: 'Gmail',
+        host :'smtp.gmlail.com',
+        secure: false,
+        auth: {
+          user: process.env.EMAIL,
+          pass: process.env.PASSWORD,
+        },
+      },
+      defaults: {
+        from: '"No Reply" <noreply@housework-contract.com>',
+      },
+      template: {
+        dir: `${__dirname}/mails/templates`,
+        adapter: new HandlebarsAdapter(),
+        options: {
+          strict: true,
+        },
+      },
     }),
     AuthModule,
   ],
