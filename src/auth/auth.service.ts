@@ -1,11 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm/index';
+import { MoreThan, Repository } from 'typeorm';
+import { format } from 'date-fns';
 import * as bcrypt from 'bcrypt';
 import { generateKey } from '../common/lib';
 import Account from '../models/account/entities';
 import CertificationCode from '../models/certificationCode/entities';
 import AccountDto from './dto/account.dto';
+import CodeDto from './dto/code.dto';
 
 @Injectable()
 export class AuthService {
@@ -17,7 +19,7 @@ export class AuthService {
     this.certificationCodeRepository = certificationCodeRepository;
   }
   getAccountByEmail({ email }) {
-    return this.accountRepository.findOne({ email });
+    return this.accountRepository.findOne({ email, active: true });
   }
   async createAccount(accountDto: AccountDto) {
     const hashedPassword = await bcrypt.hash('SeCrEtPaSsWoRd', 10);
@@ -31,8 +33,20 @@ export class AuthService {
       lastUpdateDate: currentDate
     });
   }
+  updateAccountActive({ id }) {
+    return this.accountRepository.update({ id }, { active: true });
+  }
   deleteAccount({ id }) {
     return this.accountRepository.delete({ id: id });
+  }
+  getCeritificationCode(codeDto: CodeDto) {
+    const { email, code } = codeDto;
+
+    return this.certificationCodeRepository.findOne({
+      email,
+      code,
+      expireDate: MoreThan(format(new Date(), 'yyyy-MM-dd kk:mm:ss'))
+    });
   }
   async upsertCertificationCode({ accountId, email }) {
     const code = generateKey();

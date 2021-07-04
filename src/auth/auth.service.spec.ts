@@ -120,4 +120,49 @@ describe('AuthService', () => {
         expect(findOneCertificationCode).toBeCalledTimes(1);
         expect(saveCertificationCode).toBeCalledTimes(1);
     });
+
+    it('should get a certification code', async () => {
+        const codeDto: CodeDto = {
+            "email": faker.internet.email(),
+            "code": faker.datatype.string(10)
+        };
+        const { email, code } = codeDto;
+
+        const expireDate = new Date();
+        expireDate.setDate(expireDate.getDate() + 1);
+
+        const certificationCode = {
+            ...codeDto,
+            accountId: faker.datatype.uuid(),
+            expireDate,
+        };
+
+        const findOneCertificationCode = jest.spyOn(certificationCodeRepository, 'findOne').mockResolvedValueOnce(certificationCode as CertificationCode);
+        const resultCertificationCode = await certificationCodeRepository.findOne({
+            where: {
+                email,
+                code,
+                expireDate: LessThan(new Date())
+            }
+        });
+
+        expect(resultCertificationCode).toBe(certificationCode as CertificationCode);
+        expect(findOneCertificationCode).toBeCalledTimes(1);
+    });
+
+    it('should update active field account', async () => {
+        const id = faker.datatype.uuid();
+
+        const account = {
+            id,
+            active: true,
+        };
+
+        const updateAccountActive = jest.spyOn(accountRepository, 'save').mockResolvedValueOnce(account as Account);
+
+        const resultAccount = await accountRepository.save(account as Account);
+
+        expect(resultAccount).toBe(account as Account);
+        expect(updateAccountActive).toBeCalledTimes(1);
+    });
 });
