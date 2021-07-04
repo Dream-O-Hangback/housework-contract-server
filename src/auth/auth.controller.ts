@@ -6,7 +6,7 @@ import {
     HttpStatus,
 } from '@nestjs/common';
 import AccountDto from './dto/account.dto';
-import EmailCodeDto from './dto/emailCode.dto';
+import EmailDto from './dto/email.dto';
 import MailCodeDto from '../mails/dto/mailCode.dto';
 import CodeDto from './dto/code.dto';
 import { AuthService } from './auth.service';
@@ -54,9 +54,9 @@ export class AuthController {
     }
 
     @Post('/email-code')
-    async sendEmailCode(@Body() emailCodeDto: EmailCodeDto): Promise<object> {
+    async sendEmailCode(@Body() emailDto: EmailDto): Promise<object> {
         try {
-            const { email } = emailCodeDto;
+            const { email } = emailDto;
 
             const account = await this.authService.getAccountByEmail({ email });
             if (!account) {
@@ -71,7 +71,7 @@ export class AuthController {
             const certificationCode = await this.authService.upsertCertificationCode({ accountId, email });
             const { code, createDate } = certificationCode;
 
-            this.mailService.sendEmailCodeEmail(new MailCodeDto(emailCodeDto.email, code, createDate)).catch((err) => console.log(err));
+            this.mailService.sendEmailCodeEmail(new MailCodeDto(emailDto.email, code, createDate)).catch((err) => console.log(err));
             
             return { message: 'success' };
         } catch (err) {
@@ -109,6 +109,33 @@ export class AuthController {
                     errorCode: 'ERR_NOT_FOUND',
                     description: '...'
                 }, HttpStatus.NOT_FOUND);
+            }
+
+            return { message: 'success' }; 
+        } catch (err) {
+            console.log(err);
+            if (err instanceof HttpException) {
+                throw err;
+            }
+            
+            throw new HttpException({
+                message: 'fail',
+                errorCode: 'ERR_INTERVER_SERVER',
+                description: '...'
+            }, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Post('/email-check')
+    async CheckEmailDuplication(@Body() emailDto: EmailDto): Promise<object> {
+        try {
+            const isDuplicated = await this.authService.getActiveAccountByEmail(emailDto);
+            if (isDuplicated) {
+                throw new HttpException({
+                    message: 'fail',
+                    errorCode: 'ERR_ALREADY_EXISTS',
+                    description: '...'
+                }, HttpStatus.BAD_REQUEST);
             }
 
             return { message: 'success' }; 

@@ -45,6 +45,19 @@ describe('AuthService', () => {
         certificationCodeRepository = moduleRef.get(getRepositoryToken(CertificationCode));
     });
 
+    it('should get active account by email', async () => {
+        const email = faker.internet.email();
+        const account = { id: faker.datatype.uuid() };
+
+        const accountRepositoryFindOneSpy = jest.spyOn(accountRepository, 'findOne').mockResolvedValueOnce(account as Account);
+        
+        const result = await authService.getActiveAccountByEmail({ email });
+        
+        expect(result).toBe(account as Account);
+        expect(accountRepositoryFindOneSpy).toBeCalledTimes(1);
+        expect(accountRepositoryFindOneSpy).toHaveBeenCalledWith({ email, active: true });
+    });
+
     it('should get account by email', async () => {
         const email = faker.internet.email();
         const account = { id: faker.datatype.uuid() };
