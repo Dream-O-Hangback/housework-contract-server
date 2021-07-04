@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MoreThan, Repository } from 'typeorm';
-import { format } from 'date-fns';
 import * as bcrypt from 'bcrypt';
 import { generateKey } from '../common/lib';
 import Account from '../models/account/entities';
@@ -18,8 +17,11 @@ export class AuthService {
     this.accountRepository = accountRepository;
     this.certificationCodeRepository = certificationCodeRepository;
   }
-  getAccountByEmail({ email }) {
+  getActiveAccountByEmail({ email }) {
     return this.accountRepository.findOne({ email, active: true });
+  }
+  getAccountByEmail({ email }) {
+    return this.accountRepository.findOne({ email });
   }
   async createAccount(accountDto: AccountDto) {
     const hashedPassword = await bcrypt.hash('SeCrEtPaSsWoRd', 10);
@@ -45,7 +47,7 @@ export class AuthService {
     return this.certificationCodeRepository.findOne({
       email,
       code,
-      expireDate: MoreThan(format(new Date(), 'yyyy-MM-dd kk:mm:ss'))
+      expireDate: MoreThan(new Date())
     });
   }
   async upsertCertificationCode({ accountId, email }) {

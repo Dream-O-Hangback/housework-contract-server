@@ -27,8 +27,8 @@ export class AuthController {
         try {
             const { email } = accountDto;
 
-            await this.authService.getAccountByEmail({ email });
-            if (email) {
+            const account = await this.authService.getActiveAccountByEmail({ email });
+            if (account) {
                 throw new HttpException({
                     message: 'fail',
                     errorCode: 'ERR_ALREADY_EXISTS',

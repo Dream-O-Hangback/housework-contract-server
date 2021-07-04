@@ -6,9 +6,12 @@ export default class CertificationCode {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
-    @ManyToOne(type => Account, account => account.id)
-    @JoinColumn({ name: 'account_id' })
+    @Column({ name: 'account_id', nullable: true })
     accountId: string;
+
+    @ManyToOne(type => Account)
+    @JoinColumn()
+    account: Account;
 
     @Column({ type: 'varchar', length: 255 })
     email: string;
