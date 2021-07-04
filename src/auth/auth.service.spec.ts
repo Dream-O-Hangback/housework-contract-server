@@ -1,7 +1,7 @@
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { LessThan, Repository } from 'typeorm';
-import faker from 'faker';
+import { Repository } from 'typeorm';
+import * as faker from 'faker';
 import * as bcrypt from 'bcrypt';
 import { generateKey } from '../common/lib';
 import { AuthService } from './auth.service';
@@ -16,6 +16,7 @@ const mockRepository = () => ({
     find: jest.fn(),
     findOne: jest.fn(),
     save: jest.fn(),
+    update: jest.fn(),
     delete: jest.fn(),
     query: jest.fn(),
 });
@@ -104,18 +105,8 @@ describe('AuthService', () => {
         const findOneCertificationCode = jest.spyOn(certificationCodeRepository, 'findOne').mockResolvedValueOnce(null);
         const saveCertificationCode = jest.spyOn(certificationCodeRepository, 'save').mockResolvedValueOnce(newCertificationCode);
 
-        const duplicatedCertificationCode = await certificationCodeRepository.findOne({ email });
+        const resultCertificationCode = await authService.upsertCertificationCode({ accountId, email });
 
-        let resultCertificationCode = undefined;
-        if (duplicatedCertificationCode) {
-            duplicatedCertificationCode.code = code;
-            duplicatedCertificationCode.expireDate = expireDate;
-            resultCertificationCode = await certificationCodeRepository.save(duplicatedCertificationCode);
-        } else {
-            resultCertificationCode = await certificationCodeRepository.save(newCertificationCode);
-        }
-
-        expect(findOneCertificationCode).toBe(null);
         expect(resultCertificationCode).toBe(newCertificationCode as CertificationCode);
         expect(findOneCertificationCode).toBeCalledTimes(1);
         expect(saveCertificationCode).toBeCalledTimes(1);
@@ -138,13 +129,11 @@ describe('AuthService', () => {
         };
 
         const findOneCertificationCode = jest.spyOn(certificationCodeRepository, 'findOne').mockResolvedValueOnce(certificationCode as CertificationCode);
-        const resultCertificationCode = await certificationCodeRepository.findOne({
-            where: {
-                email,
-                code,
-                expireDate: LessThan(new Date())
-            }
-        });
+
+        const resultCertificationCode = await authService.getCeritificationCode({
+            email,
+            code
+        } as CodeDto);
 
         expect(resultCertificationCode).toBe(certificationCode as CertificationCode);
         expect(findOneCertificationCode).toBeCalledTimes(1);
@@ -158,11 +147,10 @@ describe('AuthService', () => {
             active: true,
         };
 
-        const updateAccountActive = jest.spyOn(accountRepository, 'save').mockResolvedValueOnce(account as Account);
+        const updateAccountActive = jest.spyOn(accountRepository, 'update').mockResolvedValueOnce(account as Account);
 
-        const resultAccount = await accountRepository.save(account as Account);
+        await authService.updateAccountActive({ id });
 
-        expect(resultAccount).toBe(account as Account);
         expect(updateAccountActive).toBeCalledTimes(1);
     });
 });
