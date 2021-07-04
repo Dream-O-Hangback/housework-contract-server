@@ -24,7 +24,7 @@ export class AuthService {
     return this.accountRepository.findOne({ email });
   }
   async createAccount(accountDto: AccountDto) {
-    const hashedPassword = await bcrypt.hash('SeCrEtPaSsWoRd', 10);
+    const hashedPassword = await bcrypt.hash(accountDto.password, 10);
     const currentDate = new Date();
 
     return this.accountRepository.save({

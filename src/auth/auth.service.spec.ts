@@ -1,8 +1,9 @@
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import * as faker from 'faker';
+import { MoreThan, Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
+import * as faker from 'faker';
+import MockDate from 'mockdate';
 import { generateKey } from '../common/lib';
 import { AuthService } from './auth.service';
 import Account from '../models/account/entities';
@@ -26,6 +27,10 @@ describe('AuthService', () => {
     let accountRepository: MockRepository<Account>;
     let certificationCodeRepository: MockRepository<CertificationCode>;
 
+    beforeAll(() => MockDate.set('2021-01-01'));
+
+    afterAll(() => MockDate.reset());
+
     beforeEach(async () => {
         const moduleRef = await Test.createTestingModule({
             providers: [
@@ -44,12 +49,13 @@ describe('AuthService', () => {
         const email = faker.internet.email();
         const account = { id: faker.datatype.uuid() };
 
-        const findOneAccount = jest.spyOn(accountRepository, 'findOne').mockResolvedValueOnce(account as Account);
+        const accountRepositoryFindOneSpy = jest.spyOn(accountRepository, 'findOne').mockResolvedValueOnce(account as Account);
         
         const result = await authService.getAccountByEmail({ email });
         
         expect(result).toBe(account as Account);
-        expect(findOneAccount).toBeCalledTimes(1);
+        expect(accountRepositoryFindOneSpy).toBeCalledTimes(1);
+        expect(accountRepositoryFindOneSpy).toHaveBeenCalledWith({ email });
     });
 
     it('should create a new account', async () => {
@@ -65,26 +71,26 @@ describe('AuthService', () => {
         };
 
         const currentDate = new Date();
-
         const originalPassword = accountDto.password;
         const hashedPassword = await bcrypt.hash(originalPassword, 10);
 
         const newAccount = {
             ...accountDto,
             "password": hashedPassword,
-            "profileImageUrl": "",
             "notificationOpenDate": currentDate,
             "emailOpenDate": currentDate,
             "lastUpdateDate": currentDate,
-            "createDate": currentDate,
         }
 
-        const saveAccount = jest.spyOn(accountRepository, 'save').mockResolvedValueOnce(newAccount as Account);
+        const accountRepositorySaveSpy = jest.spyOn(accountRepository, 'save').mockResolvedValueOnce(newAccount as Account);
         const result = await authService.createAccount(accountDto);
 
         expect(await bcrypt.compare(originalPassword, hashedPassword)).toBe(true);
         expect(result).toBe(newAccount as Account);
-        expect(saveAccount).toBeCalledTimes(1);
+        expect(accountRepositorySaveSpy).toBeCalledTimes(1);
+
+        delete newAccount.password;
+        expect(accountRepositorySaveSpy).toHaveBeenCalledWith(expect.objectContaining(newAccount));
     });
 
     it('should create(upsert) a certification code', async () => {
@@ -102,14 +108,22 @@ describe('AuthService', () => {
             expireDate,
         };
 
-        const findOneCertificationCode = jest.spyOn(certificationCodeRepository, 'findOne').mockResolvedValueOnce(null);
-        const saveCertificationCode = jest.spyOn(certificationCodeRepository, 'save').mockResolvedValueOnce(newCertificationCode);
+        const certificationCodeRepositoryFindOneSpy = jest.spyOn(certificationCodeRepository, 'findOne').mockResolvedValueOnce(null);
+        const certificationCodeRepositorySaveSpy = jest.spyOn(certificationCodeRepository, 'save').mockResolvedValueOnce(newCertificationCode);
 
         const resultCertificationCode = await authService.upsertCertificationCode({ accountId, email });
 
         expect(resultCertificationCode).toBe(newCertificationCode as CertificationCode);
-        expect(findOneCertificationCode).toBeCalledTimes(1);
-        expect(saveCertificationCode).toBeCalledTimes(1);
+        expect(certificationCodeRepositoryFindOneSpy).toBeCalledTimes(1);
+        expect(certificationCodeRepositoryFindOneSpy).toHaveBeenCalledWith({ email });
+        expect(certificationCodeRepositorySaveSpy).toBeCalledTimes(1);
+        expect(certificationCodeRepositorySaveSpy).toHaveBeenCalledWith(
+            expect.objectContaining({
+                accountId,
+                email,
+                expireDate
+            })
+        );
     });
 
     it('should get a certification code', async () => {
@@ -128,7 +142,7 @@ describe('AuthService', () => {
             expireDate,
         };
 
-        const findOneCertificationCode = jest.spyOn(certificationCodeRepository, 'findOne').mockResolvedValueOnce(certificationCode as CertificationCode);
+        const certificationCodeRepositoryFindOneSpy = jest.spyOn(certificationCodeRepository, 'findOne').mockResolvedValueOnce(certificationCode as CertificationCode);
 
         const resultCertificationCode = await authService.getCeritificationCode({
             email,
@@ -136,7 +150,12 @@ describe('AuthService', () => {
         } as CodeDto);
 
         expect(resultCertificationCode).toBe(certificationCode as CertificationCode);
-        expect(findOneCertificationCode).toBeCalledTimes(1);
+        expect(certificationCodeRepositoryFindOneSpy).toBeCalledTimes(1);
+        expect(certificationCodeRepositoryFindOneSpy).toHaveBeenCalledWith({
+            email,
+            code,
+            expireDate: MoreThan(new Date())
+        });
     });
 
     it('should update active field account', async () => {
@@ -147,10 +166,11 @@ describe('AuthService', () => {
             active: true,
         };
 
-        const updateAccountActive = jest.spyOn(accountRepository, 'update').mockResolvedValueOnce(account as Account);
+        const accountRepositoryUpdateSpy = jest.spyOn(accountRepository, 'update').mockResolvedValueOnce(account as Account);
 
         await authService.updateAccountActive({ id });
 
-        expect(updateAccountActive).toBeCalledTimes(1);
+        expect(accountRepositoryUpdateSpy).toBeCalledTimes(1);
+        expect(accountRepositoryUpdateSpy).toHaveBeenCalledWith({ id }, { active: true });
     });
 });
