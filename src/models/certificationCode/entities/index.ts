@@ -14,7 +14,7 @@ export default class CertificationCode {
     email: string;
 
     @Column({ type: 'varchar', length: 50 })
-    key: string;
+    code: string;
 
     @Column({ name: 'expire_date' })
     expireDate: Date;

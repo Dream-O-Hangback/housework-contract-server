@@ -24,11 +24,20 @@ export class AuthController {
     @Post('/sign-up')
     async signUp(@Body() accountDto: AccountDto): Promise<object> {
         try {
-            await this.authService.saveAccount(accountDto);
+            const { email } = accountDto;
+
+            await this.authService.getAccountByEmail({ email });
+            if (email) {
+                throw new HttpException({
+                    message: 'fail',
+                    errorCode: 'ERR_ALREADY_EXISTS',
+                    description: '...'
+                }, HttpStatus.BAD_REQUEST);
+            }
+
+            await this.authService.createAccount(accountDto);
             
-            return {
-                message: 'success'
-            };
+            return { message: 'success' };
         } catch (err) {
             console.log(err);
             if (err instanceof HttpException) {
@@ -46,23 +55,24 @@ export class AuthController {
     @Post('/email-code')
     async sendEmailCode(@Body() emailCodeDto: EmailCodeDto): Promise<object> {
         try {
-            const certificationCode = await this.authService.upsertCertificationCode(emailCodeDto);
-            if (!certificationCode) {
+            const { email } = emailCodeDto;
+
+            const account = await this.authService.getAccountByEmail({ email });
+            if (!account) {
                 throw new HttpException({
                     message: 'fail',
-                    errorCode: 'ERR_DOES_NOT_EXIST',
+                    errorCode: 'ERR_NOT_FOUND',
                     description: '...'
-                }, HttpStatus.BAD_REQUEST);
+                }, HttpStatus.NOT_FOUND);
             }
 
-            const { key, createDate } = certificationCode;
+            const { id: accountId } = account;
+            const certificationCode = await this.authService.upsertCertificationCode({ accountId, email });
+            const { code, createDate } = certificationCode;
 
-            this.mailService.sendEmailCodeEmail(new MailCodeDto(emailCodeDto.email, key, createDate)).catch((err) => console.log(err));
+            this.mailService.sendEmailCodeEmail(new MailCodeDto(emailCodeDto.email, code, createDate)).catch((err) => console.log(err));
             
-            return {
-                message: 'success',
-                code: key
-            };
+            return { message: 'success' };
         } catch (err) {
             console.log(err);
             if (err instanceof HttpException) {
