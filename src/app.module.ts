@@ -5,6 +5,7 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
+import { AccountModule } from './models/account/account.module';
 import entities from './models';
 
 @Module({
@@ -21,7 +22,7 @@ import entities from './models';
       password: process.env.DB_PASSWORD,
       database: process.env.DB_DATABASE,
       entities,
-      synchronize: true,
+      synchronize: false,
     }),
     MailerModule.forRoot({
       transport: {
@@ -38,6 +39,7 @@ import entities from './models';
       },
     }),
     AuthModule,
+    AccountModule,
   ],
   controllers: [AppController],
   providers: [AppService],
