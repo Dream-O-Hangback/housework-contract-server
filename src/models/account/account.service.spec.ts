@@ -43,10 +43,10 @@ describe('AccountService', () => {
 
         const accountRepositoryFindOneSpy = jest.spyOn(accountRepository, 'findOne').mockResolvedValueOnce(account as Account);
         
-        const result = await accountService.getActiveAccountByNickname({ nickname });
+        const result = await accountService.getAccountByNickname({ nickname });
         
         expect(result).toBe(account as Account);
         expect(accountRepositoryFindOneSpy).toBeCalledTimes(1);
-        expect(accountRepositoryFindOneSpy).toHaveBeenCalledWith({ nickname, active: true });
+        expect(accountRepositoryFindOneSpy).toHaveBeenCalledWith({ nickname });
     });
 });

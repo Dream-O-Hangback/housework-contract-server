@@ -126,16 +126,16 @@ export class AuthController {
         }
     }
 
-    @Post('/email-check')
+    @Post('/email/exists')
     async CheckEmailDuplication(@Body() emailDto: EmailDto): Promise<object> {
         try {
-            const isDuplicated = await this.authService.getActiveAccountByEmail(emailDto);
+            const isDuplicated = !!(await this.authService.getAccountByEmail(emailDto));
             if (isDuplicated) {
                 throw new HttpException({
                     message: 'fail',
                     errorCode: 'ERR_ALREADY_EXISTS',
                     description: '...'
-                }, HttpStatus.BAD_REQUEST);
+                }, HttpStatus.CONFLICT);
             }
 
             return { message: 'success' }; 

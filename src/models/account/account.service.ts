@@ -10,7 +10,7 @@ export class AccountService {
   ) {
     this.accountRepository = accountRepository;
   }
-  getActiveAccountByNickname({ nickname }) {
-    return this.accountRepository.findOne({ nickname, active: true });
+  getAccountByNickname({ nickname }) {
+    return this.accountRepository.findOne({ nickname });
   }
 }

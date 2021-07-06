@@ -16,16 +16,16 @@ export class AccountController {
         this.accountService = accountService;
     }
 
-    @Post('/nickname-check')
+    @Post('/nickname/exists')
     async CheckNicknameDuplication(@Body() nicknameDto: NicknameDto): Promise<object> {
         try {
-            const isDuplicated = await this.accountService.getActiveAccountByNickname(nicknameDto);
+            const isDuplicated = !!(await this.accountService.getAccountByNickname(nicknameDto));
             if (isDuplicated) {
                 throw new HttpException({
                     message: 'fail',
                     errorCode: 'ERR_ALREADY_EXISTS',
                     description: '...'
-                }, HttpStatus.BAD_REQUEST);
+                }, HttpStatus.CONFLICT);
             }
 
             return { message: 'success' }; 
