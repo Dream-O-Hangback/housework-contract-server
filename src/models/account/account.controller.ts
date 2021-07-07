@@ -21,7 +21,7 @@ export class AccountController {
         try {
             const { nickname } = nicknameData;
 
-            const isDuplicated = !!(await this.accountService.getAccountByNickname({ nickname }));
+            const isDuplicated = !!(await this.accountService.getItemByNickname({ nickname }));
             if (isDuplicated) {
                 throw new HttpException({
                     message: 'fail',

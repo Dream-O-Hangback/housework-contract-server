@@ -8,16 +8,22 @@ import {
 import AccountDto from './dto/account.dto';
 import EmailDto from './dto/email.dto';
 import CodeDto from './dto/code.dto';
-import { AuthService } from './auth.service';
+import { AccountService } from '../models/account/account.service';
+import { CertificationCodeService } from '../models/certificationCode/certificationCode.service';
+import { RefreshTokenService } from '../models/refreshToken/refreshToken.service';
 import { MailService } from '../mails/mails.service';
 
 @Controller('auth')
 export class AuthController {
     constructor(
-        private authService: AuthService,
+        private accountService: AccountService,
+        private certificationCodeService: CertificationCodeService,
+        private refreshTokenService: RefreshTokenService,
         private mailService: MailService
     ) {
-        this.authService = authService;
+        this.accountService = accountService;
+        this.certificationCodeService = certificationCodeService;
+        this.refreshTokenService = refreshTokenService;
         this.mailService = mailService;
     }
 
@@ -26,7 +32,7 @@ export class AuthController {
         try {
             const { email } = accountData;
 
-            const account = await this.authService.getActiveAccountByEmail({ email });
+            const account = await this.accountService.getActiveItemByEmail({ email });
             if (account) {
                 throw new HttpException({
                     message: 'fail',
@@ -35,7 +41,7 @@ export class AuthController {
                 }, HttpStatus.BAD_REQUEST);
             }
 
-            await this.authService.createAccount(accountData);
+            await this.accountService.createItem(accountData);
             
             return { message: 'success' };
         } catch (err) {
@@ -57,7 +63,7 @@ export class AuthController {
         try {
             const { email } = emailData;
 
-            const account = await this.authService.getAccountByEmail({ email });
+            const account = await this.accountService.getItemByEmail({ email });
             if (!account) {
                 throw new HttpException({
                     message: 'fail',
@@ -67,7 +73,7 @@ export class AuthController {
             }
 
             const { id: accountId } = account;
-            const certificationCode = await this.authService.upsertCertificationCode({ accountId, email });
+            const certificationCode = await this.certificationCodeService.upsertItem({ accountId, email });
             const { code, createDate } = certificationCode;
 
             this.mailService.sendEmailCodeEmail({ email: emailData.email, code, generateDate: createDate }).catch((err) => console.log(err));
@@ -90,7 +96,7 @@ export class AuthController {
     @Post('/email-verify')
     async verifyEmailCode(@Body() codeDto: CodeDto): Promise<object> {
         try {
-            const certificationCode = await this.authService.getCeritificationCode(codeDto);
+            const certificationCode = await this.certificationCodeService.getItem(codeDto);
             if (!certificationCode) {
                 throw new HttpException({
                     message: 'fail',
@@ -101,7 +107,7 @@ export class AuthController {
 
             const { accountId } = certificationCode;
 
-            const account = await this.authService.updateAccountActive({ id: accountId });
+            const account = await this.accountService.updateItemActive({ id: accountId });
             if (account.affected === 0) {
                 throw new HttpException({
                     message: 'fail',
@@ -128,7 +134,7 @@ export class AuthController {
     @Post('/email/exists')
     async CheckEmailDuplication(@Body() emailDto: EmailDto): Promise<object> {
         try {
-            const isDuplicated = !!(await this.authService.getAccountByEmail(emailDto));
+            const isDuplicated = !!(await this.accountService.getItemByEmail(emailDto));
             if (isDuplicated) {
                 throw new HttpException({
                     message: 'fail',
