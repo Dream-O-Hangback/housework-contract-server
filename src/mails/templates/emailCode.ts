@@ -1,6 +1,4 @@
-import MailCodeDto from '../dto/mailCode.dto';
-
-export default (mailCodeDto: MailCodeDto) => {
+export default ({ code, generateDate }) => {
     return `
     <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional //EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><!--[if IE]><html xmlns="http://www.w3.org/1999/xhtml" class="ie"><![endif]--><!--[if !IE]><!--><html style="margin: 0;padding: 0;" xmlns="http://www.w3.org/1999/xhtml"><!--<![endif]--><head>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -577,7 +575,7 @@ export default (mailCodeDto: MailCodeDto) => {
             
                 <div style="Margin-left: 20px;Margin-right: 20px;">
         <div style="mso-line-height-rule: exactly;mso-text-raise: 11px;vertical-align: middle;">
-            <p class="size-30" style="Margin-top: 0;Margin-bottom: 20px;font-family: ubuntu,sans-serif;font-size: 26px;line-height: 34px;text-align: center;user-select: auto;" lang="x-size-30"><span class="font-ubuntu"><span style="color:#16cbfa"><strong style="user-select:auto">${mailCodeDto.code}</strong></span></span></p>
+            <p class="size-30" style="Margin-top: 0;Margin-bottom: 20px;font-family: ubuntu,sans-serif;font-size: 26px;line-height: 34px;text-align: center;user-select: auto;" lang="x-size-30"><span class="font-ubuntu"><span style="color:#16cbfa"><strong style="user-select:auto">${code}</strong></span></span></p>
         </div>
         </div>
             
@@ -591,7 +589,7 @@ export default (mailCodeDto: MailCodeDto) => {
             
                 <div style="Margin-left: 20px;Margin-right: 20px;">
         <div style="mso-line-height-rule: exactly;mso-text-raise: 11px;vertical-align: middle;">
-            <p class="size-13" style="Margin-top: 0;Margin-bottom: 0;font-family: ubuntu,sans-serif;font-size: 13px;line-height: 21px;text-align: left;user-select: auto;" lang="x-size-13"><span class="font-ubuntu"><span style="color:rgb(143, 143, 143); user-select:auto">&#8226; ${mailCodeDto.generatedAt.toISOString().substr(0, 10).replace(/-/, '.')} ${mailCodeDto.generatedAt.toTimeString()} 기준</span></span></p><p class="size-13" style="Margin-top: 20px;Margin-bottom: 20px;font-family: ubuntu,sans-serif;font-size: 13px;line-height: 21px;text-align: left;user-select: auto;" lang="x-size-13"><span class="font-ubuntu"><span style="color:rgb(143, 143, 143); user-select:auto">&#8226; </span><span style="color:rgb(143, 143, 143); user-select:auto">인증번호는 <strong style="user-select:auto">이메일 발송 시점으로부터 하루동안 유효</strong>합니다.</span></span></p>
+            <p class="size-13" style="Margin-top: 0;Margin-bottom: 0;font-family: ubuntu,sans-serif;font-size: 13px;line-height: 21px;text-align: left;user-select: auto;" lang="x-size-13"><span class="font-ubuntu"><span style="color:rgb(143, 143, 143); user-select:auto">&#8226; ${generateDate.toISOString().substr(0, 10).replace(/-/, '.')} ${generateDate.toTimeString()} 기준</span></span></p><p class="size-13" style="Margin-top: 20px;Margin-bottom: 20px;font-family: ubuntu,sans-serif;font-size: 13px;line-height: 21px;text-align: left;user-select: auto;" lang="x-size-13"><span class="font-ubuntu"><span style="color:rgb(143, 143, 143); user-select:auto">&#8226; </span><span style="color:rgb(143, 143, 143); user-select:auto">인증번호는 <strong style="user-select:auto">이메일 발송 시점으로부터 하루동안 유효</strong>합니다.</span></span></p>
         </div>
         </div>
             

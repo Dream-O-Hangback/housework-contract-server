@@ -7,7 +7,6 @@ import {
 } from '@nestjs/common';
 import AccountDto from './dto/account.dto';
 import EmailDto from './dto/email.dto';
-import MailCodeDto from '../mails/dto/mailCode.dto';
 import CodeDto from './dto/code.dto';
 import { AuthService } from './auth.service';
 import { MailService } from '../mails/mails.service';
@@ -23,9 +22,9 @@ export class AuthController {
     }
 
     @Post('/sign-up')
-    async signUp(@Body() accountDto: AccountDto): Promise<object> {
+    async signUp(@Body() accountData: AccountDto): Promise<object> {
         try {
-            const { email } = accountDto;
+            const { email } = accountData;
 
             const account = await this.authService.getActiveAccountByEmail({ email });
             if (account) {
@@ -36,7 +35,7 @@ export class AuthController {
                 }, HttpStatus.BAD_REQUEST);
             }
 
-            await this.authService.createAccount(accountDto);
+            await this.authService.createAccount(accountData);
             
             return { message: 'success' };
         } catch (err) {
@@ -54,9 +53,9 @@ export class AuthController {
     }
 
     @Post('/email-code')
-    async sendEmailCode(@Body() emailDto: EmailDto): Promise<object> {
+    async sendEmailCode(@Body() emailData: EmailDto): Promise<object> {
         try {
-            const { email } = emailDto;
+            const { email } = emailData;
 
             const account = await this.authService.getAccountByEmail({ email });
             if (!account) {
@@ -71,7 +70,7 @@ export class AuthController {
             const certificationCode = await this.authService.upsertCertificationCode({ accountId, email });
             const { code, createDate } = certificationCode;
 
-            this.mailService.sendEmailCodeEmail(new MailCodeDto(emailDto.email, code, createDate)).catch((err) => console.log(err));
+            this.mailService.sendEmailCodeEmail({ email: emailData.email, code, generateDate: createDate }).catch((err) => console.log(err));
             
             return { message: 'success' };
         } catch (err) {

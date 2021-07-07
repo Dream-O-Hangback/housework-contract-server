@@ -72,7 +72,7 @@ describe('AuthService', () => {
     });
 
     it('should create a new account', async () => {
-        const accountDto: AccountDto = {
+        const accountData: AccountDto = {
             "email": faker.internet.email(),
             "name": `${faker.name.firstName()} ${faker.name.lastName()}`,
             "password": faker.datatype.string(),
@@ -84,11 +84,11 @@ describe('AuthService', () => {
         };
 
         const currentDate = new Date();
-        const originalPassword = accountDto.password;
+        const originalPassword = accountData.password;
         const hashedPassword = await bcrypt.hash(originalPassword, 10);
 
         const newAccount = {
-            ...accountDto,
+            ...accountData,
             "password": hashedPassword,
             "notificationOpenDate": currentDate,
             "emailOpenDate": currentDate,
@@ -96,7 +96,7 @@ describe('AuthService', () => {
         }
 
         const accountRepositorySaveSpy = jest.spyOn(accountRepository, 'save').mockResolvedValueOnce(newAccount as Account);
-        const result = await authService.createAccount(accountDto);
+        const result = await authService.createAccount(accountData);
 
         expect(await bcrypt.compare(originalPassword, hashedPassword)).toBe(true);
         expect(result).toBe(newAccount as Account);
@@ -140,17 +140,17 @@ describe('AuthService', () => {
     });
 
     it('should get a certification code', async () => {
-        const codeDto: CodeDto = {
+        const codeData: CodeDto = {
             "email": faker.internet.email(),
             "code": faker.datatype.string(10)
         };
-        const { email, code } = codeDto;
+        const { email, code } = codeData;
 
         const expireDate = new Date();
         expireDate.setDate(expireDate.getDate() + 1);
 
         const certificationCode = {
-            ...codeDto,
+            ...codeData,
             accountId: faker.datatype.uuid(),
             expireDate,
         };
