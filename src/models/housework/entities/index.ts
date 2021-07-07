@@ -22,6 +22,9 @@ export default class Housework {
     @Column({ type: 'int' })
     frequency: string;
 
+    @Column({ name: 'expire_date' })
+    expireDate: Date;
+
     @CreateDateColumn({ name: 'create_date' })
     createDate: Date;
 

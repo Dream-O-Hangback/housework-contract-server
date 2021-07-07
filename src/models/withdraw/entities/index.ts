@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, UpdateDateColumn, PrimaryGeneratedColumn, Entity } from 'typeorm';
+import { Column, PrimaryGeneratedColumn, Entity } from 'typeorm';
 
 @Entity('withdraw')
 export default class Withdraw {
@@ -38,13 +38,13 @@ export default class Withdraw {
     @Column({ name: 'email_open_date' })
     emailOpenDate: Date;
 
-    @UpdateDateColumn({ name: 'last_update_date' })
+    @Column({ name: 'last_update_date' })
     lastUpdateDate: Date;
 
     @Column({ type: 'varbinary', length: 16, name: 'last_update_ip' })
     lastUpdateIp: string;
 
-    @CreateDateColumn({ name: 'create_date' })
+    @Column({ name: 'create_date' })
     createDate: Date;
 
     @Column({ type: 'varbinary', length: 16, name: 'create_ip' })
