@@ -5,17 +5,17 @@ import { AuthService } from './auth.service';
 import { MailService } from '../mails/mails.service';
 import { AccountService } from 'src/models/account/account.service';
 import { CertificationCodeService } from 'src/models/certificationCode/certificationCode.service';
-import { RefreshTokenService } from 'src/models/refreshToken/refreshToken.service';
+// import { RefreshTokenService } from 'src/models/refreshToken/refreshToken.service';
 import Account from '../models/account/entities';
 import CertificationCode from '../models/certificationCode/entities';
-import RefreshToken from 'src/models/refreshToken/entities';
+// import RefreshToken from 'src/models/refreshToken/entities';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([
       Account,
       CertificationCode,
-      RefreshToken,
+      // RefreshToken,
     ],
   )],
   controllers: [AuthController],
@@ -24,7 +24,7 @@ import RefreshToken from 'src/models/refreshToken/entities';
     MailService,
     AccountService,
     CertificationCodeService,
-    RefreshTokenService,
+    // RefreshTokenService,
   ],
 })
 export class AuthModule {}

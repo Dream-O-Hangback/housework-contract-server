@@ -43,7 +43,7 @@ describe('AccountService', () => {
 
         const accountRepositoryFindOneSpy = jest.spyOn(accountRepository, 'findOne').mockResolvedValueOnce(account as Account);
         
-        const result = await accountService.getAccountByNickname({ nickname });
+        const result = await accountService.getItemByNickname({ nickname });
         
         expect(result).toBe(account as Account);
         expect(accountRepositoryFindOneSpy).toBeCalledTimes(1);

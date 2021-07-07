@@ -4,8 +4,11 @@ import { MoreThan, Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import * as faker from 'faker';
 import MockDate from 'mockdate';
-import { generateKey } from '../common/lib';
+import { keyGenerator } from '../common/lib';
 import { AuthService } from './auth.service';
+import { AccountService } from 'src/models/account/account.service';
+import { CertificationCodeService } from 'src/models/certificationCode/certificationCode.service';
+import { RefreshTokenService } from 'src/models/refreshToken/refreshToken.service';
 import Account from '../models/account/entities';
 import CertificationCode from '../models/certificationCode/entities';
 import AccountDto from './dto/account.dto';
@@ -24,6 +27,9 @@ const mockRepository = () => ({
 
 describe('AuthService', () => {
     let authService: AuthService;
+    let accountService: AccountService;
+    let certificationCodeService: CertificationCodeService;
+    let refreshTokenService: RefreshTokenService;
     let accountRepository: MockRepository<Account>;
     let certificationCodeRepository: MockRepository<CertificationCode>;
 
@@ -51,7 +57,7 @@ describe('AuthService', () => {
 
         const accountRepositoryFindOneSpy = jest.spyOn(accountRepository, 'findOne').mockResolvedValueOnce(account as Account);
         
-        const result = await authService.getActiveAccountByEmail({ email });
+        const result = await accountService.getActiveItemByEmail({ email });
         
         expect(result).toBe(account as Account);
         expect(accountRepositoryFindOneSpy).toBeCalledTimes(1);
@@ -64,7 +70,7 @@ describe('AuthService', () => {
 
         const accountRepositoryFindOneSpy = jest.spyOn(accountRepository, 'findOne').mockResolvedValueOnce(account as Account);
         
-        const result = await authService.getAccountByEmail({ email });
+        const result = await accountService.getItemByEmail({ email });
         
         expect(result).toBe(account as Account);
         expect(accountRepositoryFindOneSpy).toBeCalledTimes(1);
@@ -96,7 +102,7 @@ describe('AuthService', () => {
         }
 
         const accountRepositorySaveSpy = jest.spyOn(accountRepository, 'save').mockResolvedValueOnce(newAccount as Account);
-        const result = await authService.createAccount(accountData);
+        const result = await accountService.createItem(accountData);
 
         expect(await bcrypt.compare(originalPassword, hashedPassword)).toBe(true);
         expect(result).toBe(newAccount as Account);
@@ -110,7 +116,7 @@ describe('AuthService', () => {
         const accountId = faker.datatype.uuid();
         const email = faker.internet.email();
 
-        const code = generateKey();
+        const code = keyGenerator();
         const expireDate = new Date();
         expireDate.setDate(expireDate.getDate() + 1);
 
@@ -124,7 +130,7 @@ describe('AuthService', () => {
         const certificationCodeRepositoryFindOneSpy = jest.spyOn(certificationCodeRepository, 'findOne').mockResolvedValueOnce(null);
         const certificationCodeRepositorySaveSpy = jest.spyOn(certificationCodeRepository, 'save').mockResolvedValueOnce(newCertificationCode);
 
-        const resultCertificationCode = await authService.upsertCertificationCode({ accountId, email });
+        const resultCertificationCode = await certificationCodeService.upsertItem({ accountId, email });
 
         expect(resultCertificationCode).toBe(newCertificationCode as CertificationCode);
         expect(certificationCodeRepositoryFindOneSpy).toBeCalledTimes(1);
@@ -157,7 +163,7 @@ describe('AuthService', () => {
 
         const certificationCodeRepositoryFindOneSpy = jest.spyOn(certificationCodeRepository, 'findOne').mockResolvedValueOnce(certificationCode as CertificationCode);
 
-        const resultCertificationCode = await authService.getCeritificationCode({
+        const resultCertificationCode = await certificationCodeService.getItem({
             email,
             code
         } as CodeDto);
@@ -181,7 +187,7 @@ describe('AuthService', () => {
 
         const accountRepositoryUpdateSpy = jest.spyOn(accountRepository, 'update').mockResolvedValueOnce(account as Account);
 
-        await authService.updateAccountActive({ id });
+        await accountService.updateItemActive({ id });
 
         expect(accountRepositoryUpdateSpy).toBeCalledTimes(1);
         expect(accountRepositoryUpdateSpy).toHaveBeenCalledWith({ id }, { active: true });

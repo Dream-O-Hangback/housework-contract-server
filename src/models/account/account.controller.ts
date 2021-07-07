@@ -5,6 +5,8 @@ import {
     HttpException,
     HttpStatus,
 } from '@nestjs/common';
+import successMessageGenerator from '../../common/lib/successMessageGenerator';
+import failMessage from '../../common/constants/failMessage';
 import { AccountService } from './account.service';
 import NicknameDto from './dto/nickname.dto';
 
@@ -23,25 +25,17 @@ export class AccountController {
 
             const isDuplicated = !!(await this.accountService.getItemByNickname({ nickname }));
             if (isDuplicated) {
-                throw new HttpException({
-                    message: 'fail',
-                    errorCode: 'ERR_ALREADY_EXISTS',
-                    description: '...'
-                }, HttpStatus.CONFLICT);
+                throw new HttpException(failMessage.ERR_ALREADY_EXISTS, HttpStatus.CONFLICT);
             }
 
-            return { message: 'success' }; 
+            return successMessageGenerator(); 
         } catch (err) {
             console.log(err);
             if (err instanceof HttpException) {
                 throw err;
             }
             
-            throw new HttpException({
-                message: 'fail',
-                errorCode: 'ERR_INTERVER_SERVER',
-                description: '...'
-            }, HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }

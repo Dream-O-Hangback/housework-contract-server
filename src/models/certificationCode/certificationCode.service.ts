@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MoreThan, Repository } from 'typeorm';
-import { generateKey } from '../../common/lib';
+import { keyGenerator } from '../../common/lib';
 import CertificationCode from './entities';
 
 @Injectable()
@@ -19,7 +19,7 @@ export class CertificationCodeService {
     });
   }
   async upsertItem({ accountId, email }) {
-    const code = generateKey();
+    const code = keyGenerator();
     const expireDate = new Date();
     expireDate.setDate(expireDate.getDate() + 1);
 

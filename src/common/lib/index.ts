@@ -1,5 +1,5 @@
-import generateKey from "./generateKey";
+import keyGenerator from "./keyGenerator";
 
 export {
-    generateKey,
+    keyGenerator,
 }
