@@ -4,7 +4,10 @@ import {
     Post,
     HttpException,
     HttpStatus,
+    UseGuards,
+    Request,
 } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import successMessageGenerator from '../common/lib/successMessageGenerator';
 import failMessage from '../common/constants/failMessage';
 import AccountDto from './dto/account.dto';
@@ -14,6 +17,7 @@ import { AccountService } from '../models/account/account.service';
 import { CertificationCodeService } from '../models/certificationCode/certificationCode.service';
 // import { RefreshTokenService } from '../models/refreshToken/refreshToken.service';
 import { MailService } from '../mails/mails.service';
+import { LocalStrategyGuard } from './guards/local.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -50,6 +54,12 @@ export class AuthController {
             
             throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @UseGuards(LocalStrategyGuard)
+    @Post('/login')
+    async login(@Request() req) {
+        return req.user;
     }
 
     @Post('/email-code')
