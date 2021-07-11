@@ -38,9 +38,13 @@ export class AuthController {
         try {
             const { email } = accountData;
 
-            const account = await this.accountService.getActiveItemByEmail({ email });
-            if (account) {
+            const doesExistsActiveAccount = await this.accountService.getActiveItemByEmail({ email });
+            const doesExistsAccount = await this.accountService.getItemByEmail({ email });
+            if (doesExistsActiveAccount) {
                 throw new HttpException(failMessage.ERR_ALREADY_EXISTS, HttpStatus.CONFLICT);
+            }
+            if (doesExistsAccount) {
+                throw new HttpException(failMessage.ERR_ALREADY_STARTED, HttpStatus.CONFLICT);
             }
 
             await this.accountService.createItem(accountData);

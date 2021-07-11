@@ -8,7 +8,7 @@ export class AuthService {
 
     async validateAccount({ id: email, password }) {
         const account = await this.accountService.getActiveItemByEmail({ email });
-        if (account && (await bcrypt.compare(account.password, password))) {
+        if (account && (await bcrypt.compare(password, account.password))) {
             const { password, ...result } = account;
             return result;
         }

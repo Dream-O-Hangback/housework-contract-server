@@ -10,6 +10,11 @@ export const ERR_ALREADY_EXISTS: FailMessageType = {
     description: '...'
 }
 
+export const ERR_ALREADY_STARTED: FailMessageType = {
+    errorCode: 'ALREADY_STARTED',
+    description: '...'
+}
+
 export const ERR_NOT_FOUND: FailMessageType = {
     errorCode: 'NOT_FOUND',
     description: '...'
