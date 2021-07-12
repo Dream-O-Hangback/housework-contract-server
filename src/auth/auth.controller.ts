@@ -6,6 +6,7 @@ import {
     HttpStatus,
     UseGuards,
     Request,
+    HttpCode,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import successMessageGenerator from '../common/lib/successMessageGenerator';
@@ -38,6 +39,7 @@ export class AuthController {
     }
 
     @Post('/sign-up')
+    @HttpCode(200)
     async signUp(@Body() accountData: AccountDto): Promise<object> {
         try {
             const { email } = accountData;
@@ -66,12 +68,14 @@ export class AuthController {
 
     @UseGuards(LocalStrategyGuard)
     @Post('/login')
+    @HttpCode(200)
     async login(@Request() req) {
         return this.authService.login(req.user);
     }
 
     @UseGuards(JwtStrategyGuard)
     @Post('/logout')
+    @HttpCode(200)
     async logout(@Request() req) {
         await this.authService.logout(req.user);
 
@@ -79,6 +83,7 @@ export class AuthController {
     }
 
     @Post('/email-code')
+    @HttpCode(200)
     async sendEmailCode(@Body() emailData: EmailDto): Promise<object> {
         try {
             const { email } = emailData;
@@ -106,6 +111,7 @@ export class AuthController {
     }
 
     @Post('/email-verify')
+    @HttpCode(200)
     async verifyEmailCode(@Body() codeDto: CodeDto): Promise<object> {
         try {
             const certificationCode = await this.certificationCodeService.getItem(codeDto);
@@ -132,6 +138,7 @@ export class AuthController {
     }
 
     @Post('/email/exists')
+    @HttpCode(200)
     async CheckEmailDuplication(@Body() emailDto: EmailDto): Promise<object> {
         try {
             const isDuplicated = !!(await this.accountService.getItemByEmail(emailDto));

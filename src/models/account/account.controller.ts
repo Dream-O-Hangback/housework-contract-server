@@ -4,6 +4,7 @@ import {
     Post,
     HttpException,
     HttpStatus,
+    HttpCode,
 } from '@nestjs/common';
 import successMessageGenerator from '../../common/lib/successMessageGenerator';
 import failMessage from '../../common/constants/failMessage';
@@ -19,6 +20,7 @@ export class AccountController {
     }
 
     @Post('/nickname/exists')
+    @HttpCode(200)
     async CheckNicknameDuplication(@Body() nicknameData: NicknameDto): Promise<object> {
         try {
             const { nickname } = nicknameData;
