@@ -11,7 +11,15 @@ export class RefreshTokenService {
   ) {
     this.refreshTokenRepository = refreshTokenRepository;
   }
-  createItem({ accountId, token, expireDate }) {
+  async upsertItem({ accountId, token, expireDate }) {
+    const refreshToken = await this.refreshTokenRepository.findOne({ accountId });
+    
+    if (refreshToken) {
+      return this.refreshTokenRepository.update(
+        { accountId },
+        { token, expireDate }
+      );
+    }
     return this.refreshTokenRepository.save({
       accountId,
       token,

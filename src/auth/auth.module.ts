@@ -6,13 +6,14 @@ import { JwtModule } from '@nestjs/jwt';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { MailService } from '../mails/mails.service';
-import { AccountService } from 'src/models/account/account.service';
-import { CertificationCodeService } from 'src/models/certificationCode/certificationCode.service';
-// import { RefreshTokenService } from 'src/models/refreshToken/refreshToken.service';
+import { AccountService } from '../models/account/account.service';
+import { CertificationCodeService } from '../models/certificationCode/certificationCode.service';
+import { RefreshTokenService } from '../models/refreshToken/refreshToken.service';
 import { LocalStrategy } from './strategies/local.strategy';
 import Account from '../models/account/entities';
 import CertificationCode from '../models/certificationCode/entities';
-// import RefreshToken from 'src/models/refreshToken/entities';
+import RefreshToken from '../models/refreshToken/entities';
+import { JwtStrategy } from './strategies/jwt.strategy';
 
 @Module({
   imports: [
@@ -31,7 +32,7 @@ import CertificationCode from '../models/certificationCode/entities';
     TypeOrmModule.forFeature([
       Account,
       CertificationCode,
-      // RefreshToken,
+      RefreshToken,
     ],
   )],
   controllers: [AuthController],
@@ -40,8 +41,9 @@ import CertificationCode from '../models/certificationCode/entities';
     MailService,
     AccountService,
     CertificationCodeService,
-    // RefreshTokenService,
+    RefreshTokenService,
     LocalStrategy,
+    JwtStrategy,
   ],
   exports: [
     AuthService,

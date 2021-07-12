@@ -13,6 +13,7 @@ import GroupMember from './groupMember/entities';
 import Housework from './housework/entities';
 import HouseworkDumpLog from './houseworkDumpLog/entities';
 import HouseworkLog from './houseworkLog/entities';
+import RefreshToken from './refreshToken/entities';
 import { Routine, RoutineFullCharge, RoutineRotation } from './routine/entities';
 import Rule from './rule/entities';
 import RuleLog from './ruleLog/entities';
@@ -37,10 +38,11 @@ export default [
     Housework,
     HouseworkDumpLog,
     HouseworkLog,
+    RefreshToken,
     Routine,
     RoutineFullCharge,
     RoutineRotation,
     Rule,
     RuleLog,
-    Withdraw
+    Withdraw,
 ]

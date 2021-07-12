@@ -19,6 +19,7 @@ import { CertificationCodeService } from '../models/certificationCode/certificat
 // import { RefreshTokenService } from '../models/refreshToken/refreshToken.service';
 import { MailService } from '../mails/mails.service';
 import { LocalStrategyGuard } from './guards/local.guard';
+import { JwtStrategyGuard } from './guards/jwt.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -67,6 +68,14 @@ export class AuthController {
     @Post('/login')
     async login(@Request() req) {
         return this.authService.login(req.user);
+    }
+
+    @UseGuards(JwtStrategyGuard)
+    @Post('/logout')
+    async logout(@Request() req) {
+        await this.authService.logout(req.user);
+
+        return successMessageGenerator();
     }
 
     @Post('/email-code')

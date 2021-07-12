@@ -22,7 +22,7 @@ import entities from './models';
       password: process.env.DB_PASSWORD,
       database: process.env.DB_DATABASE,
       entities,
-      synchronize: false,
+      synchronize: true,
     }),
     MailerModule.forRoot({
       transport: {
