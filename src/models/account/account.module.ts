@@ -14,5 +14,6 @@ import Account from '../account/entities';
   providers: [
     AccountService,
   ],
+  exports: [AccountService],
 })
 export class AccountModule {}

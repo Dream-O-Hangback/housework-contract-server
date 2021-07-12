@@ -13,6 +13,7 @@ import failMessage from '../common/constants/failMessage';
 import AccountDto from './dto/account.dto';
 import EmailDto from './dto/email.dto';
 import CodeDto from './dto/code.dto';
+import { AuthService } from './auth.service';
 import { AccountService } from '../models/account/account.service';
 import { CertificationCodeService } from '../models/certificationCode/certificationCode.service';
 // import { RefreshTokenService } from '../models/refreshToken/refreshToken.service';
@@ -22,11 +23,13 @@ import { LocalStrategyGuard } from './guards/local.guard';
 @Controller('auth')
 export class AuthController {
     constructor(
+        private authService: AuthService,
         private accountService: AccountService,
         private certificationCodeService: CertificationCodeService,
         // private refreshTokenService: RefreshTokenService,
         private mailService: MailService
     ) {
+        this.authService = authService;
         this.accountService = accountService;
         this.certificationCodeService = certificationCodeService;
         // this.refreshTokenService = refreshTokenService;
@@ -63,7 +66,7 @@ export class AuthController {
     @UseGuards(LocalStrategyGuard)
     @Post('/login')
     async login(@Request() req) {
-        return req.user;
+        return this.authService.login(req.user);
     }
 
     @Post('/email-code')
