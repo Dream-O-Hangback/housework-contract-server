@@ -1,6 +1,7 @@
 import {
     Body,
     Controller,
+    Headers,
     Post,
     HttpException,
     HttpStatus,
@@ -16,7 +17,6 @@ import CodeDto from './dto/code.dto';
 import { AuthService } from './auth.service';
 import { AccountService } from '../models/account/account.service';
 import { CertificationCodeService } from '../models/certificationCode/certificationCode.service';
-// import { RefreshTokenService } from '../models/refreshToken/refreshToken.service';
 import { MailService } from '../mails/mails.service';
 import { LocalStrategyGuard } from './guards/local.guard';
 import { JwtStrategyGuard } from './guards/jwt.guard';
@@ -27,19 +27,17 @@ export class AuthController {
         private authService: AuthService,
         private accountService: AccountService,
         private certificationCodeService: CertificationCodeService,
-        // private refreshTokenService: RefreshTokenService,
         private mailService: MailService,
     ) {
         this.authService = authService;
         this.accountService = accountService;
         this.certificationCodeService = certificationCodeService;
-        // this.refreshTokenService = refreshTokenService;
         this.mailService = mailService;
     }
 
     @Post('/sign-up')
     @HttpCode(200)
-    async signUp(@Body() accountData: AccountDto): Promise<object> {
+    async signUp(@Body() accountData: AccountDto) {
         try {
             const { email } = accountData;
 
@@ -70,7 +68,7 @@ export class AuthController {
     @HttpCode(200)
     async login(@Request() req) {
         try {
-            return successMessageGenerator(await this.authService.login(req.user));
+            return successMessageGenerator(await this.authService.issueToken(req.user));
         } catch (err) {
             console.log(err);
             if (err instanceof HttpException) {
@@ -97,12 +95,26 @@ export class AuthController {
         }
     }
 
-    @UseGuards(JwtStrategyGuard)
-    @Post('/access-token')
+    @Post('/refresh-token')
     @HttpCode(200)
-    async createAccessToken(@Request() req) {
+    async reissueToken(@Headers('authorization') accessToken: string) {
         try {
-            return successMessageGenerator(this.authService.reissueAccessToken(req.user));
+            let payload = undefined;
+
+            try {
+                if (!accessToken) throw new Error();
+
+                payload = this.authService.verifyAccessToken(accessToken.replace('Bearer ', ''));
+                if (!payload || !payload.id) throw new Error();
+
+                const account = await this.accountService.getItem({ id: payload.id });
+                if (!account) throw new Error();
+            } catch (err) {
+                console.log(err);
+                throw new HttpException(undefined, HttpStatus.UNAUTHORIZED);
+            }
+            
+            return successMessageGenerator(await this.authService.issueToken(payload));
         } catch (err) {
             console.log(err);
             if (err instanceof HttpException) {

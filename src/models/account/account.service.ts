@@ -38,6 +38,9 @@ export class AccountService {
       lastUpdateDate: currentDate,
     });
   }
+  getItem({ id }) {
+    return this.accountRepository.findOne({ id });
+  }
   getActiveItemByEmail({ email }) {
     return this.accountRepository.findOne({ email, active: true });
   }
