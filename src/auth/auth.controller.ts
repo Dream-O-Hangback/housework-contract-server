@@ -8,7 +8,6 @@ import {
     Request,
     HttpCode,
 } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
 import successMessageGenerator from '../common/lib/successMessageGenerator';
 import failMessage from '../common/constants/failMessage';
 import AccountDto from './dto/account.dto';
@@ -29,7 +28,7 @@ export class AuthController {
         private accountService: AccountService,
         private certificationCodeService: CertificationCodeService,
         // private refreshTokenService: RefreshTokenService,
-        private mailService: MailService
+        private mailService: MailService,
     ) {
         this.authService = authService;
         this.accountService = accountService;
@@ -70,16 +69,48 @@ export class AuthController {
     @Post('/login')
     @HttpCode(200)
     async login(@Request() req) {
-        return this.authService.login(req.user);
+        try {
+            return successMessageGenerator(await this.authService.login(req.user));
+        } catch (err) {
+            console.log(err);
+            if (err instanceof HttpException) {
+                throw err;
+            }
+            
+            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @UseGuards(JwtStrategyGuard)
     @Post('/logout')
     @HttpCode(200)
     async logout(@Request() req) {
-        await this.authService.logout(req.user);
+        try {
+            return successMessageGenerator(await this.authService.logout(req.user));
+        } catch (err) {
+            console.log(err);
+            if (err instanceof HttpException) {
+                throw err;
+            }
+            
+            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
-        return successMessageGenerator();
+    @UseGuards(JwtStrategyGuard)
+    @Post('/access-token')
+    @HttpCode(200)
+    async createAccessToken(@Request() req) {
+        try {
+            return successMessageGenerator(this.authService.reissueAccessToken(req.user));
+        } catch (err) {
+            console.log(err);
+            if (err instanceof HttpException) {
+                throw err;
+            }
+            
+            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @Post('/email-code')

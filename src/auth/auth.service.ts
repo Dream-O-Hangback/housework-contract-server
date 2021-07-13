@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { AccountService } from '../models/account/account.service';
@@ -10,6 +11,7 @@ export class AuthService {
         private accountService: AccountService,
         private refreshTokenService: RefreshTokenService,
         private jwtService: JwtService,
+        private configService: ConfigService,
     ) {}
 
     async validateAccount({ id: email, password }) {
@@ -24,18 +26,29 @@ export class AuthService {
     async login({ id }) {
         const payload = { id };
 
-        const token = this.jwtService.sign(payload, {
-
+        const accessToken = this.jwtService.sign(payload, { issuer: this.configService.get<string>('JWT_ISSUER') });
+        const refreshToken = this.jwtService.sign(payload, {
+            issuer: this.configService.get<string>('JWT_ISSUER'),
+            secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
+            expiresIn: this.configService.get<string>('JWT_REFRESH_EXPIRES_IN'),
         });
+
         const currentDate = new Date();
         currentDate.setDate(currentDate.getDate() + 15);
 
-        await this.refreshTokenService.upsertItem({ accountId: id, token, expireDate: currentDate });
+        await this.refreshTokenService.upsertItem({ accountId: id, token: refreshToken, expireDate: currentDate });
 
-        return { accessToken: this.jwtService.sign(payload) };
+        return { accessToken };
     }
 
     async logout({ id: accountId }) {
         await this.refreshTokenService.deleteItem({ accountId });
+    }
+
+    reissueAccessToken({ id }) {
+        const payload = { id };
+        const accessToken = this.jwtService.sign(payload, { issuer: this.configService.get<string>('JWT_ISSUER') });
+
+        return { accessToken };
     }
 }
