@@ -39,7 +39,7 @@ export class AccountService {
     });
   }
   getItem({ id }) {
-    return this.accountRepository.findOne({ id });
+    return this.accountRepository.findOne({ id, active: true });
   }
   getActiveItemByEmail({ email }) {
     return this.accountRepository.findOne({ email, active: true });
@@ -54,6 +54,6 @@ export class AccountService {
     return this.accountRepository.update({ id }, { active: true });
   }
   deleteItem({ id }) {
-    return this.accountRepository.delete({ id: id });
+    return this.accountRepository.delete({ id: id, active: true });
   }
 }

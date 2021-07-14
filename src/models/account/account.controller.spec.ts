@@ -23,7 +23,7 @@ describe('AccountController', () => {
             controllers: [AccountController],
             providers: [
                 AccountService,
-                { provide: getRepositoryToken(Account), useValue: mockRepository }
+                { provide: getRepositoryToken(Account), useValue: mockRepository() }
             ],
         }).compile();
 
