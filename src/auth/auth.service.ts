@@ -24,7 +24,7 @@ export class AuthService {
         return null;
     }
 
-    async issueToken({ id }: JwtPayload) {
+    async issueAccessToken({ id }: JwtPayload) {
         const payload = { id };
 
         const accessToken = this.jwtService.sign(payload, { issuer: this.configService.get<string>('JWT_ISSUER') });
@@ -42,11 +42,11 @@ export class AuthService {
         return { accessToken };
     }
 
-    async logout({ id: accountId }: JwtPayload) {
-        await this.refreshTokenService.deleteItem({ accountId });
-    }
-
     verifyAccessToken(accessToken: string) {
         return this.jwtService.verify(accessToken, { issuer: this.configService.get<string>('JWT_ISSUER') });
+    }
+
+    async resetRefreshToken({ id: accountId }: JwtPayload) {
+        await this.refreshTokenService.deleteItem({ accountId });
     }
 }

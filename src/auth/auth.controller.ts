@@ -68,7 +68,7 @@ export class AuthController {
     @HttpCode(200)
     async login(@Request() req) {
         try {
-            return successMessageGenerator(await this.authService.issueToken(req.user));
+            return successMessageGenerator(await this.authService.issueAccessToken(req.user));
         } catch (err) {
             console.log(err);
             if (err instanceof HttpException) {
@@ -84,7 +84,7 @@ export class AuthController {
     @HttpCode(200)
     async logout(@Request() req) {
         try {
-            return successMessageGenerator(await this.authService.logout(req.user));
+            return successMessageGenerator(await this.authService.resetRefreshToken(req.user));
         } catch (err) {
             console.log(err);
             if (err instanceof HttpException) {
@@ -114,7 +114,7 @@ export class AuthController {
                 throw new HttpException(undefined, HttpStatus.UNAUTHORIZED);
             }
             
-            return successMessageGenerator(await this.authService.issueToken(payload));
+            return successMessageGenerator(await this.authService.issueAccessToken(payload));
         } catch (err) {
             console.log(err);
             if (err instanceof HttpException) {

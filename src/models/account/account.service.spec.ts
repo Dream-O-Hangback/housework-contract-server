@@ -139,9 +139,7 @@ describe('AccountService', () => {
     it('should delete a account', async () => {
         const id = faker.datatype.uuid();
 
-        const account = { id, active: true };
-
-        const accountRepositoryDeleteSpy = jest.spyOn(accountRepository, 'delete').mockResolvedValueOnce(account as Account);
+        const accountRepositoryDeleteSpy = jest.spyOn(accountRepository, 'delete').mockResolvedValueOnce(undefined);
 
         await accountService.deleteItem({ id });
 
