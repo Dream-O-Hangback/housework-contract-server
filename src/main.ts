@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { HttpException, HttpStatus, ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
+import failMessage from './common/constants/failMessage';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });
@@ -9,11 +10,7 @@ async function bootstrap() {
     transform: true,
     disableErrorMessages: process.env.NODE_ENV === 'dev' ? false : true,
     exceptionFactory: (errors: never) => {
-      throw new HttpException({
-        message: 'fail',
-        errorCode: 'ERR_INVALID_PARAM',
-        description: '...'
-      }, HttpStatus.BAD_REQUEST);
+      throw new HttpException(failMessage.ERR_INVALID_PARAM, HttpStatus.BAD_REQUEST);
     },
   }));
   await app.listen(3000);
