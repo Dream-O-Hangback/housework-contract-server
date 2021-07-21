@@ -10,10 +10,10 @@ import { AccountService } from '../models/account/account.service';
 import { CertificationCodeService } from '../models/certificationCode/certificationCode.service';
 import { RefreshTokenService } from '../models/refreshToken/refreshToken.service';
 import { LocalStrategy } from './strategies/local.strategy';
+import { JwtStrategy } from './strategies/jwt.strategy';
 import Account from '../models/account/entities';
 import CertificationCode from '../models/certificationCode/entities';
 import RefreshToken from '../models/refreshToken/entities';
-import { JwtStrategy } from './strategies/jwt.strategy';
 
 @Module({
   imports: [

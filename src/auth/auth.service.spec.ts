@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import * as bcrypt from 'bcrypt';
 import * as faker from 'faker';
 import MockDate from 'mockdate';
 import { AuthService } from './auth.service';
@@ -10,6 +11,11 @@ import { AccountService } from '../models/account/account.service';
 import { RefreshTokenService } from '../models/refreshToken/refreshToken.service';
 import Account from '../models/account/entities';
 import RefreshToken from '../models/refreshToken/entities';
+
+const mockJwtService = {
+    sign: jest.fn(),
+    verify: jest.fn(),
+};
 
 type MockRepository<T = any> = Partial<Record<keyof Repository<T>, jest.Mock>>;
 
@@ -22,6 +28,7 @@ const mockRepository = () => ({
 
 describe('AuthService', () => {
     let authService: AuthService;
+    let configService: ConfigService;
     let jwtService: JwtService;
     let accountRepository: MockRepository<Account>;
     let refreshTokenRepository: MockRepository<RefreshToken>;
@@ -35,15 +42,16 @@ describe('AuthService', () => {
             providers: [
                 AuthService,
                 ConfigService,
-                JwtService,
                 AccountService,
                 RefreshTokenService,
+                { provide: JwtService, useValue: mockJwtService },
                 { provide: getRepositoryToken(Account), useValue: mockRepository() },
                 { provide: getRepositoryToken(RefreshToken), useValue: mockRepository() },
             ],
         }).compile();
 
         authService = moduleRef.get<AuthService>(AuthService);
+        configService = moduleRef.get<ConfigService>(ConfigService);
         jwtService = moduleRef.get<JwtService>(JwtService);
         accountRepository = moduleRef.get(getRepositoryToken(Account));
         refreshTokenRepository = moduleRef.get(getRepositoryToken(RefreshToken));
@@ -55,11 +63,13 @@ describe('AuthService', () => {
 
         const account = { id: faker.datatype.uuid(), password };
 
-        const accountRepositoryFindOneSpy = jest.spyOn(accountRepository, 'findOne').mockResolvedValueOnce(account as Account);
+        const encryptedPassword = await bcrypt.hash(password, 10);
+
+        const accountRepositoryFindOneSpy = jest.spyOn(accountRepository, 'findOne').mockResolvedValueOnce({ id: account.id, password: encryptedPassword });
         
         const result = await authService.validateAccount(email, password);
         
-        expect(result).toBe(account as Account);
+        expect(result).toStrictEqual({ id: account.id } as Account);
         expect(accountRepositoryFindOneSpy).toBeCalledTimes(1);
         expect(accountRepositoryFindOneSpy).toHaveBeenCalledWith({ email, active: true });
     });
@@ -70,14 +80,14 @@ describe('AuthService', () => {
         const accessToken = faker.datatype.string();
         const refreshToken = faker.datatype.string();
 
-        const jwtServiceSignSpyForAccessToken = jest.spyOn(jwtService, 'sign').mockReturnValue(accessToken);
-        const jwtServiceSignSpyForRefreshToken = jest.spyOn(jwtService, 'sign').mockReturnValue(refreshToken);
+        const jwtServiceSignSpyForAccessToken = jest.spyOn(jwtService, 'sign').mockReturnValueOnce(accessToken);
+        const jwtServiceSignSpyForRefreshToken = jest.spyOn(jwtService, 'sign').mockReturnValueOnce(refreshToken);
 
         const currentDate = new Date();
         currentDate.setDate(currentDate.getDate() + 15);
 
-        const refreshTokenRepositoryFindOneSpy = jest.spyOn(accountRepository, 'findOne').mockResolvedValueOnce(undefined);
-        const refreshTokenRepositorySaveSpy = jest.spyOn(accountRepository, 'save').mockResolvedValueOnce({
+        const refreshTokenRepositoryFindOneSpy = jest.spyOn(refreshTokenRepository, 'findOne').mockResolvedValueOnce(null);
+        const refreshTokenRepositorySaveSpy = jest.spyOn(refreshTokenRepository, 'save').mockResolvedValueOnce({
             accountId: id,
             token: refreshToken,
             expireDate: currentDate,
@@ -85,11 +95,11 @@ describe('AuthService', () => {
 
         const result = await authService.issueAccessToken({ id });
         
-        expect(result).toBe({ accessToken });
-        expect(jwtServiceSignSpyForAccessToken).toBeCalledTimes(1);
-        expect(jwtServiceSignSpyForAccessToken).toHaveBeenCalledWith(expect.objectContaining({ id }));
-        expect(jwtServiceSignSpyForRefreshToken).toBeCalledTimes(1);
-        expect(jwtServiceSignSpyForRefreshToken).toHaveBeenCalledWith(expect.objectContaining({ id }));
+        expect(result).toStrictEqual({ accessToken });
+        expect(jwtServiceSignSpyForAccessToken).toBeCalledTimes(2);
+        expect(jwtServiceSignSpyForAccessToken).toHaveBeenCalledWith(expect.objectContaining({ id }), expect.anything());
+        expect(jwtServiceSignSpyForRefreshToken).toBeCalledTimes(2);
+        expect(jwtServiceSignSpyForRefreshToken).toHaveBeenCalledWith(expect.objectContaining({ id }), expect.anything());
         expect(refreshTokenRepositoryFindOneSpy).toBeCalledTimes(1);
         expect(refreshTokenRepositoryFindOneSpy).toHaveBeenCalledWith({ accountId: id });
         expect(refreshTokenRepositorySaveSpy).toBeCalledTimes(1);
@@ -100,7 +110,7 @@ describe('AuthService', () => {
         });
     });
 
-    it('should verify a access token', async () => {
+    it('should verify a access token', () => {
         const accessToken = faker.datatype.string();
         const payload = { id: faker.datatype.uuid() };
 
@@ -110,7 +120,7 @@ describe('AuthService', () => {
         
         expect(result).toBe(payload);
         expect(jwtServiceVerifySpy).toBeCalledTimes(1);
-        expect(jwtServiceVerifySpy).toHaveBeenCalledWith(expect.stringMatching(accessToken));
+        expect(jwtServiceVerifySpy).toHaveBeenCalledWith(expect.stringContaining(accessToken), expect.anything());
     });
 
     it('should reset a refresh token', async () => {
@@ -121,6 +131,6 @@ describe('AuthService', () => {
         await authService.resetRefreshToken({ id });
         
         expect(refreshTokenDeleteSpy).toBeCalledTimes(1);
-        expect(refreshTokenDeleteSpy).toHaveBeenCalledWith({ id, active: true });
+        expect(refreshTokenDeleteSpy).toHaveBeenCalledWith({ accountId: id });
     });
 });

@@ -9,8 +9,8 @@ import {
     Request,
     HttpCode,
 } from '@nestjs/common';
-import successMessageGenerator from '../common/lib/successMessageGenerator';
-import failMessage from '../common/constants/failMessage';
+import { successMessageGenerator } from '../common/lib';
+import { failMessage } from '../common/constants';
 import AccountDto from './dto/account.dto';
 import EmailDto from './dto/email.dto';
 import CodeDto from './dto/code.dto';
