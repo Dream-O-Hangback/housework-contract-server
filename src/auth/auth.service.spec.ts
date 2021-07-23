@@ -1,108 +1,132 @@
 import { Test } from '@nestjs/testing';
+import { JwtService } from '@nestjs/jwt';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
-import { generateKey } from '../common/lib';
+import * as faker from 'faker';
+import MockDate from 'mockdate';
 import { AuthService } from './auth.service';
+import { AccountService } from '../models/account/account.service';
+import { RefreshTokenService } from '../models/refreshToken/refreshToken.service';
 import Account from '../models/account/entities';
-import CertificationCode from '../models/certificationCode/entities';
-import AccountDto from './dto/account.dto';
-import EmailCodeDto from './dto/emailCode.dto';
+import RefreshToken from '../models/refreshToken/entities';
+
+const mockJwtService = {
+    sign: jest.fn(),
+    verify: jest.fn(),
+};
 
 type MockRepository<T = any> = Partial<Record<keyof Repository<T>, jest.Mock>>;
 
 const mockRepository = () => ({
-    find: jest.fn(),
-    findOne: jest.fn(),
     save: jest.fn(),
+    findOne: jest.fn(),
+    update: jest.fn(),
     delete: jest.fn(),
-    query: jest.fn(),
 });
 
 describe('AuthService', () => {
+    let jwtService: JwtService;
     let authService: AuthService;
     let accountRepository: MockRepository<Account>;
-    let certificationCodeRepository: MockRepository<CertificationCode>;
+    let refreshTokenRepository: MockRepository<RefreshToken>;
+
+    beforeAll(() => MockDate.set('2021-01-01'));
+
+    afterAll(() => MockDate.reset());
 
     beforeEach(async () => {
         const moduleRef = await Test.createTestingModule({
             providers: [
                 AuthService,
+                AccountService,
+                RefreshTokenService,
+                { provide: JwtService, useValue: mockJwtService },
                 { provide: getRepositoryToken(Account), useValue: mockRepository() },
-                { provide: getRepositoryToken(CertificationCode), useValue: mockRepository() },
+                { provide: getRepositoryToken(RefreshToken), useValue: mockRepository() },
             ],
         }).compile();
-
+        
+        jwtService = moduleRef.get<JwtService>(JwtService);
         authService = moduleRef.get<AuthService>(AuthService);
         accountRepository = moduleRef.get(getRepositoryToken(Account));
-        certificationCodeRepository = moduleRef.get(getRepositoryToken(CertificationCode));
+        refreshTokenRepository = moduleRef.get(getRepositoryToken(RefreshToken));
     });
 
-    describe('create a new account', () => {
-        it('should create a new account', async () => {
-            const accountDto: AccountDto = {
-                "email": "kyw017763@gmail.com",
-                "name": "A",
-                "password": "ABCDE",
-                "nickname": "A",
-                "profile": "A",
-                "type": "local",
-                "notificationOpen": true,
-                "emailOpen": true,
-            };
+    it('should validate a account', async () => {
+        const email = faker.internet.email();
+        const password = faker.datatype.string();
 
-            const currentDate = new Date();
+        const account = { id: faker.datatype.uuid(), password };
 
-            const originalPassword = accountDto.password;
-            const hashedPassword = await bcrypt.hash(originalPassword, 10);
+        const encryptedPassword = await bcrypt.hash(password, (await bcrypt.genSalt()));
 
-            const newAccount = {
-                ...accountDto,
-                "password": hashedPassword,
-                "profileImageUrl": "",
-                "notificationOpenDate": currentDate,
-                "emailOpenDate": currentDate,
-                "lastUpdateDate": currentDate,
-                "createDate": currentDate,
-            }
+        const accountRepositoryFindOneSpy = jest.spyOn(accountRepository, 'findOne').mockResolvedValueOnce({ id: account.id, password: encryptedPassword });
+        
+        const result = await authService.validateAccount(email, password);
+        
+        expect(result).toStrictEqual({ id: account.id } as Account);
+        expect(accountRepositoryFindOneSpy).toBeCalledTimes(1);
+        expect(accountRepositoryFindOneSpy).toHaveBeenCalledWith({ email, active: true });
+    });
 
-            const saveAccount = jest.spyOn(accountRepository, 'save').mockResolvedValueOnce(newAccount as Account);
-            const result = await authService.saveAccount(accountDto);
+    it('should issue a access token', async () => {
+        const id = faker.datatype.uuid();
 
-            expect(await bcrypt.compare(originalPassword, hashedPassword)).toBe(true);
-            expect(result).toBe(newAccount as Account);
-            expect(saveAccount).toBeCalledTimes(1);
+        const accessToken = faker.datatype.string();
+        const refreshToken = faker.datatype.string();
+
+        const jwtServiceSignSpyForAccessToken = jest.spyOn(jwtService, 'sign').mockReturnValueOnce(accessToken);
+        const jwtServiceSignSpyForRefreshToken = jest.spyOn(jwtService, 'sign').mockReturnValueOnce(refreshToken);
+
+        const currentDate = new Date();
+        currentDate.setDate(currentDate.getDate() + 15);
+
+        const refreshTokenRepositoryFindOneSpy = jest.spyOn(refreshTokenRepository, 'findOne').mockResolvedValueOnce(null);
+        const refreshTokenRepositorySaveSpy = jest.spyOn(refreshTokenRepository, 'save').mockResolvedValueOnce({
+            accountId: id,
+            token: refreshToken,
+            expireDate: currentDate,
+        });
+
+        const result = await authService.issueAccessToken({ id });
+        
+        expect(result).toStrictEqual({ accessToken });
+        expect(jwtServiceSignSpyForAccessToken).toBeCalledTimes(2);
+        expect(jwtServiceSignSpyForAccessToken).toHaveBeenCalledWith(expect.objectContaining({ id }), expect.anything());
+        expect(jwtServiceSignSpyForRefreshToken).toBeCalledTimes(2);
+        expect(jwtServiceSignSpyForRefreshToken).toHaveBeenCalledWith(expect.objectContaining({ id }), expect.anything());
+        expect(refreshTokenRepositoryFindOneSpy).toBeCalledTimes(1);
+        expect(refreshTokenRepositoryFindOneSpy).toHaveBeenCalledWith({ accountId: id });
+        expect(refreshTokenRepositorySaveSpy).toBeCalledTimes(1);
+        expect(refreshTokenRepositorySaveSpy).toHaveBeenCalledWith({
+            accountId: id,
+            token: refreshToken,
+            expireDate: currentDate,
         });
     });
 
-    describe('send a certification code to email', () => {
-        it('should create a new certification code', async () => {
-            const emailCodeDto: EmailCodeDto = {
-                "email": "kyw017763@gmail.com",
-            };
+    it('should verify a access token', () => {
+        const accessToken = faker.datatype.string();
+        const payload = { id: faker.datatype.uuid() };
 
-            const account = {
-                id: 'id'
-            };
+        const jwtServiceVerifySpy = jest.spyOn(jwtService, 'verify').mockReturnValueOnce(payload);
+        
+        const result = authService.verifyAccessToken(accessToken);
+        
+        expect(result).toBe(payload);
+        expect(jwtServiceVerifySpy).toBeCalledTimes(1);
+        expect(jwtServiceVerifySpy).toHaveBeenCalledWith(expect.stringContaining(accessToken), expect.anything());
+    });
 
-            const key = generateKey();
-            const expireDate = new Date();
-            expireDate.setDate(expireDate.getDate() + 1);
+    it('should reset a refresh token', async () => {
+        const id = faker.datatype.uuid();
 
-            const newCertificationCode = {
-                ...emailCodeDto,
-                accountId: account.id,
-                key,
-                expireDate,
-            };
-
-            const findOneAccount = jest.spyOn(accountRepository, 'findOne').mockResolvedValueOnce(account as Account);
-            const saveCertificationCode = jest.spyOn(certificationCodeRepository, 'query').mockResolvedValueOnce(newCertificationCode as CertificationCode);
-            const certificationCodeResult = await authService.upsertCertificationCode(emailCodeDto);
-
-            expect(certificationCodeResult).toBe(newCertificationCode as CertificationCode);
-            expect(findOneAccount).toBeCalledTimes(1);
-            expect(saveCertificationCode).toBeCalledTimes(1);
-        });
+        const refreshTokenDeleteSpy = jest.spyOn(refreshTokenRepository, 'delete').mockResolvedValueOnce(undefined);
+        
+        await authService.resetRefreshToken({ id });
+        
+        expect(refreshTokenDeleteSpy).toBeCalledTimes(1);
+        expect(refreshTokenDeleteSpy).toHaveBeenCalledWith({ accountId: id });
     });
 });

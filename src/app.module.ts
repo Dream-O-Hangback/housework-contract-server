@@ -1,9 +1,11 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { MailerModule } from '@nestjs-modules/mailer';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
+import { AccountModule } from './models/account/account.module';
 import entities from './models';
 
 @Module({
@@ -22,7 +24,22 @@ import entities from './models';
       entities,
       synchronize: true,
     }),
+    MailerModule.forRoot({
+      transport: {
+        host :'smtp.gmail.com',
+        port: 465,
+        secure: true,
+        auth: {
+          user: process.env.EMAIL,
+          pass: process.env.PASSWORD,
+        },
+      },
+      defaults: {
+        from: '"No Reply" <noreply@housework-contract.com>',
+      },
+    }),
     AuthModule,
+    AccountModule,
   ],
   controllers: [AppController],
   providers: [AppService],

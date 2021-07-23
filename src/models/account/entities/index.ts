@@ -8,7 +8,7 @@ export default class Account {
     @Column({ unique: true, type: 'varchar', length: 255 })
     email: string;
 
-    @Column({ type: 'varchar', length: 50 })
+    @Column({ type: 'varchar', length: 60 })
     password: string;
 
     @Column({ type: 'varchar', length: 255 })
@@ -41,14 +41,11 @@ export default class Account {
     @UpdateDateColumn({ name: 'last_update_date' })
     lastUpdateDate: Date;
 
-    @Column({ type: 'varbinary', length: 16, name: 'last_update_ip' })
+    @Column({ type: 'varbinary', length: 16, name: 'last_update_ip', nullable: true })
     lastUpdateIp: string;
 
     @CreateDateColumn({ name: 'create_date' })
     createDate: Date;
-
-    @Column({ type: 'varbinary', length: 16, name: 'create_ip' })
-    createIp: string;
 
     @Column({ default: false })
     active: boolean;

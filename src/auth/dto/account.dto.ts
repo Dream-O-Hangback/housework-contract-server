@@ -20,7 +20,7 @@ export default class AccountDto {
 
     @IsOptional()
     @IsString()
-    readonly profile?: string;
+    readonly profile: string;
     
     @IsNotEmpty()
     @IsString()

@@ -1,75 +1,52 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm/index';
+import { ConfigService } from '@nestjs/config';
+import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import { generateKey } from '../common/lib';
-import Account from '../models/account/entities';
-import CertificationCode from '../models/certificationCode/entities';
-import AccountDto from './dto/account.dto';
-import EmailCodeDto from './dto/emailCode.dto';
+import JwtPayload from './interfaces/jwt-payload.interface';
+import { AccountService } from '../models/account/account.service';
+import { RefreshTokenService } from '../models/refreshToken/refreshToken.service';
 
 @Injectable()
 export class AuthService {
-  constructor(
-    @InjectRepository(Account) private accountRepository: Repository<Account>,
-    @InjectRepository(CertificationCode) private certificationCodeRepository: Repository<CertificationCode>,
-  ) {
-    this.accountRepository = accountRepository;
-    this.certificationCodeRepository = certificationCodeRepository;
-  }
-  findAccountList() {
-    return this.accountRepository.find();
-  }
-  findAccount(id: string) {
-    return this.accountRepository.findOne({ id: id });
-  }
-  async saveAccount(accountDto: AccountDto) {
-    const hashedPassword = await bcrypt.hash('SeCrEtPaSsWoRd', 10);
+    constructor(
+        private configService: ConfigService,
+        private jwtService: JwtService,
+        private accountService: AccountService,
+        private refreshTokenService: RefreshTokenService,
+    ) {}
 
-    return this.accountRepository.save({ ...accountDto, password: hashedPassword });
-  }
-  deleteAccount(id: string) {
-    return this.accountRepository.delete({ id: id });
-  }
-  async upsertCertificationCode(emailCodeDto: EmailCodeDto) {
-    const { email } = emailCodeDto
+    async validateAccount(email: string, password: string) {
+        const account = await this.accountService.getActiveItemByEmail({ email });
+        if (account && (await bcrypt.compare(password, account.password))) {
+            const { id } = account;
+            return { id };
+        }
+        return null;
+    }
 
-    const account = await this.accountRepository.findOne({ email });
-    if (!account) return null;
+    async issueAccessToken({ id }: JwtPayload) {
+        const payload = { id };
 
-    const { id: accountId } = account;
+        const accessToken = this.jwtService.sign(payload, { issuer: this.configService.get<string>('JWT_ISSUER') });
+        const refreshToken = this.jwtService.sign(payload, {
+            issuer: this.configService.get<string>('JWT_ISSUER'),
+            secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
+            expiresIn: this.configService.get<string>('JWT_REFRESH_EXPIRES_IN'),
+        });
 
-    const key = generateKey();
-    const expireDate = new Date();
-    expireDate.setDate(expireDate.getDate() + 1);
+        const currentDate = new Date();
+        currentDate.setDate(currentDate.getDate() + 15);
 
-    return this.certificationCodeRepository.query(`
-        INSERT INTO certification_code (
-          "account_id",
-          "email",
-          "key",
-          "expire_date"
-        )
-        VALUES (
-          $1,
-          $2,
-          $3,
-          $4
-        )
-        ON CONFLICT("email")
-          DO UPDATE
-            SET
-              "account_id" = $1,
-              "key" = $3,
-              "expire_date" = $4
-            WHERE
-              "certification_code"."email" = $2
-        RETURNING *
-    `, [
-      accountId,
-      email,
-      key,
-      expireDate
-    ]);
-  }
+        await this.refreshTokenService.upsertItem({ accountId: id, token: refreshToken, expireDate: currentDate });
+
+        return { accessToken };
+    }
+
+    verifyAccessToken(accessToken: string) {
+        return this.jwtService.verify(accessToken, { issuer: this.configService.get<string>('JWT_ISSUER') });
+    }
+
+    async resetRefreshToken({ id: accountId }: JwtPayload) {
+        await this.refreshTokenService.deleteItem({ accountId });
+    }
 }
