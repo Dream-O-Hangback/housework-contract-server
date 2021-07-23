@@ -11,8 +11,7 @@ import entities from './models';
 @Module({
   imports: [
     ConfigModule.forRoot({
-      envFilePath: process.env.NODE_ENV === 'dev' ? '.env.dev' : '.env.test',
-      ignoreEnvFile: process.env.NODE_ENV === 'prod'
+      envFilePath: process.env.NODE_ENV === 'prod' ? '.env.prod' : '.env.dev',
     }),
     TypeOrmModule.forRoot({
       type: 'mysql',
