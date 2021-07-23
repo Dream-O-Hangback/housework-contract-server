@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
@@ -17,10 +17,10 @@ import RefreshToken from '../models/refreshToken/entities';
 
 @Module({
   imports: [
-    ConfigService,
+    ConfigModule,
     PassportModule,
     JwtModule.registerAsync({
-      imports: [ConfigService],
+      imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => {
         return {
           secret: configService.get<string>('JWT_SECRET'),
