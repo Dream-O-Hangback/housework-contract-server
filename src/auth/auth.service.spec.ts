@@ -1,4 +1,5 @@
 import { Test } from '@nestjs/testing';
+import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -15,6 +16,20 @@ const mockJwtService = {
     sign: jest.fn(),
     verify: jest.fn(),
 };
+
+const mockConfigService = {
+    get(key: string) {
+        switch (key) {
+            case 'JWT_ISSUER':
+            case 'JWT_REFRESH_SECRET':
+                return faker.datatype.string();
+            case 'JWT_REFRESH_EXPIRES_IN':
+                return '60s';
+            default:
+                return undefined;
+        }
+    }
+}
 
 type MockRepository<T = any> = Partial<Record<keyof Repository<T>, jest.Mock>>;
 
@@ -41,6 +56,7 @@ describe('AuthService', () => {
                 AuthService,
                 AccountService,
                 RefreshTokenService,
+                { provide: ConfigService, useValue: mockConfigService },
                 { provide: JwtService, useValue: mockJwtService },
                 { provide: getRepositoryToken(Account), useValue: mockRepository() },
                 { provide: getRepositoryToken(RefreshToken), useValue: mockRepository() },
