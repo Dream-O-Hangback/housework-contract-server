@@ -1,5 +1,4 @@
 import { Test } from '@nestjs/testing';
-import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -27,9 +26,8 @@ const mockRepository = () => ({
 });
 
 describe('AuthService', () => {
-    let authService: AuthService;
-    let configService: ConfigService;
     let jwtService: JwtService;
+    let authService: AuthService;
     let accountRepository: MockRepository<Account>;
     let refreshTokenRepository: MockRepository<RefreshToken>;
 
@@ -41,7 +39,6 @@ describe('AuthService', () => {
         const moduleRef = await Test.createTestingModule({
             providers: [
                 AuthService,
-                ConfigService,
                 AccountService,
                 RefreshTokenService,
                 { provide: JwtService, useValue: mockJwtService },
@@ -49,10 +46,9 @@ describe('AuthService', () => {
                 { provide: getRepositoryToken(RefreshToken), useValue: mockRepository() },
             ],
         }).compile();
-
-        authService = moduleRef.get<AuthService>(AuthService);
-        configService = moduleRef.get<ConfigService>(ConfigService);
+        
         jwtService = moduleRef.get<JwtService>(JwtService);
+        authService = moduleRef.get<AuthService>(AuthService);
         accountRepository = moduleRef.get(getRepositoryToken(Account));
         refreshTokenRepository = moduleRef.get(getRepositoryToken(RefreshToken));
     });
@@ -63,7 +59,7 @@ describe('AuthService', () => {
 
         const account = { id: faker.datatype.uuid(), password };
 
-        const encryptedPassword = await bcrypt.hash(password, 10);
+        const encryptedPassword = await bcrypt.hash(password, (await bcrypt.genSalt()));
 
         const accountRepositoryFindOneSpy = jest.spyOn(accountRepository, 'findOne').mockResolvedValueOnce({ id: account.id, password: encryptedPassword });
         

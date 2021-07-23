@@ -50,7 +50,7 @@ describe('AccountService', () => {
 
         const currentDate = new Date();
         const originalPassword = accountData.password;
-        const hashedPassword = await bcrypt.hash(originalPassword, 10);
+        const hashedPassword = await bcrypt.hash(originalPassword, (await bcrypt.genSalt()));
 
         const newAccount = {
             ...accountData,

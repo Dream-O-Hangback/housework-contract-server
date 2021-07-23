@@ -21,7 +21,7 @@ export class AccountService {
     notificationOpen,
     emailOpen,
   }) {
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(password, (await bcrypt.genSalt()));
     const currentDate = new Date();
 
     return this.accountRepository.save({
