@@ -15,3 +15,7 @@ hooks:
   AfterInstall:
     - location: after_deploy.sh
       runas: ec2-user
+  ValidateService:
+    - location: validate_service.sh
+      timeout: 30
+      runas: root

@@ -1,6 +1,7 @@
+#!/bin/bash
 source /home/ec2-user/.bash_profile
 REPOSITORY=/home/ec2-user/housework-contract-server
-sudo cp /home/ec2-user/.env.prod $REPOSITORY
+cp /home/ec2-user/.env.prod $REPOSITORY
 cd $REPOSITORY
 
 pm2 delete all
