@@ -17,10 +17,14 @@ export class AuthService {
 
     async validateAccount(email: string, password: string) {
         const account = await this.accountService.getActiveItemByEmail({ email });
+
         if (account && (await bcrypt.compare(password, account.password))) {
             const { id } = account;
             return { id };
+        } else if ((await this.accountService.getItemByEmail({ email }))) {
+            return true;
         }
+
         return null;
     }
 
