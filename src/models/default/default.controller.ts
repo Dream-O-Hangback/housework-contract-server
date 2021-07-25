@@ -16,6 +16,7 @@ import { AdminGuard } from '../../auth/guards/admin.guard';
 import TypeDto from './dto/type.dto';
 import ContentDto from './dto/content.dto';
 import TypeUpdateDto from './dto/typeUpdate.dto';
+import ContentUpdateDto from './dto/contentUpdate.dto';
 
 @Controller('admin/default')
 @UseGuards(AdminGuard)
@@ -194,6 +195,25 @@ export class DefaultController {
             const { id, title, displayTitle } = alternativePaymentTypeUpdateData;
 
             await this.defaultService.updateDefaultAlternativePaymentType({ id, title, displayTitle });
+
+            return successMessageGenerator(); 
+        } catch (err) {
+            console.log(err);
+            if (err instanceof HttpException) {
+                throw err;
+            }
+            
+            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Patch('/housework')
+    @HttpCode(200)
+    async UpdateHousework(@Body() houseworkUpdateData: ContentUpdateDto) {
+        try {
+            const { id, type, title, description } = houseworkUpdateData;
+
+            await this.defaultService.updateDefaultHousework({ id, type, title, description });
 
             return successMessageGenerator(); 
         } catch (err) {
