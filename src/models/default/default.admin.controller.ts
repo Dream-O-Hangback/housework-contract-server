@@ -16,8 +16,6 @@ import { DefaultService } from './default.service';
 import { AdminGuard } from '../../auth/guards/admin.guard';
 import TypeDto from './dto/type.dto';
 import ContentDto from './dto/content.dto';
-import TypeUpdateDto from './dto/typeUpdate.dto';
-import ContentUpdateDto from './dto/contentUpdate.dto';
 import { Param } from '@nestjs/common';
 import IdParams from './dto/id.params';
 
@@ -172,11 +170,12 @@ export class DefaultAdminController {
         }
     }
 
-    @Patch('/group/type')
+    @Patch('/group/types/:id')
     @HttpCode(200)
-    async UpdateGroupType(@Body() groupTypeUpdateData: TypeUpdateDto) {
+    async UpdateGroupType(@Param() params: IdParams, @Body() groupTypeUpdateData: TypeDto) {
         try {
-            const { id, title, displayTitle } = groupTypeUpdateData;
+            const { id } = params;
+            const { title, displayTitle } = groupTypeUpdateData;
 
             await this.defaultService.updateDefaultGroupType({ id, title, displayTitle });
 
@@ -191,11 +190,12 @@ export class DefaultAdminController {
         }
     }
 
-    @Patch('/alternative-payment/type')
+    @Patch('/alternative-payment/types/:id')
     @HttpCode(200)
-    async UpdateAlternativePaymentType(@Body() alternativePaymentTypeUpdateData: TypeUpdateDto) {
+    async UpdateAlternativePaymentType(@Param() params: IdParams, @Body() alternativePaymentTypeUpdateData: TypeDto) {
         try {
-            const { id, title, displayTitle } = alternativePaymentTypeUpdateData;
+            const { id } = params;
+            const { title, displayTitle } = alternativePaymentTypeUpdateData;
 
             await this.defaultService.updateDefaultAlternativePaymentType({ id, title, displayTitle });
 
@@ -210,11 +210,12 @@ export class DefaultAdminController {
         }
     }
 
-    @Patch('/housework')
+    @Patch('/housework/:id')
     @HttpCode(200)
-    async UpdateHousework(@Body() houseworkUpdateData: ContentUpdateDto) {
+    async UpdateHousework(@Param() params: IdParams, @Body() houseworkUpdateData: ContentDto) {
         try {
-            const { id, type, title, description } = houseworkUpdateData;
+            const { id } = params;
+            const { type, title, description } = houseworkUpdateData;
 
             await this.defaultService.updateDefaultHousework({ id, type, title, description });
 
@@ -229,11 +230,12 @@ export class DefaultAdminController {
         }
     }
 
-    @Patch('/award')
+    @Patch('/awards/:id')
     @HttpCode(200)
-    async UpdateAward(@Body() awardUpdateData: ContentUpdateDto) {
+    async UpdateAward(@Param() params: IdParams, @Body() awardUpdateData: ContentDto) {
         try {
-            const { id, type, title, description } = awardUpdateData;
+            const { id } = params;
+            const { type, title, description } = awardUpdateData;
 
             await this.defaultService.updateDefaultAward({ id, type, title, description });
 
@@ -248,7 +250,7 @@ export class DefaultAdminController {
         }
     }
 
-    @Delete('/group/type/:id')
+    @Delete('/group/types/:id')
     @HttpCode(200)
     async DeleteGroupType(@Param() params: IdParams) {
         try {
@@ -267,7 +269,7 @@ export class DefaultAdminController {
         }
     }
 
-    @Delete('/alternative-payment/type/:id')
+    @Delete('/alternative-payment/types/:id')
     @HttpCode(200)
     async DeleteAlternativePaymentType(@Param() params: IdParams) {
         try {
@@ -305,7 +307,7 @@ export class DefaultAdminController {
         }
     }
 
-    @Delete('/award/:id')
+    @Delete('/awards/:id')
     @HttpCode(200)
     async DeleteAward(@Param() params: IdParams) {
         try {
