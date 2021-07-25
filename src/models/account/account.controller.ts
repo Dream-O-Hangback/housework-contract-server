@@ -21,6 +21,7 @@ import SearchQuery from './dto/search.query';
 import NicknameUpdateDto from './dto/nicknameUpdate.dto';
 import ProfileUpdateDto from './dto/profileUpdate.dto';
 import PasswordUpdateDto from './dto/passwordUpdate.dto';
+import BooleanUpdateDto from './dto/booleanUpdate.dto';
 
 @Controller('accounts')
 export class AccountController {
@@ -135,6 +136,27 @@ export class AccountController {
             }
 
             await this.accountService.updateItemPassword({ id, password: newPassword });
+
+            return successMessageGenerator();
+        } catch (err) {
+            console.log(err);
+            if (err instanceof HttpException) {
+                throw err;
+            }
+            
+            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @UseGuards(JwtStrategyGuard)
+    @Patch('/me/notifications')
+    @HttpCode(200)
+    async UpdateNotificationOption(@Request() req, @Body() notificationOptionUpdateData: BooleanUpdateDto) {
+        try {
+            const { id } = req.user;
+            const { value } = notificationOptionUpdateData;
+
+            await this.accountService.updateItemNotificationOpen({ id, value });
 
             return successMessageGenerator();
         } catch (err) {

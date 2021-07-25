@@ -259,6 +259,23 @@ describe('AccountService', () => {
         expect(accountRepositoryUpdateSpy).toHaveBeenCalledWith({ id }, expect.objectContaining({ password: expect.anything(), lastUpdateDate: new Date() }));
     });
 
+    it('should update notification option in a account', async () => {
+        const id = faker.datatype.uuid();
+        const value = true;
+        const currentDate = new Date();
+
+        const accountRepositoryUpdateSpy = jest.spyOn(accountRepository, 'update').mockResolvedValueOnce(new UpdateResult());
+
+        const result = await accountService.updateItemNotificationOpen({ id, value });
+
+        expect(result).toBeInstanceOf(UpdateResult);
+        expect(accountRepositoryUpdateSpy).toBeCalledTimes(1);
+        expect(accountRepositoryUpdateSpy).toHaveBeenCalledWith(
+            { id },
+            { notificationOpen: value, notificationOpenDate: currentDate, lastUpdateDate: currentDate },
+        );
+    });
+
     it('should delete a account', async () => {
         const id = faker.datatype.uuid();
 

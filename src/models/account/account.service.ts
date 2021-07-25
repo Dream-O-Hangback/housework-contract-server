@@ -84,6 +84,14 @@ export class AccountService {
 
         return this.accountRepository.update({ id }, { password: hashedPassword, lastUpdateDate: new Date() });
     }
+    updateItemNotificationOpen({ id, value }) {
+        const currentDate = new Date();
+
+        return this.accountRepository.update(
+            { id },
+            { notificationOpen: value, notificationOpenDate: currentDate, lastUpdateDate: currentDate },
+        );
+    }
     deleteItem({ id }) {
         return this.accountRepository.delete({ id: id, active: true });
     }
