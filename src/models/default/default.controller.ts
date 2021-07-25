@@ -148,4 +148,21 @@ export class DefaultController {
             throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @Get('/awards')
+    @HttpCode(200)
+    async GetAllAwards() {
+        try {
+            const list = await this.defaultService.getAllDefaultAwards();
+
+            return successMessageGenerator({ list, count: list.length });
+        } catch (err) {
+            console.log(err);
+            if (err instanceof HttpException) {
+                throw err;
+            }
+            
+            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }

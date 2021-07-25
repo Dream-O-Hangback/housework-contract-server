@@ -42,4 +42,7 @@ export class DefaultService {
     createDefaultAward({ type, title, description }) {
         return this.defaultAwardRepository.save({ type, title, description });
     }
+    getAllDefaultAwards() {
+        return this.defaultAwardRepository.find();
+    }
 }
