@@ -5,7 +5,7 @@ export default class NicknameUpdateDto {
     @IsString()
     readonly nickname: string;
 
-    constructor(email: string) {
-        this.nickname = email;
+    constructor(nickname: string) {
+        this.nickname = nickname;
     }
 }

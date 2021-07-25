@@ -76,6 +76,9 @@ export class AccountService {
     updateItemNickname({ id, nickname }) {
         return this.accountRepository.update({ id }, { nickname });
     }
+    updateItemProfile({ id, profile }) {
+        return this.accountRepository.update({ id }, { profile });
+    }
     deleteItem({ id }) {
         return this.accountRepository.delete({ id: id, active: true });
     }

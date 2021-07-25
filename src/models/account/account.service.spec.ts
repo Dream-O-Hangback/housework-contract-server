@@ -233,6 +233,19 @@ describe('AccountService', () => {
         expect(accountRepositoryUpdateSpy).toHaveBeenCalledWith({ id }, { nickname });
     });
 
+    it('should update profile attribute in a account', async () => {
+        const id = faker.datatype.uuid();
+        const profile = faker.random.word();
+
+        const accountRepositoryUpdateSpy = jest.spyOn(accountRepository, 'update').mockResolvedValueOnce(new UpdateResult());
+
+        const result = await accountService.updateItemProfile({ id, profile });
+
+        expect(result).toBeInstanceOf(UpdateResult);
+        expect(accountRepositoryUpdateSpy).toBeCalledTimes(1);
+        expect(accountRepositoryUpdateSpy).toHaveBeenCalledWith({ id }, { profile });
+    });
+
     it('should delete a account', async () => {
         const id = faker.datatype.uuid();
 

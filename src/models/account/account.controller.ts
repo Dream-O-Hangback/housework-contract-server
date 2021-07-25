@@ -18,6 +18,7 @@ import { JwtStrategyGuard } from '../../auth/guards/jwt.guard';
 import NicknameDto from './dto/nickname.dto';
 import SearchQuery from './dto/search.query';
 import NicknameUpdateDto from './dto/nicknameUpdate.dto';
+import ProfileUpdateDto from './dto/profileUpdate.dto';
 
 @Controller('accounts')
 export class AccountController {
@@ -59,9 +60,6 @@ export class AccountController {
             const { id } = req.user;
 
             const result = await this.accountService.getInfo({ id });
-            if (!result) {
-                throw new HttpException(failMessage.ERR_NOT_FOUND, HttpStatus.NOT_FOUND);
-            }
 
             return successMessageGenerator(result);
         } catch (err) {
@@ -87,10 +85,28 @@ export class AccountController {
                 throw new HttpException(failMessage.ERR_ALREADY_EXISTS, HttpStatus.CONFLICT);
             }
 
-            const result = await this.accountService.updateItemNickname({ id, nickname });
-            if (result.affected === 0) {
-                throw new HttpException(failMessage.ERR_NOT_FOUND, HttpStatus.NOT_FOUND);
+            await this.accountService.updateItemNickname({ id, nickname });
+
+            return successMessageGenerator();
+        } catch (err) {
+            console.log(err);
+            if (err instanceof HttpException) {
+                throw err;
             }
+            
+            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @UseGuards(JwtStrategyGuard)
+    @Patch('/me/profile')
+    @HttpCode(200)
+    async UpdateMyAccountInfoProfile(@Request() req, @Body() profileUpdateData: ProfileUpdateDto) {
+        try {
+            const { id } = req.user;
+            const { profile } = profileUpdateData;
+
+            await this.accountService.updateItemProfile({ id, profile });
 
             return successMessageGenerator();
         } catch (err) {
