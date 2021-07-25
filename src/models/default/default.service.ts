@@ -39,6 +39,9 @@ export class DefaultService {
     getAllDefaultAlternativePaymentTypes() {
         return this.defaultAlternativePaymentTypeRepository.find();
     }
+    getAllActiveDefaultAlternativePaymentTypes() {
+        return this.defaultAlternativePaymentTypeRepository.find({ active: true });
+    }
     updateDefaultAlternativePaymentType({ id, title, displayTitle }) {
         return this.defaultAlternativePaymentTypeRepository.update({ id }, { title, displayTitle });
     }
