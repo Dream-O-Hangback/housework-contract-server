@@ -6,6 +6,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { AccountModule } from './models/account/account.module';
+import { DefaultModule } from './models/default/default.module';
 import entities from './models';
 
 @Module({
@@ -39,6 +40,7 @@ import entities from './models';
     }),
     AuthModule,
     AccountModule,
+    DefaultModule,
   ],
   controllers: [AppController],
   providers: [AppService],
