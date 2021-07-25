@@ -47,7 +47,7 @@ export class AuthController {
                 throw new HttpException(failMessage.ERR_ALREADY_EXISTS, HttpStatus.CONFLICT);
             }
             if (doesExistsAccount) {
-                throw new HttpException(failMessage.ERR_ALREADY_STARTED, HttpStatus.CONFLICT);
+                throw new HttpException(failMessage.ERR_ALREADY_CREATED, HttpStatus.CONFLICT);
             }
 
             await this.accountService.createItem(accountData);
@@ -68,6 +68,10 @@ export class AuthController {
     @HttpCode(200)
     async login(@Request() req) {
         try {
+            if (!req.user) {
+                throw new HttpException(failMessage.ERR_NOT_VERIFIED, HttpStatus.CONFLICT);
+            }
+
             return successMessageGenerator(await this.authService.issueAccessToken(req.user));
         } catch (err) {
             console.log(err);
@@ -84,7 +88,8 @@ export class AuthController {
     @HttpCode(200)
     async logout(@Request() req) {
         try {
-            return successMessageGenerator(await this.authService.resetRefreshToken(req.user));
+            await this.authService.resetRefreshToken(req.user)
+            return successMessageGenerator();
         } catch (err) {
             console.log(err);
             if (err instanceof HttpException) {

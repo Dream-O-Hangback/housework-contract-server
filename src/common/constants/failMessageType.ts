@@ -5,13 +5,18 @@ export const ERR_INVALID_PARAM: FailMessageType = {
     description: '...'
 }
 
+export const ERR_NOT_VERIFIED: FailMessageType = {
+    errorCode: 'NOT_VERIFIED',
+    description: '...'
+}
+
 export const ERR_ALREADY_EXISTS: FailMessageType = {
     errorCode: 'ALREADY_EXISTS',
     description: '...'
 }
 
-export const ERR_ALREADY_STARTED: FailMessageType = {
-    errorCode: 'ALREADY_STARTED',
+export const ERR_ALREADY_CREATED: FailMessageType = {
+    errorCode: 'ALREADY_CREATED',
     description: '...'
 }
 

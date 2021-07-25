@@ -21,7 +21,7 @@ export class AccountController {
 
     @Post('/nickname/exists')
     @HttpCode(200)
-    async CheckNicknameDuplication(@Body() nicknameData: NicknameDto): Promise<object> {
+    async CheckNicknameDuplication(@Body() nicknameData: NicknameDto) {
         try {
             const { nickname } = nicknameData;
 

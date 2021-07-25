@@ -16,38 +16,38 @@ import CertificationCode from '../models/certificationCode/entities';
 import RefreshToken from '../models/refreshToken/entities';
 
 @Module({
-  imports: [
-    ConfigModule,
-    PassportModule,
-    JwtModule.registerAsync({
-      imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => {
-        return {
-          secret: configService.get<string>('JWT_SECRET'),
-          signOptions: { expiresIn: configService.get<string>('JWT_EXPIRES_IN') },
-        };
-      },
-      inject: [ConfigService]
-    }),
-    TypeOrmModule.forFeature([
-      Account,
-      CertificationCode,
-      RefreshToken,
+    imports: [
+        ConfigModule,
+        PassportModule,
+        JwtModule.registerAsync({
+            imports: [ConfigModule],
+            useFactory: async (configService: ConfigService) => {
+                return {
+                    secret: configService.get<string>('JWT_SECRET'),
+                    signOptions: { expiresIn: configService.get<string>('JWT_EXPIRES_IN') },
+                };
+            },
+            inject: [ConfigService]
+        }),
+        TypeOrmModule.forFeature([
+            Account,
+            CertificationCode,
+            RefreshToken,
+        ],
+    )],
+    controllers: [AuthController],
+    providers: [
+        AuthService,
+        MailService,
+        AccountService,
+        CertificationCodeService,
+        RefreshTokenService,
+        LocalStrategy,
+        JwtStrategy,
     ],
-  )],
-  controllers: [AuthController],
-  providers: [
-    AuthService,
-    MailService,
-    AccountService,
-    CertificationCodeService,
-    RefreshTokenService,
-    LocalStrategy,
-    JwtStrategy,
-  ],
-  exports: [
-    AuthService,
-    JwtModule,
-  ],
+    exports: [
+        AuthService,
+        JwtModule,
+    ],
 })
 export class AuthModule {}

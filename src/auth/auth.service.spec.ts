@@ -86,6 +86,19 @@ describe('AuthService', () => {
         expect(accountRepositoryFindOneSpy).toHaveBeenCalledWith({ email, active: true });
     });
 
+    it('should validate a account and return null', async () => {
+        const email = faker.internet.email();
+        const password = faker.datatype.string();
+
+        const accountRepositoryFindOneSpy = jest.spyOn(accountRepository, 'findOne').mockResolvedValueOnce(null);
+        
+        const result = await authService.validateAccount(email, password);
+        
+        expect(result).toEqual(null);
+        expect(accountRepositoryFindOneSpy).toBeCalledTimes(2);
+        expect(accountRepositoryFindOneSpy).toHaveBeenCalledWith({ email, active: true });
+    });
+
     it('should issue a access token', async () => {
         const id = faker.datatype.uuid();
 
