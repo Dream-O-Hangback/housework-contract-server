@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Like, Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import Account from '../account/entities';
 
@@ -37,6 +37,20 @@ export class AccountService {
         emailOpenDate: currentDate,
         lastUpdateDate: currentDate,
         });
+    }
+    async getList({ searchWord, skip, take }) {
+        const [list, count] = await this.accountRepository.findAndCount({
+            where: [
+                { email: Like(`%${searchWord}%`), active: true },
+                { name: Like(`%${searchWord}%`), active: true },
+                { nickname: Like(`%${searchWord}%`), active: true },
+            ],
+            select: ['id', 'email', 'name', 'nickname', 'profileImageUrl', 'profile'],
+            skip,
+            take,
+        });
+
+        return { list, count };
     }
     getItem({ id }) {
         return this.accountRepository.findOne({ id, active: true });

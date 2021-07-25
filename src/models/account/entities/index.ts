@@ -1,6 +1,7 @@
-import { Column, CreateDateColumn, UpdateDateColumn, PrimaryGeneratedColumn, Entity } from 'typeorm';
+import { Column, CreateDateColumn, UpdateDateColumn, PrimaryGeneratedColumn, Entity, Index } from 'typeorm';
 
 @Entity('account')
+// @Index(['email', 'name', 'nickname'], { fulltext: true })
 export default class Account {
     @PrimaryGeneratedColumn('uuid')
     id: string;

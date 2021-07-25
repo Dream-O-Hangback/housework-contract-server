@@ -1,6 +1,6 @@
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Like, Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import * as faker from 'faker';
 import MockDate from 'mockdate';
@@ -11,6 +11,7 @@ type MockRepository<T = any> = Partial<Record<keyof Repository<T>, jest.Mock>>;
 
 const mockRepository = () => ({
     save: jest.fn(),
+    findAndCount: jest.fn(),
     findOne: jest.fn(),
     update: jest.fn(),
     delete: jest.fn(),
@@ -69,6 +70,61 @@ describe('AccountService', () => {
 
         delete newAccount.password;
         expect(accountRepositorySaveSpy).toHaveBeenCalledWith(expect.objectContaining(newAccount));
+    });
+
+    it('should get (active) account list by search word', async () => {
+        const searchWord = `${faker.name.firstName()} ${faker.name.lastName()}`;
+        const offset = 0;
+        const limit = 10;
+
+        const accounts = [
+            {
+                id: faker.datatype.uuid(),
+                email: faker.internet.email(),
+                name: searchWord,
+                nickname: searchWord,
+                profile: faker.random.word(),
+            },
+            {
+                id: faker.datatype.uuid(),
+                email: faker.internet.email(),
+                name: `${faker.name.firstName()} ${faker.name.lastName()}`,
+                nickname: `${faker.name.firstName()} ${faker.name.lastName()}`,
+                profile: faker.random.word(),
+            },
+            {
+                id: faker.datatype.uuid(),
+                email: faker.internet.email(),
+                name: `${faker.name.firstName()} ${faker.name.lastName()}`,
+                nickname: `${faker.name.firstName()} ${faker.name.lastName()}`,
+                profile: faker.random.word(),
+            },
+        ];
+
+        const filteredAccounts = accounts.filter((elem) => (
+            elem.email.indexOf(searchWord) !== -1 ||
+            elem.name.indexOf(searchWord) !== -1 ||
+            elem.nickname.indexOf(searchWord) !== -1
+        ));
+
+        const accountRepositoryFindSpy = jest.spyOn(accountRepository, 'findAndCount').mockResolvedValueOnce([filteredAccounts, filteredAccounts.length]);
+        
+        const { list, count } = await accountService.getList({ searchWord, skip: offset * limit, take: limit });
+        
+        expect(list).toHaveLength(1);
+        expect(list[0]).toStrictEqual(accounts[0]);
+        expect(count).toEqual(1);
+        expect(accountRepositoryFindSpy).toBeCalledTimes(1);
+        expect(accountRepositoryFindSpy).toHaveBeenCalledWith({
+            where: [
+                { email: Like(`%${searchWord}%`), active: true },
+                { name: Like(`%${searchWord}%`), active: true },
+                { nickname: Like(`%${searchWord}%`), active: true },
+            ],
+            select: ['id', 'email', 'name', 'nickname', 'profileImageUrl', 'profile'],
+            skip: offset * limit,
+            take: limit,
+        });
     });
 
     it('should get a (active) account', async () => {
