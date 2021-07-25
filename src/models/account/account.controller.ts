@@ -3,6 +3,7 @@ import {
     Controller,
     Post,
     Get,
+    Patch,
     HttpException,
     HttpStatus,
     HttpCode,
@@ -16,6 +17,7 @@ import { AccountService } from './account.service';
 import { JwtStrategyGuard } from '../../auth/guards/jwt.guard';
 import NicknameDto from './dto/nickname.dto';
 import SearchQuery from './dto/search.query';
+import NicknameUpdateDto from './dto/nicknameUpdate.dto';
 
 @Controller('accounts')
 export class AccountController {
@@ -62,6 +64,35 @@ export class AccountController {
             }
 
             return successMessageGenerator(result);
+        } catch (err) {
+            console.log(err);
+            if (err instanceof HttpException) {
+                throw err;
+            }
+            
+            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @UseGuards(JwtStrategyGuard)
+    @Patch('/me/nickname')
+    @HttpCode(200)
+    async UpdateMyAccountInfoNickname(@Request() req, @Body() nicknameUpdateData: NicknameUpdateDto) {
+        try {
+            const { id } = req.user;
+            const { nickname } = nicknameUpdateData;
+
+            const isDuplicated = !!(await this.accountService.getItemByNickname({ nickname }));
+            if (isDuplicated) {
+                throw new HttpException(failMessage.ERR_ALREADY_EXISTS, HttpStatus.CONFLICT);
+            }
+
+            const result = await this.accountService.updateItemNickname({ id, nickname });
+            if (result.affected === 0) {
+                throw new HttpException(failMessage.ERR_NOT_FOUND, HttpStatus.NOT_FOUND);
+            }
+
+            return successMessageGenerator();
         } catch (err) {
             console.log(err);
             if (err instanceof HttpException) {

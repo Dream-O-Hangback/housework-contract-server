@@ -169,8 +169,8 @@ export class AuthController {
 
             const { accountId } = certificationCode;
 
-            const account = await this.accountService.updateItemActive({ id: accountId });
-            if (account.affected === 0) {
+            const result = await this.accountService.updateItemActive({ id: accountId });
+            if (result.affected === 0) {
                 throw new HttpException(failMessage.ERR_NOT_FOUND, HttpStatus.NOT_FOUND);
             }
 

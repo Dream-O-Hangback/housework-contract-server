@@ -221,6 +221,20 @@ describe('AccountService', () => {
         expect(accountRepositoryUpdateSpy).toHaveBeenCalledWith({ id }, { active: true });
     });
 
+    it('should update nickname attribute in a account', async () => {
+        const id = faker.datatype.uuid();
+        const nickname = faker.random.word();
+
+        const account = { id, nickname };
+
+        const accountRepositoryUpdateSpy = jest.spyOn(accountRepository, 'update').mockResolvedValueOnce(account as Account);
+
+        await accountService.updateItemNickname({ id, nickname });
+
+        expect(accountRepositoryUpdateSpy).toBeCalledTimes(1);
+        expect(accountRepositoryUpdateSpy).toHaveBeenCalledWith({ id }, { nickname });
+    });
+
     it('should delete a account', async () => {
         const id = faker.datatype.uuid();
 

@@ -73,6 +73,9 @@ export class AccountService {
     updateItemActive({ id }) {
         return this.accountRepository.update({ id }, { active: true });
     }
+    updateItemNickname({ id, nickname }) {
+        return this.accountRepository.update({ id }, { nickname });
+    }
     deleteItem({ id }) {
         return this.accountRepository.delete({ id: id, active: true });
     }
