@@ -38,4 +38,23 @@ export class DefaultController {
             throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @Post('/alternative-payment/type')
+    @HttpCode(200)
+    async CreateAlternativePaymentType(@Body() alternativePaymentTypeData: TypeDto) {
+        try {
+            const { title, displayTitle } = alternativePaymentTypeData;
+
+            await this.defaultService.createDefaultAlternativePaymentType({ title, displayTitle });
+
+            return successMessageGenerator(); 
+        } catch (err) {
+            console.log(err);
+            if (err instanceof HttpException) {
+                throw err;
+            }
+            
+            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }

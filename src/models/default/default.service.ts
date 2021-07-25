@@ -24,4 +24,7 @@ export class DefaultService {
     createDefaultGroupType({ title, displayTitle }) {
         return this.defaultGroupTypeRepository.save({ title, displayTitle });
     }
+    createDefaultAlternativePaymentType({ title, displayTitle }) {
+        return this.defaultAlternativePaymentTypeRepository.save({ title, displayTitle });
+    }
 }
