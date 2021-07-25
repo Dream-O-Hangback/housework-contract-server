@@ -48,6 +48,9 @@ export class DefaultService {
     updateDefaultAlternativePaymentType({ id, title, displayTitle }) {
         return this.defaultAlternativePaymentTypeRepository.update({ id }, { title, displayTitle });
     }
+    deleteAlternativePaymentType({ id }) {
+        return this.defaultAlternativePaymentTypeRepository.update({ id }, { active: false });
+    }
     createDefaultHousework({ type, title, description }) {
         return this.defaultHouseworkRepository.save({ type, title, description });
     }
