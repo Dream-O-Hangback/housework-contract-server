@@ -27,6 +27,9 @@ export class DefaultService {
     getAllDefaultGroupTypes() {
         return this.defaultGroupTypeRepository.find();
     }
+    getAllActiveDefaultGroupTypes() {
+        return this.defaultGroupTypeRepository.find({ active: true });
+    }
     updateDefaultGroupType({ id, title, displayTitle }) {
         return this.defaultGroupTypeRepository.update({ id }, { title, displayTitle });
     }
