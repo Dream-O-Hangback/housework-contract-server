@@ -2,6 +2,7 @@ import {
     Body,
     Controller,
     Post,
+    Get,
     HttpException,
     HttpStatus,
     HttpCode,
@@ -87,6 +88,23 @@ export class DefaultController {
             await this.defaultService.createDefaultAward({ type, title, description });
 
             return successMessageGenerator(); 
+        } catch (err) {
+            console.log(err);
+            if (err instanceof HttpException) {
+                throw err;
+            }
+            
+            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Get('/group/types')
+    @HttpCode(200)
+    async GetAllGroupTypes() {
+        try {
+            const list = await this.defaultService.getAllDefaultGroupTypes();
+
+            return successMessageGenerator({ list, count: list.length });
         } catch (err) {
             console.log(err);
             if (err instanceof HttpException) {
