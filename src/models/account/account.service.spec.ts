@@ -1,6 +1,6 @@
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Like, Repository } from 'typeorm';
+import { Like, Repository, UpdateResult } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import * as faker from 'faker';
 import MockDate from 'mockdate';
@@ -211,12 +211,11 @@ describe('AccountService', () => {
     it('should update active attribute in a account', async () => {
         const id = faker.datatype.uuid();
 
-        const account = { id, active: true };
+        const accountRepositoryUpdateSpy = jest.spyOn(accountRepository, 'update').mockResolvedValueOnce(new UpdateResult());
 
-        const accountRepositoryUpdateSpy = jest.spyOn(accountRepository, 'update').mockResolvedValueOnce(account as Account);
+        const result = await accountService.updateItemActive({ id });
 
-        await accountService.updateItemActive({ id });
-
+        expect(result).toBeInstanceOf(UpdateResult);
         expect(accountRepositoryUpdateSpy).toBeCalledTimes(1);
         expect(accountRepositoryUpdateSpy).toHaveBeenCalledWith({ id }, { active: true });
     });
@@ -225,12 +224,11 @@ describe('AccountService', () => {
         const id = faker.datatype.uuid();
         const nickname = faker.random.word();
 
-        const account = { id, nickname };
+        const accountRepositoryUpdateSpy = jest.spyOn(accountRepository, 'update').mockResolvedValueOnce(new UpdateResult());
 
-        const accountRepositoryUpdateSpy = jest.spyOn(accountRepository, 'update').mockResolvedValueOnce(account as Account);
+        const result = await accountService.updateItemNickname({ id, nickname });
 
-        await accountService.updateItemNickname({ id, nickname });
-
+        expect(result).toBeInstanceOf(UpdateResult);
         expect(accountRepositoryUpdateSpy).toBeCalledTimes(1);
         expect(accountRepositoryUpdateSpy).toHaveBeenCalledWith({ id }, { nickname });
     });
