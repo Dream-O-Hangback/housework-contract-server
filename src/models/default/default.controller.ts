@@ -51,4 +51,21 @@ export class DefaultController {
             throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @Get('/housework')
+    @HttpCode(200)
+    async GetAllHousework() {
+        try {
+            const list = await this.defaultService.getAllActiveDefaultHousework();
+
+            return successMessageGenerator({ list, count: list.length });
+        } catch (err) {
+            console.log(err);
+            if (err instanceof HttpException) {
+                throw err;
+            }
+            
+            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }

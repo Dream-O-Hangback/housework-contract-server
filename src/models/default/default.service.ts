@@ -51,6 +51,9 @@ export class DefaultService {
     getAllDefaultHousework() {
         return this.defaultHouseworkRepository.find();
     }
+    getAllActiveDefaultHousework() {
+        return this.defaultHouseworkRepository.find({ active: true });
+    }
     updateDefaultHousework({ id, type, title, description }) {
         return this.defaultHouseworkRepository.update({ id }, { type, title, description });
     }
