@@ -276,6 +276,23 @@ describe('AccountService', () => {
         );
     });
 
+    it('should update email notification option in a account', async () => {
+        const id = faker.datatype.uuid();
+        const value = true;
+        const currentDate = new Date();
+
+        const accountRepositoryUpdateSpy = jest.spyOn(accountRepository, 'update').mockResolvedValueOnce(new UpdateResult());
+
+        const result = await accountService.updateItemEmailOpen({ id, value });
+
+        expect(result).toBeInstanceOf(UpdateResult);
+        expect(accountRepositoryUpdateSpy).toBeCalledTimes(1);
+        expect(accountRepositoryUpdateSpy).toHaveBeenCalledWith(
+            { id },
+            { emailOpen: value, emailOpenDate: currentDate, lastUpdateDate: currentDate },
+        );
+    });
+
     it('should delete a account', async () => {
         const id = faker.datatype.uuid();
 

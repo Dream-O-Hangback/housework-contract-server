@@ -169,6 +169,27 @@ export class AccountController {
         }
     }
 
+    @UseGuards(JwtStrategyGuard)
+    @Patch('/me/email-notifications')
+    @HttpCode(200)
+    async UpdateEmailNotificationOption(@Request() req, @Body() emailNotificationOptionUpdateData: BooleanUpdateDto) {
+        try {
+            const { id } = req.user;
+            const { value } = emailNotificationOptionUpdateData;
+
+            await this.accountService.updateItemEmailOpen({ id, value });
+
+            return successMessageGenerator();
+        } catch (err) {
+            console.log(err);
+            if (err instanceof HttpException) {
+                throw err;
+            }
+            
+            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @Post('/nickname/exists')
     @HttpCode(200)
     async CheckNicknameDuplication(@Body() nicknameData: NicknameDto) {

@@ -92,6 +92,14 @@ export class AccountService {
             { notificationOpen: value, notificationOpenDate: currentDate, lastUpdateDate: currentDate },
         );
     }
+    updateItemEmailOpen({ id, value }) {
+        const currentDate = new Date();
+
+        return this.accountRepository.update(
+            { id },
+            { emailOpen: value, emailOpenDate: currentDate, lastUpdateDate: currentDate },
+        );
+    }
     deleteItem({ id }) {
         return this.accountRepository.delete({ id: id, active: true });
     }
