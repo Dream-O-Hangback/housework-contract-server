@@ -3,6 +3,7 @@ import {
     Controller,
     Post,
     Get,
+    Patch,
     HttpException,
     HttpStatus,
     HttpCode,
@@ -14,6 +15,7 @@ import { DefaultService } from './default.service';
 import { AdminGuard } from '../../auth/guards/admin.guard';
 import TypeDto from './dto/type.dto';
 import ContentDto from './dto/content.dto';
+import TypeUpdateDto from './dto/typeUpdate.dto';
 
 @Controller('admin/default')
 @UseGuards(AdminGuard)
@@ -156,6 +158,25 @@ export class DefaultController {
             const list = await this.defaultService.getAllDefaultAwards();
 
             return successMessageGenerator({ list, count: list.length });
+        } catch (err) {
+            console.log(err);
+            if (err instanceof HttpException) {
+                throw err;
+            }
+            
+            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Patch('/group/type')
+    @HttpCode(200)
+    async UpdateGroupType(@Body() groupTypeUpdateData: TypeUpdateDto) {
+        try {
+            const { id, title, displayTitle } = groupTypeUpdateData;
+
+            await this.defaultService.updateDefaultGroupType({ id, title, displayTitle });
+
+            return successMessageGenerator(); 
         } catch (err) {
             console.log(err);
             if (err instanceof HttpException) {

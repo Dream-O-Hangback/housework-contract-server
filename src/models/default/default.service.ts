@@ -27,6 +27,9 @@ export class DefaultService {
     getAllDefaultGroupTypes() {
         return this.defaultGroupTypeRepository.find();
     }
+    updateDefaultGroupType({ id, title, displayTitle }) {
+        return this.defaultGroupTypeRepository.update({ id }, { title, displayTitle });
+    }
     createDefaultAlternativePaymentType({ title, displayTitle }) {
         return this.defaultAlternativePaymentTypeRepository.save({ title, displayTitle });
     }
