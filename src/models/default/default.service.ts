@@ -63,6 +63,9 @@ export class DefaultService {
     getAllDefaultAwards() {
         return this.defaultAwardRepository.find();
     }
+    getAllActiveDefaultAwards() {
+        return this.defaultAwardRepository.find({ active: true });
+    }
     updateDefaultAward({ id, type, title, description }) {
         return this.defaultAwardRepository.update({ id }, { type, title, description });
     }
