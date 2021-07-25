@@ -112,7 +112,7 @@ export class AuthController {
                 payload = this.authService.verifyAccessToken(accessToken.replace('Bearer ', ''));
                 if (!payload || !payload.id) throw new Error();
 
-                const account = await this.accountService.getItem({ id: payload.id });
+                const account = await this.accountService.getActiveItem({ id: payload.id });
                 if (!account) throw new Error();
             } catch (err) {
                 console.log(err);

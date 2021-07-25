@@ -127,13 +127,13 @@ describe('AccountService', () => {
         });
     });
 
-    it('should get a (active) account', async () => {
+    it('should get a active account', async () => {
         const id = faker.datatype.uuid();
         const account = { id, active: true };
 
         const accountRepositoryFindOneSpy = jest.spyOn(accountRepository, 'findOne').mockResolvedValueOnce(account as Account);
         
-        const result = await accountService.getItem({ id });
+        const result = await accountService.getActiveItem({ id });
         
         expect(result).toBe(account as Account);
         expect(accountRepositoryFindOneSpy).toBeCalledTimes(1);
@@ -177,6 +177,35 @@ describe('AccountService', () => {
         expect(result).toBe(account as Account);
         expect(accountRepositoryFindOneSpy).toBeCalledTimes(1);
         expect(accountRepositoryFindOneSpy).toHaveBeenCalledWith({ nickname });
+    });
+
+    it('should get a active account info', async () => {
+        const id = faker.datatype.uuid();
+        const account = {
+            id,
+            email: faker.internet.email(),
+            name: faker.random.word(),
+            nickname: faker.random.word(),
+            profileImageUrl: null,
+            profile: faker.random.word(),
+            type: 'local',
+            notificationOpen: true,
+            notificationOpenDate: new Date(),
+            emailOpen: true,
+            emailOpenDate: new Date(),
+            createDate: new Date(),
+        };
+
+        const accountRepositoryFindOneSpy = jest.spyOn(accountRepository, 'findOne').mockResolvedValueOnce(account as Account);
+        
+        const result = await accountService.getInfo({ id });
+        
+        expect(result).toBe(account as Account);
+        expect(accountRepositoryFindOneSpy).toBeCalledTimes(1);
+        expect(accountRepositoryFindOneSpy).toHaveBeenCalledWith(
+            { id, active: true },
+            { select: ['id', 'email', 'name', 'nickname', 'profileImageUrl', 'profile', 'type', 'notificationOpen', 'notificationOpenDate', 'emailOpen', 'emailOpenDate', 'createDate'] },
+        );
     });
 
     it('should update active attribute in a account', async () => {

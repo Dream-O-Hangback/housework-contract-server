@@ -52,7 +52,7 @@ export class AccountService {
 
         return { list, count };
     }
-    getItem({ id }) {
+    getActiveItem({ id }) {
         return this.accountRepository.findOne({ id, active: true });
     }
     getActiveItemByEmail({ email }) {
@@ -63,6 +63,12 @@ export class AccountService {
     }
     getItemByNickname({ nickname }) {
         return this.accountRepository.findOne({ nickname });
+    }
+    getInfo({ id }) {
+        return this.accountRepository.findOne(
+            { id, active: true },
+            { select: ['id', 'email', 'name', 'nickname', 'profileImageUrl', 'profile', 'type', 'notificationOpen', 'notificationOpenDate', 'emailOpen', 'emailOpenDate', 'createDate'] },
+        );
     }
     updateItemActive({ id }) {
         return this.accountRepository.update({ id }, { active: true });

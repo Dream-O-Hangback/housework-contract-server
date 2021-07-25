@@ -2,10 +2,11 @@ import {
     Body,
     Controller,
     Post,
+    Get,
     HttpException,
     HttpStatus,
     HttpCode,
-    Get,
+    Request,
     Query,
     UseGuards,
 } from '@nestjs/common';
@@ -38,6 +39,29 @@ export class AccountController {
             const list = await this.accountService.getList({ searchWord, skip: offset * limit, take: limit });
 
             return successMessageGenerator(list); 
+        } catch (err) {
+            console.log(err);
+            if (err instanceof HttpException) {
+                throw err;
+            }
+            
+            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @UseGuards(JwtStrategyGuard)
+    @Get('/me')
+    @HttpCode(200)
+    async GetMyAccountInfo(@Request() req) {
+        try {
+            const { id } = req.user;
+
+            const result = await this.accountService.getInfo({ id });
+            if (!result) {
+                throw new HttpException(failMessage.ERR_NOT_FOUND, HttpStatus.NOT_FOUND);
+            }
+
+            return successMessageGenerator(result);
         } catch (err) {
             console.log(err);
             if (err instanceof HttpException) {
