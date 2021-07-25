@@ -4,6 +4,7 @@ import {
     Post,
     Get,
     Patch,
+    Delete,
     HttpException,
     HttpStatus,
     HttpCode,
@@ -17,6 +18,8 @@ import TypeDto from './dto/type.dto';
 import ContentDto from './dto/content.dto';
 import TypeUpdateDto from './dto/typeUpdate.dto';
 import ContentUpdateDto from './dto/contentUpdate.dto';
+import { Param } from '@nestjs/common';
+import IdParams from './dto/id.params';
 
 @Controller('admin/default')
 @UseGuards(AdminGuard)
@@ -235,6 +238,25 @@ export class DefaultAdminController {
             await this.defaultService.updateDefaultAward({ id, type, title, description });
 
             return successMessageGenerator(); 
+        } catch (err) {
+            console.log(err);
+            if (err instanceof HttpException) {
+                throw err;
+            }
+            
+            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Delete('/group/type/:id')
+    @HttpCode(200)
+    async DeleteGroupType(@Param() params: IdParams) {
+        try {
+            const { id } = params;
+            
+            await this.defaultService.deleteDefaultGroupType({ id });
+
+            return successMessageGenerator();
         } catch (err) {
             console.log(err);
             if (err instanceof HttpException) {

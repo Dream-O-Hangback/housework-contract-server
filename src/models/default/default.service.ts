@@ -33,6 +33,9 @@ export class DefaultService {
     updateDefaultGroupType({ id, title, displayTitle }) {
         return this.defaultGroupTypeRepository.update({ id }, { title, displayTitle });
     }
+    deleteDefaultGroupType({ id }) {
+        return this.defaultGroupTypeRepository.update({ id }, { active: false });
+    }
     createDefaultAlternativePaymentType({ title, displayTitle }) {
         return this.defaultAlternativePaymentTypeRepository.save({ title, displayTitle });
     }
