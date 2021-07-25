@@ -217,7 +217,7 @@ describe('AccountService', () => {
 
         expect(result).toBeInstanceOf(UpdateResult);
         expect(accountRepositoryUpdateSpy).toBeCalledTimes(1);
-        expect(accountRepositoryUpdateSpy).toHaveBeenCalledWith({ id }, { active: true });
+        expect(accountRepositoryUpdateSpy).toHaveBeenCalledWith({ id }, { active: true, lastUpdateDate: new Date() });
     });
 
     it('should update nickname attribute in a account', async () => {
@@ -230,7 +230,7 @@ describe('AccountService', () => {
 
         expect(result).toBeInstanceOf(UpdateResult);
         expect(accountRepositoryUpdateSpy).toBeCalledTimes(1);
-        expect(accountRepositoryUpdateSpy).toHaveBeenCalledWith({ id }, { nickname });
+        expect(accountRepositoryUpdateSpy).toHaveBeenCalledWith({ id }, { nickname, lastUpdateDate: new Date() });
     });
 
     it('should update profile attribute in a account', async () => {
@@ -243,7 +243,20 @@ describe('AccountService', () => {
 
         expect(result).toBeInstanceOf(UpdateResult);
         expect(accountRepositoryUpdateSpy).toBeCalledTimes(1);
-        expect(accountRepositoryUpdateSpy).toHaveBeenCalledWith({ id }, { profile });
+        expect(accountRepositoryUpdateSpy).toHaveBeenCalledWith({ id }, { profile, lastUpdateDate: new Date() });
+    });
+
+    it('should update password attribute in a account', async () => {
+        const id = faker.datatype.uuid();
+        const newPassword = faker.random.word();
+
+        const accountRepositoryUpdateSpy = jest.spyOn(accountRepository, 'update').mockResolvedValueOnce(new UpdateResult());
+
+        const result = await accountService.updateItemPassword({ id, password: newPassword });
+
+        expect(result).toBeInstanceOf(UpdateResult);
+        expect(accountRepositoryUpdateSpy).toBeCalledTimes(1);
+        expect(accountRepositoryUpdateSpy).toHaveBeenCalledWith({ id }, expect.objectContaining({ password: expect.anything(), lastUpdateDate: new Date() }));
     });
 
     it('should delete a account', async () => {

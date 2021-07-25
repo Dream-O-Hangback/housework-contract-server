@@ -25,17 +25,17 @@ export class AccountService {
         const currentDate = new Date();
 
         return this.accountRepository.save({
-        email,
-        name,
-        password: hashedPassword,
-        nickname,
-        profile,
-        type,
-        notificationOpen,
-        emailOpen,
-        notificationOpenDate: currentDate,
-        emailOpenDate: currentDate,
-        lastUpdateDate: currentDate,
+            email,
+            name,
+            password: hashedPassword,
+            nickname,
+            profile,
+            type,
+            notificationOpen,
+            emailOpen,
+            notificationOpenDate: currentDate,
+            emailOpenDate: currentDate,
+            lastUpdateDate: currentDate,
         });
     }
     async getList({ searchWord, skip, take }) {
@@ -71,13 +71,18 @@ export class AccountService {
         );
     }
     updateItemActive({ id }) {
-        return this.accountRepository.update({ id }, { active: true });
+        return this.accountRepository.update({ id }, { active: true, lastUpdateDate: new Date() });
     }
     updateItemNickname({ id, nickname }) {
-        return this.accountRepository.update({ id }, { nickname });
+        return this.accountRepository.update({ id }, { nickname, lastUpdateDate: new Date() });
     }
     updateItemProfile({ id, profile }) {
-        return this.accountRepository.update({ id }, { profile });
+        return this.accountRepository.update({ id }, { profile, lastUpdateDate: new Date() });
+    }
+    async updateItemPassword({ id, password }) {
+        const hashedPassword = await bcrypt.hash(password, (await bcrypt.genSalt()));
+
+        return this.accountRepository.update({ id }, { password: hashedPassword, lastUpdateDate: new Date() });
     }
     deleteItem({ id }) {
         return this.accountRepository.delete({ id: id, active: true });

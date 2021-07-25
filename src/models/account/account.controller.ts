@@ -11,6 +11,7 @@ import {
     Query,
     UseGuards,
 } from '@nestjs/common';
+import * as bcrypt from 'bcrypt';
 import { successMessageGenerator } from '../../common/lib';
 import { failMessage } from '../../common/constants';
 import { AccountService } from './account.service';
@@ -19,6 +20,7 @@ import NicknameDto from './dto/nickname.dto';
 import SearchQuery from './dto/search.query';
 import NicknameUpdateDto from './dto/nicknameUpdate.dto';
 import ProfileUpdateDto from './dto/profileUpdate.dto';
+import PasswordUpdateDto from './dto/passwordUpdate.dto';
 
 @Controller('accounts')
 export class AccountController {
@@ -107,6 +109,32 @@ export class AccountController {
             const { profile } = profileUpdateData;
 
             await this.accountService.updateItemProfile({ id, profile });
+
+            return successMessageGenerator();
+        } catch (err) {
+            console.log(err);
+            if (err instanceof HttpException) {
+                throw err;
+            }
+            
+            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @UseGuards(JwtStrategyGuard)
+    @Patch('/me/password')
+    @HttpCode(200)
+    async UpdateMyAccountPassword(@Request() req, @Body() passwordUpdateData: PasswordUpdateDto) {
+        try {
+            const { id } = req.user;
+            const { oldPassword, newPassword } = passwordUpdateData;
+
+            const account = await this.accountService.getActiveItem({ id });
+            if (!(await bcrypt.compare(oldPassword, account.password))) {
+                throw new HttpException(failMessage.ERR_NOT_VERIFIED, HttpStatus.CONFLICT);
+            }
+
+            await this.accountService.updateItemPassword({ id, password: newPassword });
 
             return successMessageGenerator();
         } catch (err) {
