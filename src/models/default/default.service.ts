@@ -36,6 +36,9 @@ export class DefaultService {
     createDefaultHousework({ type, title, description }) {
         return this.defaultHouseworkRepository.save({ type, title, description });
     }
+    getAllDefaultHousework() {
+        return this.defaultHouseworkRepository.find();
+    }
     createDefaultAward({ type, title, description }) {
         return this.defaultAwardRepository.save({ type, title, description });
     }
