@@ -54,4 +54,7 @@ export class DefaultService {
     getAllDefaultAwards() {
         return this.defaultAwardRepository.find();
     }
+    updateDefaultAward({ id, type, title, description }) {
+        return this.defaultAwardRepository.update({ id }, { type, title, description });
+    }
 }
