@@ -27,4 +27,7 @@ export class DefaultService {
     createDefaultAlternativePaymentType({ title, displayTitle }) {
         return this.defaultAlternativePaymentTypeRepository.save({ title, displayTitle });
     }
+    createDefaultHousework({ type, title, description }) {
+        return this.defaultHouseworkRepository.save({ type, title, description });
+    }
 }
