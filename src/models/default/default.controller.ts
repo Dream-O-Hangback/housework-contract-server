@@ -77,4 +77,23 @@ export class DefaultController {
             throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @Post('/award')
+    @HttpCode(200)
+    async CreateAward(@Body() awardData: ContentDto) {
+        try {
+            const { type, title, description } = awardData;
+
+            await this.defaultService.createDefaultAward({ type, title, description });
+
+            return successMessageGenerator(); 
+        } catch (err) {
+            console.log(err);
+            if (err instanceof HttpException) {
+                throw err;
+            }
+            
+            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }
