@@ -63,6 +63,9 @@ export class DefaultService {
     updateDefaultHousework({ id, type, title, description }) {
         return this.defaultHouseworkRepository.update({ id }, { type, title, description });
     }
+    deleteDefaultHousework({ id }) {
+        return this.defaultHouseworkRepository.update({ id }, { active: false });
+    }
     createDefaultAward({ type, title, description }) {
         return this.defaultAwardRepository.save({ type, title, description });
     }

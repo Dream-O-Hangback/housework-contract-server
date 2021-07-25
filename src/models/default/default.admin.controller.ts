@@ -285,4 +285,23 @@ export class DefaultAdminController {
             throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @Delete('/housework/:id')
+    @HttpCode(200)
+    async DeleteHousework(@Param() params: IdParams) {
+        try {
+            const { id } = params;
+
+            await this.defaultService.deleteDefaultHousework({ id });
+
+            return successMessageGenerator();
+        } catch (err) {
+            console.log(err);
+            if (err instanceof HttpException) {
+                throw err;
+            }
+            
+            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }
