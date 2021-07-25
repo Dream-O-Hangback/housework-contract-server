@@ -36,6 +36,9 @@ export class DefaultService {
     getAllDefaultAlternativePaymentTypes() {
         return this.defaultAlternativePaymentTypeRepository.find();
     }
+    updateDefaultAlternativePaymentType({ id, title, displayTitle }) {
+        return this.defaultAlternativePaymentTypeRepository.update({ id }, { title, displayTitle });
+    }
     createDefaultHousework({ type, title, description }) {
         return this.defaultHouseworkRepository.save({ type, title, description });
     }
