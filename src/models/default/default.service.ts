@@ -30,6 +30,9 @@ export class DefaultService {
     createDefaultAlternativePaymentType({ title, displayTitle }) {
         return this.defaultAlternativePaymentTypeRepository.save({ title, displayTitle });
     }
+    getAllDefaultAlternativePaymentTypes() {
+        return this.defaultAlternativePaymentTypeRepository.find();
+    }
     createDefaultHousework({ type, title, description }) {
         return this.defaultHouseworkRepository.save({ type, title, description });
     }
