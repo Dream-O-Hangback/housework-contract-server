@@ -78,4 +78,7 @@ export class DefaultService {
     updateDefaultAward({ id, type, title, description }) {
         return this.defaultAwardRepository.update({ id }, { type, title, description });
     }
+    deleteDefaultAward({ id }) {
+        return this.defaultAwardRepository.update({ id }, { active: false });
+    }
 }

@@ -10,9 +10,7 @@ export class AdminGuard implements CanActivate {
     canActivate(context: ExecutionContext): boolean | Promise<boolean> | Observable<boolean> {
         const req = context.switchToHttp().getRequest();
         
-        console.log(req.headers, this.configService.get<string>('ADMIN_API_KEY'));
         if (req.headers['x-api-key'] === this.configService.get<string>('ADMIN_API_KEY')) {
-            console.log('yes!');
             return true;
         }
 
