@@ -1,18 +1,18 @@
 import {
-    Body,
     Controller,
-    Post,
     Get,
-    Patch,
     HttpException,
     HttpStatus,
     HttpCode,
+    UseGuards,
 } from '@nestjs/common';
 import { successMessageGenerator } from '../../common/lib';
 import { failMessage } from '../../common/constants';
 import { DefaultService } from './default.service';
+import { JwtStrategyGuard } from '../../auth/guards/jwt.guard';
 
 @Controller('default')
+@UseGuards(JwtStrategyGuard)
 export class DefaultController {
     constructor(private defaultService: DefaultService) {
         this.defaultService = defaultService;
