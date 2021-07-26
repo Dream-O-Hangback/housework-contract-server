@@ -10,7 +10,10 @@ import {
     Request,
     Query,
     UseGuards,
+    UseInterceptors,
+    UploadedFile,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express/multer';
 import * as bcrypt from 'bcrypt';
 import { successMessageGenerator } from '../../common/lib';
 import { failMessage } from '../../common/constants';
@@ -22,13 +25,16 @@ import NicknameUpdateDto from './dto/nicknameUpdate.dto';
 import ProfileUpdateDto from './dto/profileUpdate.dto';
 import PasswordUpdateDto from './dto/passwordUpdate.dto';
 import BooleanUpdateDto from './dto/booleanUpdate.dto';
+import { ConfigService } from '@nestjs/config';
 
 @Controller('accounts')
 export class AccountController {
     constructor(
-        private accountService: AccountService
+        private accountService: AccountService,
+        private configService: ConfigService,
     ) {
         this.accountService = accountService;
+        this.configService = configService;
     }
 
     @UseGuards(JwtStrategyGuard)
@@ -65,6 +71,27 @@ export class AccountController {
             const result = await this.accountService.getInfo({ id });
 
             return successMessageGenerator(result);
+        } catch (err) {
+            console.log(err);
+            if (err instanceof HttpException) {
+                throw err;
+            }
+            
+            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    
+    @UseGuards(JwtStrategyGuard)
+    @UseInterceptors(FileInterceptor('files'))
+    @Post('/me/profile/upload')
+    @HttpCode(200)
+    async UpdateMyAccountInfoProfileImage(@Request() req, @UploadedFile() file: Express.Multer.File) {
+        try {
+            const { id } = req.user;
+
+            // await this.accountService.updateItemProfileImage({ id, ProfileImage });
+
+            return successMessageGenerator();
         } catch (err) {
             console.log(err);
             if (err instanceof HttpException) {
