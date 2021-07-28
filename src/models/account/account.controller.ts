@@ -13,8 +13,11 @@ import {
     UseInterceptors,
     UploadedFile,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { FileInterceptor } from '@nestjs/platform-express/multer';
 import * as bcrypt from 'bcrypt';
+import * as multer from 'multer';
+import * as path from 'path';
 import { successMessageGenerator } from '../../common/lib';
 import { failMessage } from '../../common/constants';
 import { AccountService } from './account.service';
@@ -25,7 +28,7 @@ import NicknameUpdateDto from './dto/nicknameUpdate.dto';
 import ProfileUpdateDto from './dto/profileUpdate.dto';
 import PasswordUpdateDto from './dto/passwordUpdate.dto';
 import BooleanUpdateDto from './dto/booleanUpdate.dto';
-import { ConfigService } from '@nestjs/config';
+import { fs } from '../../common/lib';
 
 @Controller('accounts')
 export class AccountController {
@@ -82,7 +85,22 @@ export class AccountController {
     }
     
     @UseGuards(JwtStrategyGuard)
-    @UseInterceptors(FileInterceptor('files'))
+    @UseInterceptors(FileInterceptor(
+        'files',
+        {
+            storage: multer.diskStorage({
+                filename: (req, file, cb) => {
+                    cb(null, `${req.user.id}-${Date.now()}${path.extname(file.originalname)}`);
+                },
+                destination: async (_req, _file, cb) => {
+                    if (!(await fs.doesExist(`/tmp/image/`))) {
+                        await fs.mkdir(`/tmp/image/`);
+                    }
+                    cb(null, `/tmp/image/`);
+                },
+            }),
+        }
+    ))
     @Post('/me/profile/upload')
     @HttpCode(200)
     async UpdateMyAccountInfoProfileImage(@Request() req, @UploadedFile() file: Express.Multer.File) {
