@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { FileService } from '../../providers/file.service';
 import { AccountController } from './account.controller';
 import { AccountService } from './account.service';
 import Account from '../account/entities';
@@ -10,6 +11,7 @@ import Account from '../account/entities';
     controllers: [AccountController],
     providers: [
         ConfigService,
+        FileService,
         AccountService,
     ],
     exports: [AccountService],

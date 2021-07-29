@@ -10,6 +10,11 @@ export const ERR_NOT_VERIFIED: FailMessageType = {
     description: '...'
 }
 
+export const ERR_NOT_UPLOADED: FailMessageType = {
+    errorCode: 'NOT_UPLOADED',
+    description: '...'
+}
+
 export const ERR_ALREADY_EXISTS: FailMessageType = {
     errorCode: 'ALREADY_EXISTS',
     description: '...'

@@ -8,18 +8,15 @@ import {
     HttpStatus,
     HttpCode,
     Request,
+    Response,
     Query,
     UseGuards,
-    UseInterceptors,
-    UploadedFile,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { FileInterceptor } from '@nestjs/platform-express/multer';
 import * as bcrypt from 'bcrypt';
-import * as multer from 'multer';
-import * as path from 'path';
 import { successMessageGenerator } from '../../common/lib';
 import { failMessage } from '../../common/constants';
+import { FileService } from '../../providers/file.service';
 import { AccountService } from './account.service';
 import { JwtStrategyGuard } from '../../auth/guards/jwt.guard';
 import NicknameDto from './dto/nickname.dto';
@@ -28,16 +25,17 @@ import NicknameUpdateDto from './dto/nicknameUpdate.dto';
 import ProfileUpdateDto from './dto/profileUpdate.dto';
 import PasswordUpdateDto from './dto/passwordUpdate.dto';
 import BooleanUpdateDto from './dto/booleanUpdate.dto';
-import { fs } from '../../common/lib';
 
 @Controller('accounts')
 export class AccountController {
     constructor(
         private accountService: AccountService,
         private configService: ConfigService,
+        private fileService: FileService,
     ) {
         this.accountService = accountService;
         this.configService = configService;
+        this.fileService = fileService;
     }
 
     @UseGuards(JwtStrategyGuard)
@@ -85,31 +83,38 @@ export class AccountController {
     }
     
     @UseGuards(JwtStrategyGuard)
-    @UseInterceptors(FileInterceptor(
-        'files',
-        {
-            storage: multer.diskStorage({
-                filename: (req, file, cb) => {
-                    cb(null, `${req.user.id}-${Date.now()}${path.extname(file.originalname)}`);
-                },
-                destination: async (_req, _file, cb) => {
-                    if (!(await fs.doesExist(`/tmp/image/`))) {
-                        await fs.mkdir(`/tmp/image/`);
-                    }
-                    cb(null, `/tmp/image/`);
-                },
-            }),
-        }
-    ))
+    // @UseInterceptors(FileInterceptor(
+    //     'files',
+    //     {
+    //         storage: multer.diskStorage({
+    //             filename: (req, file, cb) => {
+    //                 cb(null, `${req.user.id}-${Date.now()}${path.extname(file.originalname)}`);
+    //             },
+    //             destination: async (_req, _file, cb) => {
+    //                 if (!(await fs.doesExist(`/tmp/image/`))) {
+    //                     await fs.mkdir(`/tmp/image/`);
+    //                 }
+    //                 cb(null, `/tmp/image/`);
+    //             },
+    //         }),
+    //     }
+    // ))
     @Post('/me/profile/upload')
     @HttpCode(200)
-    async UpdateMyAccountInfoProfileImage(@Request() req, @UploadedFile() file: Express.Multer.File) {
+    async UpdateMyAccountInfoProfileImage(@Request() req, /* @UploadedFile() file: Express.Multer.File, */ @Response() res) {
         try {
             const { id } = req.user;
 
-            // await this.accountService.updateItemProfileImage({ id, ProfileImage });
+            await this.fileService.uploadFile(req, res, this.configService.get<string>('PATH_USER_IMAGE_PROFILE'));
 
-            return successMessageGenerator();
+            const profileImageUrl = req.file.location;
+            if (!profileImageUrl) {
+                throw new HttpException(failMessage.ERR_NOT_UPLOADED, HttpStatus.BAD_REQUEST);
+            }
+
+            await this.accountService.updateItemProfileImage({ id, profileImageUrl });
+
+            return successMessageGenerator({ profileImageUrl });
         } catch (err) {
             console.log(err);
             if (err instanceof HttpException) {
