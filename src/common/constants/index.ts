@@ -1,13 +1,13 @@
-import awardType from './awardType';
-import confirmationType from './confirmationType';
+import { AwardType } from './awardType';
+import { ConfirmationType } from './confirmationType';
+import { HouseworkType } from "./houseworkType";
 import failMessage from "./failMessage";
 import * as failMessageType from "./failMessageType";
-import houseworkType from "./houseworkType";
 
 export {
-    awardType,
-    confirmationType,
+    AwardType,
+    ConfirmationType,
+    HouseworkType,
     failMessage,
     failMessageType,
-    houseworkType,
 }

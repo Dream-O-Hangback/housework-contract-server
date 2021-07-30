@@ -1,5 +1,5 @@
-export default {
-    Default: 'default',
-    General: 'general',
-    Additional: 'additional'
+export enum HouseworkType {
+    Default = 'default',
+    General = 'general',
+    Additional = 'additional',
 }
