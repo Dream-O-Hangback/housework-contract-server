@@ -321,11 +321,11 @@ describe('AccountService', () => {
     it('should delete a account', async () => {
         const id = faker.datatype.uuid();
 
-        const accountRepositoryDeleteSpy = jest.spyOn(accountRepository, 'delete').mockResolvedValueOnce(undefined);
+        const accountRepositoryUpdateSpy = jest.spyOn(accountRepository, 'update').mockResolvedValueOnce(new UpdateResult());
 
         await accountService.deleteItem({ id });
 
-        expect(accountRepositoryDeleteSpy).toBeCalledTimes(1);
-        expect(accountRepositoryDeleteSpy).toHaveBeenCalledWith({ id, active: true });
+        expect(accountRepositoryUpdateSpy).toBeCalledTimes(1);
+        expect(accountRepositoryUpdateSpy).toHaveBeenCalledWith({ id, active: true }, { active: false, deleteDate: new Date() });
     });
 });

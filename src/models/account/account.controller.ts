@@ -4,6 +4,7 @@ import {
     Post,
     Get,
     Patch,
+    Delete,
     HttpException,
     HttpStatus,
     HttpCode,
@@ -11,7 +12,6 @@ import {
     Query,
     UseGuards,
     UseInterceptors,
-    Delete,
 } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { successMessageGenerator } from '../../common/lib';
@@ -251,6 +251,26 @@ export class AccountController {
             }
 
             return successMessageGenerator(); 
+        } catch (err) {
+            console.log(err);
+            if (err instanceof HttpException) {
+                throw err;
+            }
+            
+            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @UseGuards(JwtStrategyGuard)
+    @Delete('/me')
+    @HttpCode(200)
+    async DeleteMyAccount(@Request() req) {
+        try {
+            const { id } = req.user;
+
+            await this.accountService.deleteItem({ id });
+
+            return successMessageGenerator();
         } catch (err) {
             console.log(err);
             if (err instanceof HttpException) {
