@@ -8,12 +8,15 @@ import {
     HttpStatus,
     HttpCode,
     Request,
-    Response,
     Query,
     UseGuards,
+    UseInterceptors,
+    UploadedFile,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
+import * as path from 'path';
+import * as multerS3 from 'multer-s3';
 import { successMessageGenerator } from '../../common/lib';
 import { failMessage } from '../../common/constants';
 import { FileService } from '../../providers/file.service';
@@ -25,6 +28,7 @@ import NicknameUpdateDto from './dto/nicknameUpdate.dto';
 import ProfileUpdateDto from './dto/profileUpdate.dto';
 import PasswordUpdateDto from './dto/passwordUpdate.dto';
 import BooleanUpdateDto from './dto/booleanUpdate.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('accounts')
 export class AccountController {
@@ -83,29 +87,23 @@ export class AccountController {
     }
     
     @UseGuards(JwtStrategyGuard)
-    // @UseInterceptors(FileInterceptor(
-    //     'files',
-    //     {
-    //         storage: multer.diskStorage({
-    //             filename: (req, file, cb) => {
-    //                 cb(null, `${req.user.id}-${Date.now()}${path.extname(file.originalname)}`);
-    //             },
-    //             destination: async (_req, _file, cb) => {
-    //                 if (!(await fs.doesExist(`/tmp/image/`))) {
-    //                     await fs.mkdir(`/tmp/image/`);
-    //                 }
-    //                 cb(null, `/tmp/image/`);
-    //             },
-    //         }),
-    //     }
-    // ))
+    @UseInterceptors(FileInterceptor(
+        'files',
+        // {
+        //     storage: multerS3({
+        //         key: (req: Express.Request, file: Express.Multer.File, cb: (error: Error | null, key: string) => void) => {
+        //             cb(null, `${this.configService.get<string>('PATH_USER_IMAGE_PROFILE')}/${req.user.id}-${Date.now()}${path.extname(file.originalname)}`);
+        //         },
+        //     }),
+        // }
+    ))
     @Post('/me/profile/upload')
     @HttpCode(200)
-    async UpdateMyAccountInfoProfileImage(@Request() req, /* @UploadedFile() file: Express.Multer.File, */ @Response() res) {
+    async UpdateMyAccountInfoProfileImage(@Request() req, @UploadedFile() file: Express.Multer.File) {
         try {
             const { id } = req.user;
 
-            await this.fileService.uploadFile(req, res, this.configService.get<string>('PATH_USER_IMAGE_PROFILE'));
+            const data = await this.fileService.uploadFile(file, `${this.configService.get<string>('PATH_USER_IMAGE_PROFILE')}/${req.user.id}-${Date.now()}${path.extname(file.originalname)}`);
 
             const profileImageUrl = req.file.location;
             if (!profileImageUrl) {
