@@ -112,7 +112,7 @@ export class AuthController {
                 payload = this.authService.verifyAccessToken(accessToken.replace('Bearer ', ''));
                 if (!payload || !payload.id) throw new Error();
 
-                const account = await this.accountService.getItem({ id: payload.id });
+                const account = await this.accountService.getActiveItem({ id: payload.id });
                 if (!account) throw new Error();
             } catch (err) {
                 console.log(err);
@@ -169,8 +169,8 @@ export class AuthController {
 
             const { accountId } = certificationCode;
 
-            const account = await this.accountService.updateItemActive({ id: accountId });
-            if (account.affected === 0) {
+            const result = await this.accountService.updateItemActive({ id: accountId });
+            if (result.affected === 0) {
                 throw new HttpException(failMessage.ERR_NOT_FOUND, HttpStatus.NOT_FOUND);
             }
 

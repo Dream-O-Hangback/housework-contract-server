@@ -1,6 +1,6 @@
 import { IsString, IsNotEmpty } from 'class-validator';
 
-export default class NicknameDto {
+export default class NicknameUpdateDto {
     @IsNotEmpty()
     @IsString()
     readonly nickname: string;

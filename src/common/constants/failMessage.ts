@@ -4,6 +4,7 @@ import * as failMessageType from './failMessageType';
 export default {
     ERR_INVALID_PARAM: failMessageGenerator(failMessageType.ERR_INVALID_PARAM),
     ERR_NOT_VERIFIED: failMessageGenerator(failMessageType.ERR_NOT_VERIFIED),
+    ERR_NOT_UPLOADED: failMessageGenerator(failMessageType.ERR_NOT_UPLOADED),
     ERR_ALREADY_EXISTS: failMessageGenerator(failMessageType.ERR_ALREADY_EXISTS),
     ERR_ALREADY_CREATED: failMessageGenerator(failMessageType.ERR_ALREADY_CREATED),
     ERR_NOT_FOUND: failMessageGenerator(failMessageType.ERR_NOT_FOUND),

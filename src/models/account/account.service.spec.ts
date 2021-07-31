@@ -1,6 +1,6 @@
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Like, Repository, UpdateResult } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import * as faker from 'faker';
 import MockDate from 'mockdate';
@@ -11,6 +11,7 @@ type MockRepository<T = any> = Partial<Record<keyof Repository<T>, jest.Mock>>;
 
 const mockRepository = () => ({
     save: jest.fn(),
+    findAndCount: jest.fn(),
     findOne: jest.fn(),
     update: jest.fn(),
     delete: jest.fn(),
@@ -71,13 +72,68 @@ describe('AccountService', () => {
         expect(accountRepositorySaveSpy).toHaveBeenCalledWith(expect.objectContaining(newAccount));
     });
 
-    it('should get a (active) account', async () => {
+    it('should get (active) account list by search word', async () => {
+        const searchWord = `${faker.name.firstName()} ${faker.name.lastName()}`;
+        const offset = 0;
+        const limit = 10;
+
+        const accounts = [
+            {
+                id: faker.datatype.uuid(),
+                email: faker.internet.email(),
+                name: searchWord,
+                nickname: searchWord,
+                profile: faker.random.word(),
+            },
+            {
+                id: faker.datatype.uuid(),
+                email: faker.internet.email(),
+                name: `${faker.name.firstName()} ${faker.name.lastName()}`,
+                nickname: `${faker.name.firstName()} ${faker.name.lastName()}`,
+                profile: faker.random.word(),
+            },
+            {
+                id: faker.datatype.uuid(),
+                email: faker.internet.email(),
+                name: `${faker.name.firstName()} ${faker.name.lastName()}`,
+                nickname: `${faker.name.firstName()} ${faker.name.lastName()}`,
+                profile: faker.random.word(),
+            },
+        ];
+
+        const filteredAccounts = accounts.filter((elem) => (
+            elem.email.indexOf(searchWord) !== -1 ||
+            elem.name.indexOf(searchWord) !== -1 ||
+            elem.nickname.indexOf(searchWord) !== -1
+        ));
+
+        const accountRepositoryFindSpy = jest.spyOn(accountRepository, 'findAndCount').mockResolvedValueOnce([filteredAccounts, filteredAccounts.length]);
+        
+        const { list, count } = await accountService.getList({ searchWord, skip: offset * limit, take: limit });
+        
+        expect(list).toHaveLength(1);
+        expect(list[0]).toStrictEqual(accounts[0]);
+        expect(count).toEqual(1);
+        expect(accountRepositoryFindSpy).toBeCalledTimes(1);
+        expect(accountRepositoryFindSpy).toHaveBeenCalledWith({
+            where: [
+                { email: Like(`%${searchWord}%`), active: true },
+                { name: Like(`%${searchWord}%`), active: true },
+                { nickname: Like(`%${searchWord}%`), active: true },
+            ],
+            select: ['id', 'email', 'name', 'nickname', 'profileImageUrl', 'profile'],
+            skip: offset * limit,
+            take: limit,
+        });
+    });
+
+    it('should get a active account', async () => {
         const id = faker.datatype.uuid();
         const account = { id, active: true };
 
         const accountRepositoryFindOneSpy = jest.spyOn(accountRepository, 'findOne').mockResolvedValueOnce(account as Account);
         
-        const result = await accountService.getItem({ id });
+        const result = await accountService.getActiveItem({ id });
         
         expect(result).toBe(account as Account);
         expect(accountRepositoryFindOneSpy).toBeCalledTimes(1);
@@ -123,27 +179,153 @@ describe('AccountService', () => {
         expect(accountRepositoryFindOneSpy).toHaveBeenCalledWith({ nickname });
     });
 
+    it('should get a active account info', async () => {
+        const id = faker.datatype.uuid();
+        const account = {
+            id,
+            email: faker.internet.email(),
+            name: faker.random.word(),
+            nickname: faker.random.word(),
+            profileImageUrl: null,
+            profile: faker.random.word(),
+            type: 'local',
+            notificationOpen: true,
+            notificationOpenDate: new Date(),
+            emailOpen: true,
+            emailOpenDate: new Date(),
+            createDate: new Date(),
+        };
+
+        const accountRepositoryFindOneSpy = jest.spyOn(accountRepository, 'findOne').mockResolvedValueOnce(account as Account);
+        
+        const result = await accountService.getInfo({ id });
+        
+        expect(result).toBe(account as Account);
+        expect(accountRepositoryFindOneSpy).toBeCalledTimes(1);
+        expect(accountRepositoryFindOneSpy).toHaveBeenCalledWith(
+            { id, active: true },
+            { select: ['id', 'email', 'name', 'nickname', 'profileImageUrl', 'profile', 'type', 'notificationOpen', 'notificationOpenDate', 'emailOpen', 'emailOpenDate', 'createDate'] },
+        );
+    });
+
     it('should update active attribute in a account', async () => {
         const id = faker.datatype.uuid();
 
-        const account = { id, active: true };
+        const accountRepositoryUpdateSpy = jest.spyOn(accountRepository, 'update').mockResolvedValueOnce(new UpdateResult());
 
-        const accountRepositoryUpdateSpy = jest.spyOn(accountRepository, 'update').mockResolvedValueOnce(account as Account);
+        const result = await accountService.updateItemActive({ id });
 
-        await accountService.updateItemActive({ id });
-
+        expect(result).toBeInstanceOf(UpdateResult);
         expect(accountRepositoryUpdateSpy).toBeCalledTimes(1);
-        expect(accountRepositoryUpdateSpy).toHaveBeenCalledWith({ id }, { active: true });
+        expect(accountRepositoryUpdateSpy).toHaveBeenCalledWith({ id }, { active: true, lastUpdateDate: new Date() });
+    });
+
+    it('should update nickname attribute in a account', async () => {
+        const id = faker.datatype.uuid();
+        const nickname = faker.random.word();
+
+        const accountRepositoryUpdateSpy = jest.spyOn(accountRepository, 'update').mockResolvedValueOnce(new UpdateResult());
+
+        const result = await accountService.updateItemNickname({ id, nickname });
+
+        expect(result).toBeInstanceOf(UpdateResult);
+        expect(accountRepositoryUpdateSpy).toBeCalledTimes(1);
+        expect(accountRepositoryUpdateSpy).toHaveBeenCalledWith({ id }, { nickname, lastUpdateDate: new Date() });
+    });
+
+    it('should update profile attribute in a account', async () => {
+        const id = faker.datatype.uuid();
+        const profile = faker.random.word();
+
+        const accountRepositoryUpdateSpy = jest.spyOn(accountRepository, 'update').mockResolvedValueOnce(new UpdateResult());
+
+        const result = await accountService.updateItemProfile({ id, profile });
+
+        expect(result).toBeInstanceOf(UpdateResult);
+        expect(accountRepositoryUpdateSpy).toBeCalledTimes(1);
+        expect(accountRepositoryUpdateSpy).toHaveBeenCalledWith({ id }, { profile, lastUpdateDate: new Date() });
+    });
+
+    it('should update profileImageUrl attribute in a account', async () => {
+        const id = faker.datatype.uuid();
+        const profileImageUrl = faker.internet.url();
+
+        const accountRepositoryUpdateSpy = jest.spyOn(accountRepository, 'update').mockResolvedValueOnce(new UpdateResult());
+
+        const result = await accountService.updateItemProfileImage({ id, profileImageUrl });
+
+        expect(result).toBeInstanceOf(UpdateResult);
+        expect(accountRepositoryUpdateSpy).toBeCalledTimes(1);
+        expect(accountRepositoryUpdateSpy).toHaveBeenCalledWith({ id }, { profileImageUrl, lastUpdateDate: new Date() });
+    });
+
+    it('should update profileImageUrl attribute with null value in a account', async () => {
+        const id = faker.datatype.uuid();
+
+        const accountRepositoryUpdateSpy = jest.spyOn(accountRepository, 'update').mockResolvedValueOnce(new UpdateResult());
+
+        const result = await accountService.deleteItemProfileImage({ id });
+
+        expect(result).toBeInstanceOf(UpdateResult);
+        expect(accountRepositoryUpdateSpy).toBeCalledTimes(1);
+        expect(accountRepositoryUpdateSpy).toHaveBeenCalledWith({ id }, { profileImageUrl: null, lastUpdateDate: new Date() });
+    });
+
+    it('should update password attribute in a account', async () => {
+        const id = faker.datatype.uuid();
+        const newPassword = faker.random.word();
+
+        const accountRepositoryUpdateSpy = jest.spyOn(accountRepository, 'update').mockResolvedValueOnce(new UpdateResult());
+
+        const result = await accountService.updateItemPassword({ id, password: newPassword });
+
+        expect(result).toBeInstanceOf(UpdateResult);
+        expect(accountRepositoryUpdateSpy).toBeCalledTimes(1);
+        expect(accountRepositoryUpdateSpy).toHaveBeenCalledWith({ id }, expect.objectContaining({ password: expect.anything(), lastUpdateDate: new Date() }));
+    });
+
+    it('should update notification option in a account', async () => {
+        const id = faker.datatype.uuid();
+        const value = true;
+        const currentDate = new Date();
+
+        const accountRepositoryUpdateSpy = jest.spyOn(accountRepository, 'update').mockResolvedValueOnce(new UpdateResult());
+
+        const result = await accountService.updateItemNotificationOpen({ id, value });
+
+        expect(result).toBeInstanceOf(UpdateResult);
+        expect(accountRepositoryUpdateSpy).toBeCalledTimes(1);
+        expect(accountRepositoryUpdateSpy).toHaveBeenCalledWith(
+            { id },
+            { notificationOpen: value, notificationOpenDate: currentDate, lastUpdateDate: currentDate },
+        );
+    });
+
+    it('should update email notification option in a account', async () => {
+        const id = faker.datatype.uuid();
+        const value = true;
+        const currentDate = new Date();
+
+        const accountRepositoryUpdateSpy = jest.spyOn(accountRepository, 'update').mockResolvedValueOnce(new UpdateResult());
+
+        const result = await accountService.updateItemEmailOpen({ id, value });
+
+        expect(result).toBeInstanceOf(UpdateResult);
+        expect(accountRepositoryUpdateSpy).toBeCalledTimes(1);
+        expect(accountRepositoryUpdateSpy).toHaveBeenCalledWith(
+            { id },
+            { emailOpen: value, emailOpenDate: currentDate, lastUpdateDate: currentDate },
+        );
     });
 
     it('should delete a account', async () => {
         const id = faker.datatype.uuid();
 
-        const accountRepositoryDeleteSpy = jest.spyOn(accountRepository, 'delete').mockResolvedValueOnce(undefined);
+        const accountRepositoryUpdateSpy = jest.spyOn(accountRepository, 'update').mockResolvedValueOnce(new UpdateResult());
 
         await accountService.deleteItem({ id });
 
-        expect(accountRepositoryDeleteSpy).toBeCalledTimes(1);
-        expect(accountRepositoryDeleteSpy).toHaveBeenCalledWith({ id, active: true });
+        expect(accountRepositoryUpdateSpy).toBeCalledTimes(1);
+        expect(accountRepositoryUpdateSpy).toHaveBeenCalledWith({ id, active: true }, { active: false, deleteDate: new Date() });
     });
 });
