@@ -259,6 +259,18 @@ describe('AccountService', () => {
         expect(accountRepositoryUpdateSpy).toHaveBeenCalledWith({ id }, { profileImageUrl, lastUpdateDate: new Date() });
     });
 
+    it('should update profileImageUrl attribute with null value in a account', async () => {
+        const id = faker.datatype.uuid();
+
+        const accountRepositoryUpdateSpy = jest.spyOn(accountRepository, 'update').mockResolvedValueOnce(new UpdateResult());
+
+        const result = await accountService.deleteItemProfileImage({ id });
+
+        expect(result).toBeInstanceOf(UpdateResult);
+        expect(accountRepositoryUpdateSpy).toBeCalledTimes(1);
+        expect(accountRepositoryUpdateSpy).toHaveBeenCalledWith({ id }, { profileImageUrl: null, lastUpdateDate: new Date() });
+    });
+
     it('should update password attribute in a account', async () => {
         const id = faker.datatype.uuid();
         const newPassword = faker.random.word();

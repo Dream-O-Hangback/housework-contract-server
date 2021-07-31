@@ -82,6 +82,9 @@ export class AccountService {
     updateItemProfileImage({ id, profileImageUrl }) {
         return this.accountRepository.update({ id }, { profileImageUrl, lastUpdateDate: new Date() });
     }
+    deleteItemProfileImage({ id }) {
+        return this.accountRepository.update({ id }, { profileImageUrl: null, lastUpdateDate: new Date() });
+    }
     async updateItemPassword({ id, password }) {
         const hashedPassword = await bcrypt.hash(password, (await bcrypt.genSalt()));
 

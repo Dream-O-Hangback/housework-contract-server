@@ -11,12 +11,11 @@ import {
     Query,
     UseGuards,
     UseInterceptors,
+    Delete,
 } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
 import { successMessageGenerator } from '../../common/lib';
 import { failMessage } from '../../common/constants';
-import { FileService } from '../../providers/file.service';
 import { AccountService } from './account.service';
 import { JwtStrategyGuard } from '../../auth/guards/jwt.guard';
 import NicknameDto from './dto/nickname.dto';
@@ -31,12 +30,8 @@ import { FileInterceptor } from '@nestjs/platform-express';
 export class AccountController {
     constructor(
         private accountService: AccountService,
-        private configService: ConfigService,
-        private fileService: FileService,
     ) {
         this.accountService = accountService;
-        this.configService = configService;
-        this.fileService = fileService;
     }
 
     @UseGuards(JwtStrategyGuard)
@@ -87,7 +82,7 @@ export class AccountController {
     @UseInterceptors(FileInterceptor('files'))
     @Post('/me/profile/upload')
     @HttpCode(200)
-    async UpdateMyAccountInfoProfileImage(@Request() req) {
+    async UpdateMyProfileImage(@Request() req) {
         try {
             const { id } = req.user;
 
@@ -110,9 +105,29 @@ export class AccountController {
     }
 
     @UseGuards(JwtStrategyGuard)
+    @Delete('/me/profile')
+    @HttpCode(200)
+    async DeleteMyProfileImage(@Request() req) {
+        try {
+            const { id } = req.user;
+
+            await this.accountService.deleteItemProfileImage({ id });
+
+            return successMessageGenerator();
+        } catch (err) {
+            console.log(err);
+            if (err instanceof HttpException) {
+                throw err;
+            }
+            
+            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @UseGuards(JwtStrategyGuard)
     @Patch('/me/nickname')
     @HttpCode(200)
-    async UpdateMyAccountInfoNickname(@Request() req, @Body() nicknameUpdateData: NicknameUpdateDto) {
+    async UpdateMyAccountNickname(@Request() req, @Body() nicknameUpdateData: NicknameUpdateDto) {
         try {
             const { id } = req.user;
             const { nickname } = nicknameUpdateData;
@@ -138,7 +153,7 @@ export class AccountController {
     @UseGuards(JwtStrategyGuard)
     @Patch('/me/profile')
     @HttpCode(200)
-    async UpdateMyAccountInfoProfile(@Request() req, @Body() profileUpdateData: ProfileUpdateDto) {
+    async UpdateMyAccountProfile(@Request() req, @Body() profileUpdateData: ProfileUpdateDto) {
         try {
             const { id } = req.user;
             const { profile } = profileUpdateData;
