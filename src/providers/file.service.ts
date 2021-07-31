@@ -4,29 +4,31 @@ import {  MulterOptionsFactory } from '@nestjs/platform-express';
 import { MulterOptions } from '@nestjs/platform-express/multer/interfaces/multer-options.interface';
 import * as multerS3 from 'multer-s3';
 import * as AWS from 'aws-sdk';
+import * as path from 'path';
 
 @Injectable()
-export class FileService implements MulterOptionsFactory {
+export class FileService {
     s3: AWS.S3;
     bucket: string;
 
-    constructor(
-        private configService: ConfigService,
-    ) {
-        this.configService = configService;
-        this.s3 = new AWS.S3();
-        this.bucket = this.configService.get<string>('AWS_S3_BUCKET_NAME');
+    constructor() {}
+
+    static createMulterOptions(destination: string): MulterOptions | Promise<MulterOptions> {
+        const configService = new ConfigService();
+        const s3 = new AWS.S3();
+        const bucket = configService.get<string>('AWS_S3_BUCKET_NAME');
 
         AWS.config.update({
-            accessKeyId: this.configService.get<string>('AWS_ACCESS_KEY_ID'),
-            secretAccessKey: this.configService.get<string>('AWS_SECRET_ACCESS_KEY'),
+            accessKeyId: configService.get<string>('AWS_ACCESS_KEY_ID'),
+            secretAccessKey: configService.get<string>('AWS_SECRET_ACCESS_KEY'),
         });
-    }
 
-    createMulterOptions(): MulterOptions | Promise<MulterOptions> {
         const storage = multerS3({
-            s3: this.s3,
-            bucket: this.bucket,
+            s3,
+            bucket,
+            key: (req: Express.Request, file: Express.Multer.File, cb: (error: Error | null, key: string) => void) => {
+                cb(null, `${destination}/${req.user.id}-${Date.now()}${path.extname(file.originalname)}`);
+            },
         });
 
         const fileFilter = (req: Express.Request, file: Express.Multer.File, cb: (error: Error | null, acceptFile: boolean) => void) => {
@@ -48,9 +50,9 @@ export class FileService implements MulterOptionsFactory {
 
     async uploadFile(file: Express.Multer.File, urlKey: string) {
         const params = {
-            Body: file.buffer,
             Bucket: this.bucket,
             Key: urlKey,
+            Body: file.buffer,
         };
 
         const data = await this.s3.putObject(params).promise();
