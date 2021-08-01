@@ -40,4 +40,16 @@ export class MailService {
 
         return this.mailerService.sendMail(mailOption);
     }
+    public async sendResetPasswordFinished(email: string, password: string) {
+        mailOption.to = email;
+        mailOption.subject = `[집안일 계약서] 비밀번호 초기화 완료`;
+        mailOption.html = mailTemplate.resetPasswordFinished(
+            email,
+            password,
+            `${this.configService.get<string>('API_URL')}/login?email=${email}`,
+            `${this.configService.get<string>('API_URL')}/accounts/email-notifications/disable?email=${email}`,
+        );
+
+        return this.mailerService.sendMail(mailOption);
+    }
 }

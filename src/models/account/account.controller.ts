@@ -102,6 +102,33 @@ export class AccountController {
         }
     }
 
+    @Get('/password/reset')
+    @HttpCode(200)
+    async ResetPassword(@Query() emailData: EmailQuery) {
+        try {
+            const { email } = emailData;
+
+            const account = await this.accountService.getItemByEmail({ email });
+            const { id } = account;
+
+            const tempPassword = Math.random().toString(36).slice(-8);
+
+            await this.accountService.updateItemPassword({ id, password: tempPassword });
+
+            this.mailService.sendResetPasswordFinished(email, tempPassword).catch(err => console.log(err));
+
+            return successMessageGenerator({ password: tempPassword }); // TODO: redirect to success page
+        } catch (err) {
+             // TODO: redirect to fail page
+            console.log(err);
+            if (err instanceof HttpException) {
+                throw err;
+            }
+            
+            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @UseGuards(JwtStrategyGuard)
     @UseInterceptors(FileInterceptor('files'))
     @Post('/me/profile/upload')
