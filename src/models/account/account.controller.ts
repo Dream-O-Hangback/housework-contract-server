@@ -13,6 +13,7 @@ import {
     UseGuards,
     UseInterceptors,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import * as bcrypt from 'bcrypt';
 import { successMessageGenerator } from '../../common/lib';
 import { failMessage } from '../../common/constants';
@@ -20,18 +21,21 @@ import { AccountService } from './account.service';
 import { JwtStrategyGuard } from '../../auth/guards/jwt.guard';
 import NicknameDto from './dto/nickname.dto';
 import SearchQuery from './dto/search.query';
+import EmailQuery from './dto/email.query';
 import NicknameUpdateDto from './dto/nicknameUpdate.dto';
 import ProfileUpdateDto from './dto/profileUpdate.dto';
 import PasswordUpdateDto from './dto/passwordUpdate.dto';
 import BooleanUpdateDto from './dto/booleanUpdate.dto';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { MailService } from '../../mails/mails.service';
 
 @Controller('accounts')
 export class AccountController {
     constructor(
         private accountService: AccountService,
+        private mailService: MailService,
     ) {
         this.accountService = accountService;
+        this.mailService = mailService;
     }
 
     @UseGuards(JwtStrategyGuard)
@@ -230,6 +234,26 @@ export class AccountController {
 
             return successMessageGenerator();
         } catch (err) {
+            console.log(err);
+            if (err instanceof HttpException) {
+                throw err;
+            }
+            
+            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Get('/email-notifications/disable')
+    @HttpCode(200)
+    async DisableEmailNotificationOption(@Query() emailData: EmailQuery) {
+        try {
+            const { email } = emailData;
+
+            await this.accountService.updateItemEmailOpenByEmail({ email, value: false });
+
+            return successMessageGenerator(); // TODO: redirect to success page
+        } catch (err) {
+             // TODO: redirect to fail page
             console.log(err);
             if (err instanceof HttpException) {
                 throw err;

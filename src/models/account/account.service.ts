@@ -106,6 +106,14 @@ export class AccountService {
             { emailOpen: value, emailOpenDate: currentDate, lastUpdateDate: currentDate },
         );
     }
+    updateItemEmailOpenByEmail({ email, value }) {
+        const currentDate = new Date();
+
+        return this.accountRepository.update(
+            { email },
+            { emailOpen: value, emailOpenDate: currentDate, lastUpdateDate: currentDate },
+        );
+    }
     deleteItem({ id }) {
         return this.accountRepository.update({ id, active: true }, { active: false, deleteDate: new Date() });
     }
