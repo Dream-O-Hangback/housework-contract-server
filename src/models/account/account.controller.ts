@@ -13,25 +13,30 @@ import {
     UseGuards,
     UseInterceptors,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import * as bcrypt from 'bcrypt';
 import { successMessageGenerator } from '../../common/lib';
 import { failMessage } from '../../common/constants';
 import { AccountService } from './account.service';
 import { JwtStrategyGuard } from '../../auth/guards/jwt.guard';
 import NicknameDto from './dto/nickname.dto';
+import EmailDto from './dto/email.dto';
 import SearchQuery from './dto/search.query';
+import EmailQuery from './dto/email.query';
 import NicknameUpdateDto from './dto/nicknameUpdate.dto';
 import ProfileUpdateDto from './dto/profileUpdate.dto';
 import PasswordUpdateDto from './dto/passwordUpdate.dto';
 import BooleanUpdateDto from './dto/booleanUpdate.dto';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { MailService } from '../../mails/mails.service';
 
 @Controller('accounts')
 export class AccountController {
     constructor(
         private accountService: AccountService,
+        private mailService: MailService,
     ) {
         this.accountService = accountService;
+        this.mailService = mailService;
     }
 
     @UseGuards(JwtStrategyGuard)
@@ -77,7 +82,62 @@ export class AccountController {
             throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-    
+
+    @Post('/password/reset')
+    @HttpCode(200)
+    async SendResetPassword(@Body() emailData: EmailDto) {
+        try {
+            const { email } = emailData;
+
+            const doesExistAccount = await this.accountService.getItemByEmail({ email });
+            if (!doesExistAccount) {
+                throw new HttpException(failMessage.ERR_NOT_FOUND, HttpStatus.NOT_FOUND);
+            }
+
+            this.mailService.sendResetPassword(email).catch(err => console.log(err));
+
+            return successMessageGenerator();
+        } catch (err) {
+            console.log(err);
+            if (err instanceof HttpException) {
+                throw err;
+            }
+            
+            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Get('/password/reset')
+    @HttpCode(200)
+    async ResetPassword(@Query() emailData: EmailQuery) {
+        try {
+            const { email } = emailData;
+
+            const account = await this.accountService.getItemByEmail({ email });
+            if (!account) { // TODO: redirect to not found page
+                throw new HttpException(failMessage.ERR_NOT_FOUND, HttpStatus.NOT_FOUND);
+            }
+
+            const { id } = account;
+
+            const tempPassword = Math.random().toString(36).slice(-8);
+
+            await this.accountService.updateItemPassword({ id, password: tempPassword });
+
+            this.mailService.sendResetPasswordFinished(email, tempPassword).catch(err => console.log(err));
+
+            return successMessageGenerator({ password: tempPassword }); // TODO: redirect to success page
+        } catch (err) {
+            // TODO: redirect to fail page
+            console.log(err);
+            if (err instanceof HttpException) {
+                throw err;
+            }
+            
+            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @UseGuards(JwtStrategyGuard)
     @UseInterceptors(FileInterceptor('files'))
     @Post('/me/profile/upload')
@@ -230,6 +290,31 @@ export class AccountController {
 
             return successMessageGenerator();
         } catch (err) {
+            console.log(err);
+            if (err instanceof HttpException) {
+                throw err;
+            }
+            
+            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Get('/email-notifications/disable')
+    @HttpCode(200)
+    async DisableEmailNotificationOption(@Query() emailData: EmailQuery) {
+        try {
+            const { email } = emailData;
+
+            const doesExistAccount = await this.accountService.getItemByEmail({ email });
+            if (!doesExistAccount) { // TODO: redirect to not found page
+                throw new HttpException(failMessage.ERR_NOT_FOUND, HttpStatus.NOT_FOUND);
+            }
+
+            await this.accountService.updateItemEmailOpenByEmail({ email, value: false });
+
+            return successMessageGenerator(); // TODO: redirect to success page
+        } catch (err) {
+            // TODO: redirect to fail page
             console.log(err);
             if (err instanceof HttpException) {
                 throw err;

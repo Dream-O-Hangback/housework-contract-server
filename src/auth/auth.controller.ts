@@ -41,17 +41,18 @@ export class AuthController {
         try {
             const { email } = accountData;
 
-            const doesExistsActiveAccount = await this.accountService.getActiveItemByEmail({ email });
-            const doesExistsAccount = await this.accountService.getItemByEmail({ email });
-            if (doesExistsActiveAccount) {
+            const doesExistActiveAccount = await this.accountService.getActiveItemByEmail({ email });
+            if (doesExistActiveAccount) {
                 throw new HttpException(failMessage.ERR_ALREADY_EXISTS, HttpStatus.CONFLICT);
             }
-            if (doesExistsAccount) {
+
+            const doesExistAccount = await this.accountService.getItemByEmail({ email });
+            if (doesExistAccount) {
                 throw new HttpException(failMessage.ERR_ALREADY_CREATED, HttpStatus.CONFLICT);
             }
 
             await this.accountService.createItem(accountData);
-            
+
             return successMessageGenerator();
         } catch (err) {
             console.log(err);
@@ -145,7 +146,7 @@ export class AuthController {
             const certificationCode = await this.certificationCodeService.upsertItem({ accountId, email });
             const { code, createDate } = certificationCode;
 
-            this.mailService.sendEmailCodeEmail({ email: emailData.email, code, generateDate: createDate }).catch((err) => console.log(err));
+            this.mailService.sendEmailCodeEmail(emailData.email, code, createDate).catch((err) => console.log(err));
             
             return successMessageGenerator();
         } catch (err) {

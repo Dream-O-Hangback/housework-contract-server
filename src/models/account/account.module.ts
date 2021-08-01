@@ -7,10 +7,12 @@ import { AccountController } from './account.controller';
 import { AccountService } from './account.service';
 import Account from '../account/entities';
 import { FileModule } from '../../providers/file.module';
+import { MailModule } from '../../mails/mails.module';
 
 @Module({
     imports: [
         FileModule,
+        MailModule,
         TypeOrmModule.forFeature([Account]),
         MulterModule.registerAsync({
             imports: [ConfigModule],
