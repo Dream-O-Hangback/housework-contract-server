@@ -20,6 +20,7 @@ import { failMessage } from '../../common/constants';
 import { AccountService } from './account.service';
 import { JwtStrategyGuard } from '../../auth/guards/jwt.guard';
 import NicknameDto from './dto/nickname.dto';
+import EmailDto from './dto/email.dto';
 import SearchQuery from './dto/search.query';
 import EmailQuery from './dto/email.query';
 import NicknameUpdateDto from './dto/nicknameUpdate.dto';
@@ -81,7 +82,26 @@ export class AccountController {
             throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-    
+
+    @Post('/password/reset')
+    @HttpCode(200)
+    async SendResetPassword(@Body() emailData: EmailDto) {
+        try {
+            const { email } = emailData;
+
+            this.mailService.sendResetPassword(email).catch(err => console.log(err));
+
+            return successMessageGenerator();
+        } catch (err) {
+            console.log(err);
+            if (err instanceof HttpException) {
+                throw err;
+            }
+            
+            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @UseGuards(JwtStrategyGuard)
     @UseInterceptors(FileInterceptor('files'))
     @Post('/me/profile/upload')
