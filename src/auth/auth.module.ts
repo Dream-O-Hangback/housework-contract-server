@@ -5,7 +5,7 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
-import { MailService } from '../mails/mails.service';
+import { MailModule } from '../mails/mails.module';
 import { AccountService } from '../models/account/account.service';
 import { CertificationCodeService } from '../models/certificationCode/certificationCode.service';
 import { RefreshTokenService } from '../models/refreshToken/refreshToken.service';
@@ -18,6 +18,7 @@ import RefreshToken from '../models/refreshToken/entities';
 @Module({
     imports: [
         ConfigModule,
+        MailModule,
         PassportModule,
         JwtModule.registerAsync({
             imports: [ConfigModule],
@@ -38,7 +39,6 @@ import RefreshToken from '../models/refreshToken/entities';
     controllers: [AuthController],
     providers: [
         AuthService,
-        MailService,
         AccountService,
         CertificationCodeService,
         RefreshTokenService,
