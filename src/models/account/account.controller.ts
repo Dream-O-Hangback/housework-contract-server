@@ -89,6 +89,11 @@ export class AccountController {
         try {
             const { email } = emailData;
 
+            const doesExistAccount = await this.accountService.getItemByEmail({ email });
+            if (!doesExistAccount) {
+                throw new HttpException(failMessage.ERR_NOT_FOUND, HttpStatus.NOT_FOUND);
+            }
+
             this.mailService.sendResetPassword(email).catch(err => console.log(err));
 
             return successMessageGenerator();
@@ -109,6 +114,10 @@ export class AccountController {
             const { email } = emailData;
 
             const account = await this.accountService.getItemByEmail({ email });
+            if (!account) { // TODO: redirect to not found page
+                throw new HttpException(failMessage.ERR_NOT_FOUND, HttpStatus.NOT_FOUND);
+            }
+
             const { id } = account;
 
             const tempPassword = Math.random().toString(36).slice(-8);
@@ -119,7 +128,7 @@ export class AccountController {
 
             return successMessageGenerator({ password: tempPassword }); // TODO: redirect to success page
         } catch (err) {
-             // TODO: redirect to fail page
+            // TODO: redirect to fail page
             console.log(err);
             if (err instanceof HttpException) {
                 throw err;
@@ -296,11 +305,16 @@ export class AccountController {
         try {
             const { email } = emailData;
 
+            const doesExistAccount = await this.accountService.getItemByEmail({ email });
+            if (!doesExistAccount) { // TODO: redirect to not found page
+                throw new HttpException(failMessage.ERR_NOT_FOUND, HttpStatus.NOT_FOUND);
+            }
+
             await this.accountService.updateItemEmailOpenByEmail({ email, value: false });
 
             return successMessageGenerator(); // TODO: redirect to success page
         } catch (err) {
-             // TODO: redirect to fail page
+            // TODO: redirect to fail page
             console.log(err);
             if (err instanceof HttpException) {
                 throw err;
