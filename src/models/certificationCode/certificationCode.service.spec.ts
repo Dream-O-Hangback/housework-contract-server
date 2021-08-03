@@ -5,8 +5,8 @@ import * as faker from 'faker';
 import MockDate from 'mockdate';
 import { CertificationCodeService } from './certificationCode.service';
 import CertificationCode from './entities';
-import * as lib from '../../common/lib';
-import { keyGenerator } from '../../common/lib';
+import * as lib from '@common/lib';
+import { keyGenerator } from '@common/lib';
 
 type MockRepository<T = any> = Partial<Record<keyof Repository<T>, jest.Mock>>;
 

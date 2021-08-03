@@ -2,13 +2,12 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { MailerModule } from '@nestjs-modules/mailer';
+import { AuthModule } from '@auth/auth.module';
+import entities from '@models/index';
+import { AccountModule } from '@models/account/account.module';
+import { DefaultModule } from '@models/default/default.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { AuthModule } from './auth/auth.module';
-import { AccountModule } from './models/account/account.module';
-import { DefaultModule } from './models/default/default.module';
-import entities from './models';
-import { fs } from './common/lib';
 
 @Module({
     imports: [

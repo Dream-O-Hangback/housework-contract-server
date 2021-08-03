@@ -1,7 +1,7 @@
 import { Column, CreateDateColumn, PrimaryGeneratedColumn, Entity, ManyToOne, JoinColumn } from 'typeorm';
-import Group from '../../group/entities';
-import GroupMember from '../../groupMember/entities';
-import Housework from '../../housework/entities';
+import Group from '@models/group/entities';
+import GroupMember from '@models/groupMember/entities';
+import Housework from '@models/housework/entities';
 
 @Entity('housework_log')
 export default class HouseworkLog {

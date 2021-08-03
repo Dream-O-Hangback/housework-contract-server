@@ -1,8 +1,8 @@
 import { Column, CreateDateColumn, PrimaryGeneratedColumn, Entity, ManyToOne, OneToOne, JoinColumn } from 'typeorm';
-import Group from '../../group/entities';
-import GroupMember from '../../groupMember/entities';
-import HouseworkLog from '../../houseworkLog/entities';
-import Award from '../../award/entities';
+import Group from '@models/group/entities';
+import GroupMember from '@models/groupMember/entities';
+import HouseworkLog from '@models/houseworkLog/entities';
+import Award from '@models/award/entities';
 
 @Entity('coin_bank_log')
 export default class CoinBankLog {

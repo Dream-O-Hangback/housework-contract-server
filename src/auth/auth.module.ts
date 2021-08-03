@@ -3,17 +3,17 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
+import { MailModule } from '@mails/mails.module';
+import { AccountService } from '@models/account/account.service';
+import { CertificationCodeService } from '@models/certificationCode/certificationCode.service';
+import { RefreshTokenService } from '@models/refreshToken/refreshToken.service';
+import Account from '@models/account/entities';
+import CertificationCode from '@models/certificationCode/entities';
+import RefreshToken from '@models/refreshToken/entities';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
-import { MailModule } from '../mails/mails.module';
-import { AccountService } from '../models/account/account.service';
-import { CertificationCodeService } from '../models/certificationCode/certificationCode.service';
-import { RefreshTokenService } from '../models/refreshToken/refreshToken.service';
 import { LocalStrategy } from './strategies/local.strategy';
 import { JwtStrategy } from './strategies/jwt.strategy';
-import Account from '../models/account/entities';
-import CertificationCode from '../models/certificationCode/entities';
-import RefreshToken from '../models/refreshToken/entities';
 
 @Module({
     imports: [

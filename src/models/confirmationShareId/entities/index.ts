@@ -1,6 +1,6 @@
 import { Column, CreateDateColumn, PrimaryGeneratedColumn, Entity, ManyToOne, JoinColumn } from 'typeorm';
-import Group from '../../group/entities';
-import GroupMember from '../../groupMember/entities';
+import Group from '@models/group/entities';
+import GroupMember from '@models/groupMember/entities';
 
 @Entity('confirmation_share_id')
 export default class ConfirmationShareId {

@@ -1,7 +1,7 @@
 import { Column, CreateDateColumn, PrimaryGeneratedColumn, Entity, ManyToOne, JoinColumn } from 'typeorm';
-import Confirmation from '../../confirmation/entities';
-import Group from '../../group/entities';
-import GroupMember from '../../groupMember/entities';
+import Confirmation from '@models/confirmation/entities';
+import Group from '@models/group/entities';
+import GroupMember from '@models/groupMember/entities';
 
 @Entity('confirmation_log')
 export default class ConfirmationLog {

@@ -1,6 +1,6 @@
 import { Column, UpdateDateColumn, CreateDateColumn, PrimaryGeneratedColumn, Entity, ManyToOne, JoinColumn, OneToOne } from 'typeorm';
-import Group from '../../group/entities';
-import Award from '../../award/entities';
+import Group from '@models/group/entities';
+import Award from '@models/award/entities';
 
 @Entity('group_member')
 export default class GroupMember {

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MoreThan, Repository } from 'typeorm';
-import { keyGenerator } from '../../common/lib';
+import { keyGenerator } from '@common/lib';
 import CertificationCode from './entities';
 
 @Injectable()

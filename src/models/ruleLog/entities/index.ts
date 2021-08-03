@@ -1,6 +1,6 @@
 import { Column, CreateDateColumn, PrimaryGeneratedColumn, Entity, ManyToOne, JoinColumn } from 'typeorm';
-import Rule from '../../rule/entities';
-import GroupMember from '../../groupMember/entities';
+import Rule from '@models/rule/entities';
+import GroupMember from '@models/groupMember/entities';
 
 @Entity('rule_log')
 export default class RuleLog {

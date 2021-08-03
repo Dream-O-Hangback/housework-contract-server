@@ -2,12 +2,12 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { MulterModule } from '@nestjs/platform-express';
-import { FileService } from '../../providers/file.service';
+import { MailModule } from '@mails/mails.module';
+import { FileService } from '@providers/file.service';
+import { FileModule } from '@providers/file.module';
 import { AccountController } from './account.controller';
 import { AccountService } from './account.service';
-import Account from '../account/entities';
-import { FileModule } from '../../providers/file.module';
-import { MailModule } from '../../mails/mails.module';
+import Account from './entities';
 
 @Module({
     imports: [

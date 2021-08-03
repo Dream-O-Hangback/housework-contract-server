@@ -9,14 +9,14 @@ import {
     HttpStatus,
     HttpCode,
     UseGuards,
+    Param,
 } from '@nestjs/common';
-import { successMessageGenerator } from '../../common/lib';
-import { failMessage } from '../../common/constants';
+import { AdminGuard } from '@auth/guards/admin.guard';
+import { successMessageGenerator } from '@common/lib';
+import { failMessage } from '@common/constants';
 import { DefaultService } from './default.service';
-import { AdminGuard } from '../../auth/guards/admin.guard';
 import TypeDto from './dto/type.dto';
 import ContentDto from './dto/content.dto';
-import { Param } from '@nestjs/common';
 import IdParams from './dto/id.params';
 
 @Controller('admin/default')

@@ -9,15 +9,15 @@ import {
     Request,
     HttpCode,
 } from '@nestjs/common';
-import { successMessageGenerator } from '../common/lib';
-import { failMessage } from '../common/constants';
+import { successMessageGenerator } from '@common/lib';
+import { failMessage } from '@common/constants';
+import { MailService } from '@mails/mails.service';
+import { AccountService } from '@models/account/account.service';
+import { CertificationCodeService } from '@models/certificationCode/certificationCode.service';
+import { AuthService } from './auth.service';
 import AccountDto from './dto/account.dto';
 import EmailDto from './dto/email.dto';
 import CodeDto from './dto/code.dto';
-import { AuthService } from './auth.service';
-import { AccountService } from '../models/account/account.service';
-import { CertificationCodeService } from '../models/certificationCode/certificationCode.service';
-import { MailService } from '../mails/mails.service';
 import { LocalStrategyGuard } from './guards/local.guard';
 import { JwtStrategyGuard } from './guards/jwt.guard';
 

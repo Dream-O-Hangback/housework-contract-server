@@ -1,5 +1,5 @@
 import { Column, CreateDateColumn, PrimaryGeneratedColumn, Entity, ManyToOne, JoinColumn } from 'typeorm';
-import Group from '../../group/entities';
+import Group from '@models/group/entities';
 
 @Entity('confirmation')
 export default class Confirmation {

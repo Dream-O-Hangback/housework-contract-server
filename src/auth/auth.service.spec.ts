@@ -6,11 +6,11 @@ import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import * as faker from 'faker';
 import MockDate from 'mockdate';
+import { AccountService } from '@models/account/account.service';
+import { RefreshTokenService } from '@models/refreshToken/refreshToken.service';
+import Account from '@models/account/entities';
+import RefreshToken from '@models/refreshToken/entities';
 import { AuthService } from './auth.service';
-import { AccountService } from '../models/account/account.service';
-import { RefreshTokenService } from '../models/refreshToken/refreshToken.service';
-import Account from '../models/account/entities';
-import RefreshToken from '../models/refreshToken/entities';
 
 const mockJwtService = {
     sign: jest.fn(),

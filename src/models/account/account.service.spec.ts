@@ -4,8 +4,8 @@ import { Like, Repository, UpdateResult } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import * as faker from 'faker';
 import MockDate from 'mockdate';
-import { AccountService } from './account.service';
-import Account from './entities';
+import { AccountService } from '@models/account/account.service';
+import Account from '@models/account/entities';
 
 type MockRepository<T = any> = Partial<Record<keyof Repository<T>, jest.Mock>>;
 

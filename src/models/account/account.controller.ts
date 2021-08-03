@@ -15,10 +15,11 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import * as bcrypt from 'bcrypt';
-import { successMessageGenerator } from '../../common/lib';
-import { failMessage } from '../../common/constants';
+import { JwtStrategyGuard } from '@auth/guards/jwt.guard';
+import { successMessageGenerator } from '@common/lib';
+import { failMessage } from '@common/constants';
+import { MailService } from '@mails/mails.service';
 import { AccountService } from './account.service';
-import { JwtStrategyGuard } from '../../auth/guards/jwt.guard';
 import NicknameDto from './dto/nickname.dto';
 import EmailDto from './dto/email.dto';
 import SearchQuery from './dto/search.query';
@@ -27,7 +28,6 @@ import NicknameUpdateDto from './dto/nicknameUpdate.dto';
 import ProfileUpdateDto from './dto/profileUpdate.dto';
 import PasswordUpdateDto from './dto/passwordUpdate.dto';
 import BooleanUpdateDto from './dto/booleanUpdate.dto';
-import { MailService } from '../../mails/mails.service';
 
 @Controller('accounts')
 export class AccountController {

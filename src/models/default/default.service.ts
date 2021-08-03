@@ -6,7 +6,7 @@ import {
     DefaultAward,
     DefaultAlternativePaymentType,
     DefaultGroupType,
-} from '../default/entities';
+} from './entities';
 
 @Injectable()
 export class DefaultService {
