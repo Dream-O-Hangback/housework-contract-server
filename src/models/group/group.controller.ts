@@ -124,6 +124,36 @@ export class GroupController {
     }
 
     @UseGuards(JwtStrategyGuard)
+    @Patch('/groups/:id/me/nickname')
+    @HttpCode(200)
+    async UpdateMyGroupMemberNickname(@Param() params: IdParams, @Body() nicknameData: NicknameDto, @Request() req) {
+        try {
+            const { id: userId } = req.user;
+            const { id: groupId } = params
+            const { nickname } = nicknameData;
+
+            const group = await this.groupService.getItem({ id: groupId });
+            if (!group) {
+                throw new HttpException(failMessage.ERR_GROUP_NOT_FOUND, HttpStatus.NOT_FOUND);
+            }
+
+            const result = await this.groupMemberService.updateItemNickname({ accountId: userId, groupId, nickname });
+            if (!result.affected) {
+                throw new HttpException(failMessage.ERR_GROUP_MEMBER_NOT_FOUND, HttpStatus.NOT_FOUND);
+            }
+
+            return successMessageGenerator(); 
+        } catch (err) {
+            console.log(err);
+            if (err instanceof HttpException) {
+                throw err;
+            }
+            
+            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @UseGuards(JwtStrategyGuard)
     @Post('/groups/:id/nickname/exists')
     @HttpCode(200)
     async CheckNicknameDuplication(@Param() params: IdParams, @Body() nicknameData: NicknameDto) {

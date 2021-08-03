@@ -19,6 +19,9 @@ export class GroupMemberService {
     updateItemActive({ accountId, groupId, value }) {
         return this.groupMemberRepository.update({ accountId, groupId }, { active: value, updateDate: new Date() });
     }
+    updateItemNickname({ accountId, groupId, nickname }) {
+        return this.groupMemberRepository.update({ accountId, groupId }, { nickname, updateDate: new Date() });
+    }
     async getMyGroups({ accountId: id, skip, take }) {
         const [list, count] = await this.groupMemberRepository
             .createQueryBuilder('gm')
