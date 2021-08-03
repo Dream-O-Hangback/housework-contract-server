@@ -21,6 +21,7 @@ import GroupDto from './dto/group.dto';
 import ListQuery from './dto/list.query';
 import IdParams from './dto/id.params';
 import BooleanUpdateDto from './dto/booleanUpdate.dto';
+import NicknameDto from './dto/nickname.dto';
 
 @Controller()
 @UseGuards(JwtStrategyGuard)
@@ -112,6 +113,35 @@ export class GroupController {
             }
 
             return successMessageGenerator();
+        } catch (err) {
+            console.log(err);
+            if (err instanceof HttpException) {
+                throw err;
+            }
+            
+            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @UseGuards(JwtStrategyGuard)
+    @Post('/groups/:id/nickname/exists')
+    @HttpCode(200)
+    async CheckNicknameDuplication(@Param() params: IdParams, @Body() nicknameData: NicknameDto) {
+        try {
+            const { id: groupId } = params
+            const { nickname } = nicknameData;
+
+            const group = await this.groupService.getItem({ id: groupId });
+            if (!group) {
+                throw new HttpException(failMessage.ERR_GROUP_NOT_FOUND, HttpStatus.NOT_FOUND);
+            }
+
+            const isDuplicated = !!(await this.groupMemberService.getItemByNickname({ groupId, nickname }));
+            if (isDuplicated) {
+                throw new HttpException(failMessage.ERR_ALREADY_EXISTS, HttpStatus.CONFLICT);
+            }
+
+            return successMessageGenerator(); 
         } catch (err) {
             console.log(err);
             if (err instanceof HttpException) {
