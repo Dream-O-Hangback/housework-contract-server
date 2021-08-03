@@ -30,6 +30,16 @@ export const ERR_NOT_FOUND: FailMessageType = {
     description: '...'
 }
 
+export const ERR_GROUP_NOT_FOUND: FailMessageType = {
+    errorCode: 'GROUP_NOT_FOUND',
+    description: '...'
+}
+
+export const ERR_GROUP_MEMBER_NOT_FOUND: FailMessageType = {
+    errorCode: 'GROUP_MEMBER_NOT_FOUND',
+    description: '...'
+}
+
 export const ERR_INTERVER_SERVER: FailMessageType = {
     errorCode: 'INTERVER_SERVER',
     description: '...'

@@ -2,6 +2,7 @@ import {
     Controller,
     Get,
     Post,
+    Patch,
     HttpException,
     HttpStatus,
     HttpCode,
@@ -9,6 +10,7 @@ import {
     UseGuards,
     Body,
     Query,
+    Param,
 } from '@nestjs/common';
 import { JwtStrategyGuard } from '@auth/guards/jwt.guard';
 import { successMessageGenerator } from '@common/lib';
@@ -17,6 +19,8 @@ import { GroupService } from './group.service';
 import { GroupMemberService } from '../groupMember/groupMember.service';
 import GroupDto from './dto/group.dto';
 import ListQuery from './dto/list.query';
+import IdParams from './dto/id.params';
+import BooleanUpdateDto from './dto/booleanUpdate.dto';
 
 @Controller()
 @UseGuards(JwtStrategyGuard)
@@ -78,6 +82,36 @@ export class GroupController {
             })
 
             return successMessageGenerator({ groupMember, groupList: list, groupCount: count });
+        } catch (err) {
+            console.log(err);
+            if (err instanceof HttpException) {
+                throw err;
+            }
+            
+            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @UseGuards(JwtStrategyGuard)
+    @Patch('/groups/:id/me/active')
+    @HttpCode(200)
+    async UpdateMyGroupMemberActive(@Param() params: IdParams, @Body() booleanUpdatedate: BooleanUpdateDto, @Request() req) {
+        try {
+            const { id: userId } = req.user;
+            const { id: groupId } = params;
+            const { value } = booleanUpdatedate;
+
+            const group = await this.groupService.getItem({ id: groupId });
+            if (!group) {
+                throw new HttpException(failMessage.ERR_GROUP_NOT_FOUND, HttpStatus.NOT_FOUND);
+            }
+
+            const result = await this.groupMemberService.updateItemActive({ accountId: userId, groupId, value });
+            if (!result.affected) {
+                throw new HttpException(failMessage.ERR_GROUP_MEMBER_NOT_FOUND, HttpStatus.NOT_FOUND);
+            }
+
+            return successMessageGenerator();
         } catch (err) {
             console.log(err);
             if (err instanceof HttpException) {

@@ -13,4 +13,7 @@ export class GroupService {
     createItem({ type, name, managerPermissionActive }) {
         return this.groupRepository.save({ type, name, managerPermissionActive });
     }
+    getItem({ id }) {
+        return this.groupRepository.findOne({ id });
+    }
 }

@@ -8,5 +8,7 @@ export default {
     ERR_ALREADY_EXISTS: failMessageGenerator(failMessageType.ERR_ALREADY_EXISTS),
     ERR_ALREADY_CREATED: failMessageGenerator(failMessageType.ERR_ALREADY_CREATED),
     ERR_NOT_FOUND: failMessageGenerator(failMessageType.ERR_NOT_FOUND),
+    ERR_GROUP_NOT_FOUND: failMessageGenerator(failMessageType.ERR_GROUP_NOT_FOUND),
+    ERR_GROUP_MEMBER_NOT_FOUND: failMessageGenerator(failMessageType.ERR_GROUP_MEMBER_NOT_FOUND),
     ERR_INTERVER_SERVER: failMessageGenerator(failMessageType.ERR_INTERVER_SERVER),
 }
