@@ -10,7 +10,33 @@ export class GroupMemberService {
     ) {
         this.groupMemberRepository = groupMemberRepository;
     }
-    createGroupMember({ accountId, groupId, nickname }) {
+    createItem({ accountId, groupId, nickname }) {
         return this.groupMemberRepository.save({ accountId, groupId, nickname });
+    }
+    async getMyGroups({ accountId: id, skip, take }) {
+        const [list, count] = await this.groupMemberRepository
+            .createQueryBuilder('gm')
+            .select([
+                'gm.id',
+                'gm.nickname',
+                'gm.isManager',
+                'gm.active',
+                'gm.updateDate',
+                'gm.createDate',
+                'g.id',
+                'g.type',
+                'g.name',
+                'g.logoImageUrl',
+                'g.managerPermissionActive',
+                'g.active',
+                'g.lastInactivateDate',
+                'g.createDate',
+            ])
+            .leftJoin('gm.groupId', 'g', 'gm.accountId = :id', { id })
+            .skip(skip)
+            .take(take)
+            .getManyAndCount();
+        
+        return { list, count };
     }
 }

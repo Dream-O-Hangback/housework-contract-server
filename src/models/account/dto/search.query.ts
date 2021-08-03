@@ -1,5 +1,5 @@
 import { Type } from 'class-transformer';
-import { IsString, IsNotEmpty, IsNumber, Length } from 'class-validator';
+import { IsString, IsNotEmpty, IsNumber, IsOptional, Length } from 'class-validator';
 
 export default class SearchQuery {
     @IsNotEmpty()
@@ -10,10 +10,12 @@ export default class SearchQuery {
     
     @IsNumber()
     @Type(() => Number)
+    @IsOptional()
     readonly offset: number;
     
     @IsNumber()
     @Type(() => Number)
+    @IsOptional()
     readonly limit: number;
 
     constructor(search_word: string, offset: number, limit: number) {

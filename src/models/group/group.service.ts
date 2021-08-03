@@ -10,7 +10,7 @@ export class GroupService {
     ) {
         this.groupRepository = groupRepository;
     }
-    createGroup({ type, name, managerPermissionActive }) {
+    createItem({ type, name, managerPermissionActive }) {
         return this.groupRepository.save({ type, name, managerPermissionActive });
     }
 }
