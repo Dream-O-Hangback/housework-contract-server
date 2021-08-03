@@ -6,6 +6,7 @@ import { AuthModule } from '@auth/auth.module';
 import entities from '@models/index';
 import { AccountModule } from '@models/account/account.module';
 import { DefaultModule } from '@models/default/default.module';
+import { GroupModule } from '@models/group/group.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
@@ -41,6 +42,7 @@ import { AppService } from './app.service';
             AuthModule,
             AccountModule,
             DefaultModule,
+            GroupModule,
     ],
     controllers: [AppController],
     providers: [AppService],
