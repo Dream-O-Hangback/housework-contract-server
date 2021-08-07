@@ -22,6 +22,7 @@ import ListQuery from './dto/list.query';
 import IdParams from './dto/id.params';
 import BooleanUpdateDto from './dto/booleanUpdate.dto';
 import NicknameDto from './dto/nickname.dto';
+import GroupMember from './interfaces/groupMember';
 
 @Controller()
 @UseGuards(JwtStrategyGuard)
@@ -83,6 +84,42 @@ export class GroupController {
             })
 
             return successMessageGenerator({ groupMember, groupList: list, groupCount: count });
+        } catch (err) {
+            console.log(err);
+            if (err instanceof HttpException) {
+                throw err;
+            }
+            
+            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @UseGuards(JwtStrategyGuard)
+    @Get('/groups/:id')
+    @HttpCode(200)
+    async GetGroupInfo(@Param() params: IdParams, @Request() req) {
+        try {
+            const { id: userId } = req.user;
+            const { id: groupId } = params;
+            
+            const group = await this.groupService.getInfo({ id: groupId });
+            if (!group) {
+                throw new HttpException(failMessage.ERR_GROUP_NOT_FOUND, HttpStatus.NOT_FOUND);
+            }
+
+            let groupMembers = await this.groupMemberService.getListByGroupId({ groupId });
+
+            groupMembers = groupMembers.map((item: any) => {
+                const { accountId, ...groupMemberParams } = item;
+                const { id, profileImageUrl } = accountId
+                return { accountId: id, profileImageUrl, ...groupMemberParams };
+            });
+
+            if (!groupMembers.filter((item: GroupMember) => item.accountId === userId).length) {
+                throw new HttpException(failMessage.ERR_GROUP_MEMBER_NOT_FOUND, HttpStatus.NOT_FOUND);
+            }
+
+            return successMessageGenerator({ group, groupMembers });
         } catch (err) {
             console.log(err);
             if (err instanceof HttpException) {

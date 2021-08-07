@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import GroupMember from './entities';
+import IGroupMember from '../group/interfaces/groupMember';
 
 @Injectable()
 export class GroupMemberService {
@@ -12,6 +13,24 @@ export class GroupMemberService {
     }
     createItem({ accountId, groupId, nickname }) {
         return this.groupMemberRepository.save({ accountId, groupId, nickname });
+    }
+    getListByGroupId({ groupId }) {
+        return this.groupMemberRepository
+            .createQueryBuilder('gm')
+            .select([
+                'gm.id',
+                'gm.groupId',
+                'gm.nickname',
+                'gm.isManager',
+                'a.id',
+                'a.profileImageUrl',
+            ])
+            .leftJoin('gm.accountId', 'a')
+            .where({ groupId })
+            .getMany();
+    }
+    getItemByAccountId({ groupId, accountId }) {
+        return this.groupMemberRepository.findOne({ groupId, accountId });
     }
     getItemByNickname({ groupId, nickname }) {
         return this.groupMemberRepository.findOne({ groupId, nickname });

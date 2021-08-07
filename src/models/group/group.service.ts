@@ -16,4 +16,7 @@ export class GroupService {
     getItem({ id }) {
         return this.groupRepository.findOne({ id });
     }
+    getInfo({ id }) {
+        return this.groupRepository.findOne({ id });
+    }
 }
