@@ -100,7 +100,7 @@ export class GroupController {
                 throw new HttpException(failMessage.ERR_GROUP_NOT_FOUND, HttpStatus.NOT_FOUND);
             }
 
-            let groupMembers = await this.groupMemberService.getListByGroupId({ groupId });
+            let groupMembers = await this.groupMemberService.getGroupMemberListAndGroupInfo({ groupId });
 
             groupMembers = groupMembers.map((item: any) => {
                 const { accountId, ...groupMemberParams } = item;

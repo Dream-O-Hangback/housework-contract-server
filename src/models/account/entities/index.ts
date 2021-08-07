@@ -48,9 +48,6 @@ export default class Account {
     @CreateDateColumn({ name: 'create_date' })
     createDate: Date;
 
-    @DeleteDateColumn({ name: 'delete_date' })
-    deleteDate: Date;
-
     @Column({ default: false })
     active: boolean;
 }

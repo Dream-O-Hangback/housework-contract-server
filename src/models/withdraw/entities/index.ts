@@ -1,14 +1,17 @@
-import { Column, PrimaryGeneratedColumn, Entity } from 'typeorm';
+import { Column, PrimaryGeneratedColumn, Entity, CreateDateColumn } from 'typeorm';
 
 @Entity('withdraw')
 export default class Withdraw {
-    @PrimaryGeneratedColumn('uuid')
+    @PrimaryGeneratedColumn('uuid', { name: 'withdraw_id' })
+    withdrawId: string;
+
+    @Column('uuid')
     id: string;
 
     @Column({ unique: true, type: 'varchar', length: 255 })
     email: string;
 
-    @Column({ type: 'varchar', length: 50 })
+    @Column({ type: 'varchar', length: 60 })
     password: string;
 
     @Column({ type: 'varchar', length: 255 })
@@ -41,18 +44,15 @@ export default class Withdraw {
     @Column({ name: 'last_update_date' })
     lastUpdateDate: Date;
 
-    @Column({ type: 'varbinary', length: 16, name: 'last_update_ip' })
+    @Column({ type: 'varbinary', length: 16, name: 'last_update_ip', nullable: true })
     lastUpdateIp: string;
 
     @Column({ name: 'create_date' })
     createDate: Date;
 
-    @Column({ type: 'varbinary', length: 16, name: 'create_ip' })
-    createIp: string;
-
-    @Column({ default: true })
+    @Column({ default: false })
     active: boolean;
 
-    @Column({ name: 'deleteDate' })
-    delete_date: Date;
+    @CreateDateColumn({ name: 'delete_date' })
+    deleteDate: Date;
 }

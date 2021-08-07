@@ -5,6 +5,7 @@ import { MulterModule } from '@nestjs/platform-express';
 import { MailModule } from '@mails/mails.module';
 import { FileService } from '@providers/file.service';
 import { FileModule } from '@providers/file.module';
+import { WithdrawModule } from '@models/withdraw/withdraw.module';
 import { AccountController } from './account.controller';
 import { AccountService } from './account.service';
 import Account from './entities';
@@ -13,6 +14,7 @@ import Account from './entities';
     imports: [
         FileModule,
         MailModule,
+        WithdrawModule,
         TypeOrmModule.forFeature([Account]),
         MulterModule.registerAsync({
             imports: [ConfigModule],

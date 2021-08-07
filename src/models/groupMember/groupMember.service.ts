@@ -13,7 +13,7 @@ export class GroupMemberService {
     createItem({ accountId, groupId, nickname }) {
         return this.groupMemberRepository.save({ accountId, groupId, nickname });
     }
-    getListByGroupId({ groupId }) {
+    getGroupMemberListAndGroupInfo({ groupId }) {
         return this.groupMemberRepository
             .createQueryBuilder('gm')
             .select([

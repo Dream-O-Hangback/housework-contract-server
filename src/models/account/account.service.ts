@@ -115,6 +115,6 @@ export class AccountService {
         );
     }
     deleteItem({ id }) {
-        return this.accountRepository.update({ id, active: true }, { active: false, deleteDate: new Date() });
+        return this.accountRepository.delete({ id, active: true });
     }
 }
