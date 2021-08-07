@@ -1,14 +1,15 @@
 import { Column, CreateDateColumn, PrimaryGeneratedColumn, Entity, ManyToOne, JoinColumn } from 'typeorm';
 import Group from '@models/group/entities';
+import { DefaultAward } from '@models/default/entities';
 
 @Entity('award')
 export default class Award {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
-    @ManyToOne(type => Group, group => group.id)
+    @ManyToOne(type => Group)
     @JoinColumn({ name: 'group_id' })
-    groupId: string;
+    groupId: Group;
 
     @Column({ type: 'varchar', length: 30 })
     type: string;
@@ -19,7 +20,8 @@ export default class Award {
     @Column({ type: 'varchar', length: 255 })
     description: string;
 
-    @Column({ nullable: true, type: 'bigint', name: 'default_award_id' })
+    @ManyToOne(type => DefaultAward, { nullable: true })
+    @JoinColumn({ name: 'default_award_id' })
     defaultAwardId: number;
 
     @Column({ default: false, name: 'include_content' })

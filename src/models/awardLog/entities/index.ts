@@ -2,30 +2,33 @@ import { Column, CreateDateColumn, PrimaryGeneratedColumn, Entity, ManyToOne, On
 import Group from '@models/group/entities';
 import HouseworkLog from '@models/houseworkLog/entities';
 import Award from '@models/award/entities';
+import GroupMember from '@models/groupMember/entities';
 
 @Entity('award_log')
 export default class AwardLog {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
-    @ManyToOne(type => Group, group => group.id)
+    @ManyToOne(type => Group)
     @JoinColumn({ name: 'group_id' })
-    groupId: string;
+    groupId: Group;
 
-    @OneToOne(type => HouseworkLog, houseworkLog => houseworkLog.id)
+    @OneToOne(type => HouseworkLog)
     @JoinColumn({ name: 'housework_log_id' })
-    houseworkLogId: string;
+    houseworkLogId: HouseworkLog;
 
-    @ManyToOne(type => Award, award => award.id)
+    @ManyToOne(type => Award)
     @JoinColumn({ name: 'award_id' })
-    awardId: string;
+    awardId: Award;
 
-    @Column('uuid', { nullable: true, name: 'award_worker_id' })
-    awardWorkerId: string;
+    @ManyToOne(type => GroupMember, { nullable: true })
+    @JoinColumn({ name: 'award_worker_id' })
+    awardWorkerId: GroupMember;
 
-    @Column('uuid', { nullable: true, name: 'penalty_worker_id' })
-    penaltyWorkerId: string;
-
+    @ManyToOne(type => GroupMember, { nullable: true })
+    @JoinColumn({ name: 'penalty_worker_id' })
+    penaltyWorkerId: GroupMember;
+    
     @Column({ type: 'varchar', length: 255 })
     content: string;
 

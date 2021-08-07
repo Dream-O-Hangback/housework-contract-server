@@ -8,9 +8,9 @@ export class Routine {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
-    @ManyToOne(type => Group, group => group.id)
+    @ManyToOne(type => Group)
     @JoinColumn({ name: 'group_id' })
-    groupId: string;
+    groupId: Group;
 
     @Column({ type: 'tinyint', name: 'start_day' })
     startDay: number;
@@ -36,17 +36,17 @@ export class RoutineFullCharge {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
-    @ManyToOne(type => Group, group => group.id)
+    @ManyToOne(type => Group)
     @JoinColumn({ name: 'group_id' })
-    groupId: string;
+    groupId: Group;
 
-    @ManyToOne(type => GroupMember, groupMember => groupMember.id)
+    @ManyToOne(type => GroupMember)
     @JoinColumn({ name: 'group_member_id' })
-    groupMemberId: string;
+    groupMemberId: GroupMember;
 
-    @ManyToOne(type => Housework, housework => housework.id)
+    @ManyToOne(type => Housework)
     @JoinColumn({ name: 'housework_id' })
-    houseworkId: string;
+    houseworkId: Housework;
 
     @Column({ name: 'start_date' })
     startDate: Date;
@@ -63,17 +63,17 @@ export class RoutineRotation {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
-    @ManyToOne(type => Group, group => group.id)
+    @ManyToOne(type => Group)
     @JoinColumn({ name: 'group_id' })
-    groupId: string;
+    groupId: Group;
 
-    @ManyToOne(type => GroupMember, groupMember => groupMember.id)
+    @ManyToOne(type => GroupMember)
     @JoinColumn({ name: 'group_member_id' })
-    groupMemberId: string;
+    groupMemberId: GroupMember;
 
-    @ManyToOne(type => Housework, housework => housework.id)
+    @ManyToOne(type => Housework)
     @JoinColumn({ name: 'housework_id' })
-    houseworkId: string;
+    houseworkId: Housework;
 
     @Column({ name: 'cycle' })
     cycle:  number;

@@ -1,14 +1,15 @@
 import { Column, CreateDateColumn, PrimaryGeneratedColumn, Entity, ManyToOne, JoinColumn } from 'typeorm';
 import Group from '@models/group/entities';
+import ConfirmationLog from '@models/confirmationLog/entities';
 
 @Entity('confirmation')
 export default class Confirmation {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
-    @ManyToOne(type => Group, group => group.id)
+    @ManyToOne(type => Group)
     @JoinColumn({ name: 'group_id' })
-    groupId: string;
+    groupId: Group;
 
     @Column({ type: 'varchar', length: 30 })
     type: string;

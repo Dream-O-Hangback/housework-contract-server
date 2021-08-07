@@ -8,17 +8,17 @@ export default class GroupMember {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
-    @ManyToOne(type => Account, account => account.id)
+    @ManyToOne(type => Account)
     @JoinColumn({ name: 'account_id' })
-    accountId: string;
+    accountId: Account;
 
-    @ManyToOne(type => Group, group => group.id)
+    @ManyToOne(type => Group)
     @JoinColumn({ name: 'group_id' })
-    groupId: string;
+    groupId: Group;
 
-    @OneToOne(type => Award, award => award.id, { nullable: true })
+    @OneToOne(type => Award, { nullable: true })
     @JoinColumn({ name: 'select_award_id' })
-    selectAwardId: string;
+    selectAwardId: Award;
 
     @Column({ type: 'varchar', length: 20 })
     nickname: string;

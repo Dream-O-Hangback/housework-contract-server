@@ -8,17 +8,17 @@ export default class ConfirmationLog {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
-    @ManyToOne(type => Confirmation, confirmation => confirmation.id)
+    @ManyToOne(type => Confirmation)
     @JoinColumn({ name: 'confirmation_id' })
-    confirmationId: string;
+    confirmationId: Confirmation;
 
-    @ManyToOne(type => Group, group => group.id)
+    @ManyToOne(type => Group)
     @JoinColumn({ name: 'group_id' })
-    groupId: string;
+    groupId: Group;
 
-    @ManyToOne(type => GroupMember, groupMember => groupMember.id)
+    @ManyToOne(type => GroupMember)
     @JoinColumn({ name: 'group_member_id' })
-    groupMemberId: string;
+    groupMemberId: GroupMember;
 
     @Column({ default: false,  name: 'is_confirm' })
     isConfirm: boolean;

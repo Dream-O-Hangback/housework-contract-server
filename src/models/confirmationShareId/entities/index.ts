@@ -7,9 +7,9 @@ export default class ConfirmationShareId {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
-    @ManyToOne(type => Group, group => group.id)
+    @ManyToOne(type => Group)
     @JoinColumn({ name: 'group_id' })
-    groupId: string;
+    groupId: Group;
 
     @ManyToOne(type => GroupMember, groupMember => groupMember.id)
     @JoinColumn({ name: 'group_member_id' })

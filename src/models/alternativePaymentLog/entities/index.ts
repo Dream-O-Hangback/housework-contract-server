@@ -3,33 +3,36 @@ import Group from '@models/group/entities';
 import HouseworkLog from '@models/houseworkLog/entities';
 import Award from '@models/award/entities';
 import AlternativePayment from '@models/alternativePayment/entities';
+import GroupMember from '@models/groupMember/entities';
 
 @Entity('alternative_payment_log')
 export default class AlternativePaymentLog {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
-    @ManyToOne(type => Group, group => group.id)
+    @ManyToOne(type => Group)
     @JoinColumn({ name: 'group_id' })
-    groupId: string;
+    groupId: Group;
 
-    @OneToOne(type => HouseworkLog, houseworkLog => houseworkLog.id)
+    @OneToOne(type => HouseworkLog)
     @JoinColumn({ name: 'housework_log_id' })
-    houseworkLogId: string;
+    houseworkLogId: HouseworkLog;
 
-    @ManyToOne(type => Award, award => award.id)
+    @ManyToOne(type => Award)
     @JoinColumn({ name: 'award_id' })
-    awardId: string;
+    awardId: Award;
 
-    @ManyToOne(type => AlternativePayment, alternativePayment => alternativePayment.id)
+    @ManyToOne(type => AlternativePayment)
     @JoinColumn({ name: 'alternative_payment_id' })
-    alternativePaymentId: string;
+    alternativePaymentId: AlternativePayment;
 
-    @Column('uuid', { name: 'award_worker_id', nullable: true })
-    awardWorkerId: string;
+    @ManyToOne(type => GroupMember, { nullable: true })
+    @JoinColumn({ name: 'award_worker_id' })
+    awardWorkerId: GroupMember;
 
-    @Column('uuid', { name: 'penalty_worker_id', nullable: true })
-    penaltyWorkerId: string;
+    @ManyToOne(type => GroupMember, { nullable: true })
+    @JoinColumn({ name: 'penalty_worker_id' })
+    penaltyWorkerId: GroupMember;
 
     @Column({ default: false, name: 'is_receive' })
     isReceive: boolean;

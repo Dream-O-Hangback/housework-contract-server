@@ -9,21 +9,21 @@ export default class HouseworkDumpLog {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
-    @ManyToOne(type => Group, group => group.id)
+    @ManyToOne(type => Group)
     @JoinColumn({ name: 'group_id' })
-    groupId: string;
+    groupId: Group;
 
-    @ManyToOne(type => GroupMember, groupMember => groupMember.id)
+    @ManyToOne(type => GroupMember)
     @JoinColumn({ name: 'group_member_id' })
-    groupMemberId: string;
+    groupMemberId: GroupMember;
 
-    @OneToOne(type => HouseworkLog, houseworkLog => houseworkLog.id)
+    @OneToOne(type => HouseworkLog)
     @JoinColumn({ name: 'housework_log_id' })
-    houseworkLogId: string;
+    houseworkLogId: HouseworkLog;
 
-    @ManyToOne(type => Award, award => award.id)
+    @ManyToOne(type => Award)
     @JoinColumn({ name: 'award_id' })
-    awardId: string;
+    awardId: Award;
 
     @Column({ type: 'varchar', length: 36, name: 'target_id' })
     targetId: string;

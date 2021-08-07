@@ -6,9 +6,9 @@ export default class RefreshToken {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
-    @OneToOne(type => Account, account => account.id)
+    @OneToOne(type => Account)
     @JoinColumn({ name: 'account_id' })
-    accountId: string;
+    accountId: Account;
     
     @Column({ type: 'varchar', length: 255 })
     token: string;

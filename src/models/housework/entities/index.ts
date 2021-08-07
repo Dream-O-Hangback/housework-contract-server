@@ -6,9 +6,9 @@ export default class Housework {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
-    @ManyToOne(type => Group, group => group.id)
+    @ManyToOne(type => Group)
     @JoinColumn({ name: 'group_id' })
-    groupId: string;
+    groupId: Group;
 
     @Column({ type: 'varchar', length: 40 })
     title: string;
