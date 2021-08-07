@@ -22,7 +22,6 @@ import ListQuery from './dto/list.query';
 import IdParams from './dto/id.params';
 import BooleanUpdateDto from './dto/booleanUpdate.dto';
 import NicknameDto from './dto/nickname.dto';
-import GroupMember from './interfaces/groupMember';
 
 @Controller()
 @UseGuards(JwtStrategyGuard)
@@ -76,14 +75,8 @@ export class GroupController {
             limit = isNaN(limit) ? 5 : limit;
 
             let { list, count } = await this.groupMemberService.getMyGroups({ accountId: id, skip: offset * limit, take: limit });
-            let groupMember = undefined;
-            list = list.map((elem: any) => {
-                const { groupId, ...groupMemberParams } = elem;
-                if (!groupMember) groupMember = { ...groupMemberParams };
-                return groupId;
-            })
 
-            return successMessageGenerator({ groupMember, groupList: list, groupCount: count });
+            return successMessageGenerator({ list, count });
         } catch (err) {
             console.log(err);
             if (err instanceof HttpException) {
@@ -115,7 +108,7 @@ export class GroupController {
                 return { accountId: id, profileImageUrl, ...groupMemberParams };
             });
 
-            if (!groupMembers.filter((item: GroupMember) => item.accountId === userId).length) {
+            if (!groupMembers.filter((item: any) => item.accountId === userId).length) {
                 throw new HttpException(failMessage.ERR_GROUP_MEMBER_NOT_FOUND, HttpStatus.NOT_FOUND);
             }
 

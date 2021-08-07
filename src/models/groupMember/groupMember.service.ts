@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import GroupMember from './entities';
-import IGroupMember from '../group/interfaces/groupMember';
 
 @Injectable()
 export class GroupMemberService {
@@ -25,6 +24,7 @@ export class GroupMemberService {
                 'a.id',
                 'a.profileImageUrl',
             ])
+            .where({ groupId })
             .leftJoin('gm.accountId', 'a')
             .where({ groupId })
             .getMany();
@@ -41,7 +41,7 @@ export class GroupMemberService {
     updateItemNickname({ accountId, groupId, nickname }) {
         return this.groupMemberRepository.update({ accountId, groupId }, { nickname, updateDate: new Date() });
     }
-    async getMyGroups({ accountId: id, skip, take }) {
+    async getMyGroups({ accountId, skip, take }) {
         const [list, count] = await this.groupMemberRepository
             .createQueryBuilder('gm')
             .select([
@@ -60,7 +60,8 @@ export class GroupMemberService {
                 'g.lastInactivateDate',
                 'g.createDate',
             ])
-            .leftJoin('gm.groupId', 'g', 'gm.accountId = :id', { id })
+            .where({ accountId })
+            .leftJoin('gm.groupId', 'g')
             .skip(skip)
             .take(take)
             .getManyAndCount();
