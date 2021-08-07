@@ -9,7 +9,7 @@ export default class CertificationCode {
     @Column({ name: 'account_id', nullable: true })
     accountId: string;
 
-    @ManyToOne(type => Account)
+    @ManyToOne(type => Account, { onDelete: 'SET NULL' })
     @JoinColumn()
     account: Account;
 

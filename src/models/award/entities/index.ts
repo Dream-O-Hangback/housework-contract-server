@@ -7,7 +7,7 @@ export default class Award {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
-    @ManyToOne(type => Group)
+    @ManyToOne(type => Group, { onDelete: 'SET NULL' })
     @JoinColumn({ name: 'group_id' })
     groupId: Group;
 
@@ -20,7 +20,10 @@ export default class Award {
     @Column({ type: 'varchar', length: 255 })
     description: string;
 
-    @ManyToOne(type => DefaultAward, { nullable: true })
+    @ManyToOne(type => DefaultAward, {
+        nullable: true,
+        onDelete: 'SET NULL',
+    })
     @JoinColumn({ name: 'default_award_id' })
     defaultAwardId: number;
 

@@ -8,15 +8,15 @@ export default class ConfirmationLog {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
-    @ManyToOne(type => Confirmation)
+    @ManyToOne(type => Confirmation, { onDelete: 'SET NULL' })
     @JoinColumn({ name: 'confirmation_id' })
     confirmationId: Confirmation;
 
-    @ManyToOne(type => Group)
+    @ManyToOne(type => Group, { onDelete: 'SET NULL' })
     @JoinColumn({ name: 'group_id' })
     groupId: Group;
 
-    @ManyToOne(type => GroupMember)
+    @ManyToOne(type => GroupMember, { onDelete: 'SET NULL' })
     @JoinColumn({ name: 'group_member_id' })
     groupMemberId: GroupMember;
 

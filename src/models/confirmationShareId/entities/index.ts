@@ -7,13 +7,13 @@ export default class ConfirmationShareId {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
-    @ManyToOne(type => Group)
+    @ManyToOne(type => Group, { onDelete: 'SET NULL' })
     @JoinColumn({ name: 'group_id' })
     groupId: Group;
 
-    @ManyToOne(type => GroupMember, groupMember => groupMember.id)
+    @ManyToOne(type => GroupMember, { onDelete: 'SET NULL' })
     @JoinColumn({ name: 'group_member_id' })
-    groupMemberId: string;
+    groupMemberId: GroupMember;
 
     @Column({ type: 'varchar', length: 30, name: 'share_id' })
     shareId: string;

@@ -9,19 +9,19 @@ export default class HouseworkDumpLog {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
-    @ManyToOne(type => Group)
+    @ManyToOne(type => Group, { onDelete: 'SET NULL' })
     @JoinColumn({ name: 'group_id' })
     groupId: Group;
 
-    @ManyToOne(type => GroupMember)
+    @ManyToOne(type => GroupMember, { onDelete: 'SET NULL' })
     @JoinColumn({ name: 'group_member_id' })
     groupMemberId: GroupMember;
 
-    @OneToOne(type => HouseworkLog)
+    @OneToOne(type => HouseworkLog, { onDelete: 'SET NULL' })
     @JoinColumn({ name: 'housework_log_id' })
     houseworkLogId: HouseworkLog;
 
-    @ManyToOne(type => Award)
+    @ManyToOne(type => Award, { onDelete: 'SET NULL' })
     @JoinColumn({ name: 'award_id' })
     awardId: Award;
 

@@ -8,15 +8,18 @@ export default class GroupMember {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
-    @ManyToOne(type => Account)
+    @ManyToOne(type => Account, { onDelete: 'SET NULL' })
     @JoinColumn({ name: 'account_id' })
     accountId: Account;
 
-    @ManyToOne(type => Group)
+    @ManyToOne(type => Group, { onDelete: 'SET NULL' })
     @JoinColumn({ name: 'group_id' })
     groupId: Group;
 
-    @OneToOne(type => Award, { nullable: true })
+    @OneToOne(type => Award, {
+        nullable: true,
+        onDelete: 'SET NULL',
+    })
     @JoinColumn({ name: 'select_award_id' })
     selectAwardId: Award;
 
