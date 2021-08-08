@@ -31,6 +31,27 @@ export class GroupMemberService {
             .leftJoin('gm.account', 'a')
             .getMany();
     }
+    getInfoByAccountId({ groupId, accountId }) {
+        return this.groupMemberRepository
+            .createQueryBuilder('gm')
+            .select([
+                'gm.selectAwardId',
+                'gm.nickname',
+                'gm.isManager',
+                'gm.active',
+                'gm.updateDate',
+                'gm.createDate',
+                'a.id',
+                'a.type',
+                'a.title',
+                'a.description',
+                'a.defaultAwardId',
+                'a.includeContent',
+            ])
+            .where({ groupId, accountId })
+            .leftJoin('gm.selectAward', 'a')
+            .getOne();
+    }
     getItemByAccountId({ groupId, accountId }) {
         return this.groupMemberRepository.findOne({ groupId, accountId });
     }

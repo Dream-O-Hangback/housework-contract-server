@@ -205,6 +205,51 @@ export class GroupController {
     }
 
     @UseGuards(JwtStrategyGuard)
+    @Get('/groups/:id/me')
+    @HttpCode(200)
+    async GetMyGroupMemberInfo(@Param() params: IdParams, @Request() req) {
+        try {
+            const { id: userId } = req.user;
+            const { id: groupId } = params;
+            
+            const group = await this.groupService.getInfo({ id: groupId });
+            if (!group) {
+                throw new HttpException(failMessage.ERR_GROUP_NOT_FOUND, HttpStatus.NOT_FOUND);
+            }
+
+            const groupMember = await this.groupMemberService.getInfoByAccountId({ groupId, accountId: userId });
+            if (!groupMember) {
+                throw new HttpException(failMessage.ERR_GROUP_MEMBER_NOT_FOUND, HttpStatus.NOT_FOUND);
+            }
+
+            const {
+                selectAward,
+                nickname,
+                isManager,
+                active,
+                updateDate,
+                createDate,
+            } = groupMember;
+
+            return successMessageGenerator({
+                selectAward,
+                nickname,
+                isManager,
+                active,
+                updateDate,
+                createDate,
+            });
+        } catch (err) {
+            console.log(err);
+            if (err instanceof HttpException) {
+                throw err;
+            }
+            
+            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @UseGuards(JwtStrategyGuard)
     @Patch('/groups/:id/me/active')
     @HttpCode(200)
     async UpdateMyGroupMemberActive(@Param() params: IdParams, @Body() booleanUpdatedate: BooleanUpdateDto, @Request() req) {
