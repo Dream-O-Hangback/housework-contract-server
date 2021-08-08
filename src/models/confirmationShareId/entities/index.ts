@@ -7,13 +7,19 @@ export default class ConfirmationShareId {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
-    @ManyToOne(type => Group, { onDelete: 'SET NULL' })
+    @ManyToOne(type => Group, { onDelete: 'SET NULL', nullable: true })
     @JoinColumn({ name: 'group_id' })
-    groupId: Group;
+    group: Group;
 
-    @ManyToOne(type => GroupMember, { onDelete: 'SET NULL' })
+    @Column({ name: 'group_id', nullable: true })
+    groupId: string;
+
+    @ManyToOne(type => GroupMember, { onDelete: 'SET NULL', nullable: true })
     @JoinColumn({ name: 'group_member_id' })
-    groupMemberId: GroupMember;
+    groupMember: GroupMember;
+
+    @Column({ name: 'group_member_id', nullable: true })
+    groupMemberId: string;
 
     @Column({ type: 'varchar', length: 30, name: 'share_id' })
     shareId: string;

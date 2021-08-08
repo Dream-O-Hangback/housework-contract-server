@@ -7,9 +7,12 @@ export default class Award {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
-    @ManyToOne(type => Group, { onDelete: 'SET NULL' })
+    @ManyToOne(type => Group, { onDelete: 'SET NULL', nullable: true })
     @JoinColumn({ name: 'group_id' })
-    groupId: Group;
+    group: Group;
+
+    @Column({ name: 'group_id', nullable: true })
+    groupId: string;
 
     @Column({ type: 'varchar', length: 30 })
     type: string;
@@ -20,12 +23,12 @@ export default class Award {
     @Column({ type: 'varchar', length: 255 })
     description: string;
 
-    @ManyToOne(type => DefaultAward, {
-        nullable: true,
-        onDelete: 'SET NULL',
-    })
+    @ManyToOne(type => DefaultAward, { onDelete: 'SET NULL', nullable: true })
     @JoinColumn({ name: 'default_award_id' })
-    defaultAwardId: number;
+    defaultAward: number;
+
+    @Column({ name: 'default_award_id', nullable: true })
+    defaultAwardId: string;
 
     @Column({ default: false, name: 'include_content' })
     includeContent: boolean;

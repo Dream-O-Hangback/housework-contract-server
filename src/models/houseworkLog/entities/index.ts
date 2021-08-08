@@ -8,17 +8,26 @@ export default class HouseworkLog {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
-    @ManyToOne(type => Group, { onDelete: 'SET NULL' })
+    @ManyToOne(type => Group, { onDelete: 'SET NULL', nullable: true })
     @JoinColumn({ name: 'group_id' })
-    groupId: Group;
+    group: Group;
 
-    @ManyToOne(type => GroupMember, { onDelete: 'SET NULL' })
+    @Column({ name: 'group_id', nullable: true })
+    groupId: string;
+
+    @ManyToOne(type => GroupMember, { onDelete: 'SET NULL', nullable: true })
     @JoinColumn({ name: 'worker_id' })
-    workerId: GroupMember;
+    worker: GroupMember;
 
-    @ManyToOne(type => Housework, { onDelete: 'SET NULL' })
+    @Column({ name: 'worker_id', nullable: true })
+    workerId: string;
+
+    @ManyToOne(type => Housework, { onDelete: 'SET NULL', nullable: true })
     @JoinColumn({ name: 'housework_id' })
-    houseworkId: Housework;
+    housework: Housework;
+
+    @Column({ name: 'housework_id', nullable: true })
+    houseworkId: string;
 
     @Column({ name: 'is_complete' })
     isComplete: boolean;

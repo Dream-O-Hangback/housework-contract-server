@@ -15,13 +15,20 @@ import {
 import { JwtStrategyGuard } from '@auth/guards/jwt.guard';
 import { successMessageGenerator } from '@common/lib';
 import { failMessage } from '@common/constants';
+import GroupMember from '@models/groupMember/entities';
 import { GroupService } from './group.service';
 import { GroupMemberService } from '../groupMember/groupMember.service';
-import GroupDto from './dto/group.dto';
-import ListQuery from './dto/list.query';
-import IdParams from './dto/id.params';
-import BooleanUpdateDto from './dto/booleanUpdate.dto';
-import NicknameDto from './dto/nickname.dto';
+import {
+    GroupDto,
+    GroupUpdateDto,
+    GroupActiveUpdateDto,
+    GroupMemberUpdateDto,
+    ListQuery,
+    IdParams,
+    BooleanUpdateDto,
+    NicknameDto
+} from './dto';
+import { RedefinedGroupMemberInfo } from './interfaces';
 
 @Controller()
 @UseGuards(JwtStrategyGuard)
@@ -48,7 +55,12 @@ export class GroupController {
 
             const groupMemberCreatePromises = [];
             for (let i = 0; i < groupMembers.length; i++) {
-                groupMemberCreatePromises.push(this.groupMemberService.createItem({ accountId: groupMembers[i], groupId: group.id, nickname: `member${i + 1}` }));
+                groupMemberCreatePromises.push(this.groupMemberService.createItem({
+                    accountId: groupMembers[i],
+                    groupId: group.id,
+                    nickname: `member${i + 1}`,
+                    isManager: groupMembers[i] === id,
+                }));
             }
             await Promise.all(groupMemberCreatePromises);
 
@@ -102,17 +114,168 @@ export class GroupController {
 
             let groupMembers = await this.groupMemberService.getGroupMemberListAndGroupInfo({ groupId });
 
-            groupMembers = groupMembers.map((item: any) => {
-                const { accountId, ...groupMemberParams } = item;
-                const { id, profileImageUrl } = accountId
+            const redefinedGroupMembers: RedefinedGroupMemberInfo[] = groupMembers.map((item: any) => {
+                const { account, ...groupMemberParams } = item;
+                const { id, profileImageUrl } = account;
                 return { accountId: id, profileImageUrl, ...groupMemberParams };
             });
 
-            if (!groupMembers.filter((item: any) => item.accountId === userId).length) {
+            if (!redefinedGroupMembers.filter((item) => item.accountId === userId).length) {
                 throw new HttpException(failMessage.ERR_GROUP_MEMBER_NOT_FOUND, HttpStatus.NOT_FOUND);
             }
 
-            return successMessageGenerator({ group, groupMembers });
+            return successMessageGenerator({ group, groupMembers: redefinedGroupMembers });
+        } catch (err) {
+            console.log(err);
+            if (err instanceof HttpException) {
+                throw err;
+            }
+            
+            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @UseGuards(JwtStrategyGuard)
+    @Patch('/groups/:id')
+    @HttpCode(200)
+    async UpdateGroupInfo(@Param() params: IdParams, @Body() groupUpdateData: GroupUpdateDto) {
+        try {
+            // TODO: permission 처리
+            // TODO: 추가된, 삭제된 멤버의 housework log 처리
+            const { id: groupId } = params;
+            const { groupMembers, ...groupUpdateDataParams } = groupUpdateData;
+            
+            const result = await this.groupService.updateItem({ id: groupId, ...groupUpdateDataParams });
+            if (result.affected === 0) {
+                throw new HttpException(failMessage.ERR_GROUP_NOT_FOUND, HttpStatus.NOT_FOUND);
+            }
+
+            const originalGroupMembers = await this.groupMemberService.getListByGroupId({ groupId });
+            const originalGroupMemberIds = originalGroupMembers.map((item: GroupMember) => item.accountId);
+
+            const groupMemberCreatePromises = [];
+            for (let i = 0; i < groupMembers.length; i++) {
+                if (originalGroupMemberIds.includes(groupMembers[i])) {
+                    throw new HttpException(failMessage.ERR_ALREADY_EXISTS_GROUP_MEMBER, HttpStatus.CONFLICT);
+                }
+
+                groupMemberCreatePromises.push(this.groupMemberService.createItem({
+                    accountId: groupMembers[i],
+                    groupId,
+                    nickname: `member${originalGroupMemberIds.length + i + 1}`,
+                    isManager: false,
+                }));
+            }
+            await Promise.all(groupMemberCreatePromises);
+
+            return successMessageGenerator();
+        } catch (err) {
+            console.log(err);
+            if (err instanceof HttpException) {
+                throw err;
+            }
+            
+            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @UseGuards(JwtStrategyGuard)
+    @Patch('/groups/:id/active')
+    @HttpCode(200)
+    async UpdateGroupActive(@Param() params: IdParams, @Body() groupActiveUpdateData: GroupActiveUpdateDto) {
+        try {
+            // TODO: permission 처리
+            // TODO: housework log 처리
+            const { id: groupId } = params;
+            const { value, reason } = groupActiveUpdateData;
+            
+            const result = await this.groupService.updateItemActive({ id: groupId, active: value, lastInactivateReason: reason });
+            if (result.affected === 0) {
+                throw new HttpException(failMessage.ERR_GROUP_NOT_FOUND, HttpStatus.NOT_FOUND);
+            }
+
+            return successMessageGenerator();
+        } catch (err) {
+            console.log(err);
+            if (err instanceof HttpException) {
+                throw err;
+            }
+            
+            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @UseGuards(JwtStrategyGuard)
+    @Get('/groups/:id/me')
+    @HttpCode(200)
+    async GetMyGroupMemberInfo(@Param() params: IdParams, @Request() req) {
+        try {
+            const { id: userId } = req.user;
+            const { id: groupId } = params;
+            
+            const group = await this.groupService.getInfo({ id: groupId });
+            if (!group) {
+                throw new HttpException(failMessage.ERR_GROUP_NOT_FOUND, HttpStatus.NOT_FOUND);
+            }
+
+            const groupMember = await this.groupMemberService.getInfoByAccountId({ groupId, accountId: userId });
+            if (!groupMember) {
+                throw new HttpException(failMessage.ERR_GROUP_MEMBER_NOT_FOUND, HttpStatus.NOT_FOUND);
+            }
+
+            const {
+                selectAward,
+                nickname,
+                isManager,
+                active,
+                updateDate,
+                createDate,
+            } = groupMember;
+
+            return successMessageGenerator({
+                selectAward,
+                nickname,
+                isManager,
+                active,
+                updateDate,
+                createDate,
+            });
+        } catch (err) {
+            console.log(err);
+            if (err instanceof HttpException) {
+                throw err;
+            }
+            
+            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @UseGuards(JwtStrategyGuard)
+    @Patch('/groups/:id/me')
+    @HttpCode(200)
+    async UpdateMyGroupMemberInfo(@Param() params: IdParams, @Body() groupMemberUpdatedate: GroupMemberUpdateDto, @Request() req) {
+        try {
+            const { id: userId } = req.user;
+            const { id: groupId } = params;
+            const { selectAwardId } = groupMemberUpdatedate;
+
+            const group = await this.groupService.getItem({ id: groupId });
+            if (!group) {
+                throw new HttpException(failMessage.ERR_GROUP_NOT_FOUND, HttpStatus.NOT_FOUND);
+            }
+            
+            // TODO: 404 AWARD_NOT_FOUND 오류 처리
+            // const award = await this.awardService.getItem({ id: selectedAwardId });
+            // if (!award) {
+            //     throw new HttpException(failMessage.ERR_AWARD_NOT_FOUND, HttpStatus.NOT_FOUND);
+            // }
+
+            const result = await this.groupMemberService.updateItem({ accountId: userId, groupId, selectAwardId });
+            if (!result.affected) {
+                throw new HttpException(failMessage.ERR_GROUP_MEMBER_NOT_FOUND, HttpStatus.NOT_FOUND);
+            }
+
+            return successMessageGenerator();
         } catch (err) {
             console.log(err);
             if (err instanceof HttpException) {

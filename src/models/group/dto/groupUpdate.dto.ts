@@ -1,10 +1,6 @@
 import { IsString, IsBoolean, IsNotEmpty, IsArray, Length } from 'class-validator';
 
-export class GroupDto {
-    @IsNotEmpty()
-    @IsString()
-    readonly type: string;
-
+export class GroupUpdateDto {
     @IsNotEmpty()
     @IsString()
     readonly name: string;
@@ -16,8 +12,7 @@ export class GroupDto {
     @IsArray()
     readonly groupMembers: string[];
 
-    constructor(type: string, name: string, managerPermissionActive: boolean, groupMembers: string[]) {
-        this.type = type;
+    constructor(name: string, managerPermissionActive: boolean, groupMembers: string[]) {
         this.name = name;
         this.managerPermissionActive = managerPermissionActive;
         this.groupMembers = groupMembers;

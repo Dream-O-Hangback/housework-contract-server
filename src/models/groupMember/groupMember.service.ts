@@ -10,8 +10,11 @@ export class GroupMemberService {
     ) {
         this.groupMemberRepository = groupMemberRepository;
     }
-    createItem({ accountId, groupId, nickname }) {
-        return this.groupMemberRepository.save({ accountId, groupId, nickname });
+    createItem({ accountId, groupId, nickname, isManager }) {
+        return this.groupMemberRepository.save({ accountId, groupId, nickname, isManager });
+    }
+    getListByGroupId({ groupId }) {
+        return this.groupMemberRepository.find({ groupId });
     }
     getGroupMemberListAndGroupInfo({ groupId }) {
         return this.groupMemberRepository
@@ -25,15 +28,38 @@ export class GroupMemberService {
                 'a.profileImageUrl',
             ])
             .where({ groupId })
-            .leftJoin('gm.accountId', 'a')
-            .where({ groupId })
+            .leftJoin('gm.account', 'a')
             .getMany();
+    }
+    getInfoByAccountId({ groupId, accountId }) {
+        return this.groupMemberRepository
+            .createQueryBuilder('gm')
+            .select([
+                'gm.selectAwardId',
+                'gm.nickname',
+                'gm.isManager',
+                'gm.active',
+                'gm.updateDate',
+                'gm.createDate',
+                'a.id',
+                'a.type',
+                'a.title',
+                'a.description',
+                'a.defaultAwardId',
+                'a.includeContent',
+            ])
+            .where({ groupId, accountId })
+            .leftJoin('gm.selectAward', 'a')
+            .getOne();
     }
     getItemByAccountId({ groupId, accountId }) {
         return this.groupMemberRepository.findOne({ groupId, accountId });
     }
     getItemByNickname({ groupId, nickname }) {
         return this.groupMemberRepository.findOne({ groupId, nickname });
+    }
+    updateItem({ accountId, groupId, selectAwardId }) {
+        return this.groupMemberRepository.update({ accountId, groupId }, { selectAwardId, updateDate: new Date() });
     }
     updateItemActive({ accountId, groupId, value }) {
         return this.groupMemberRepository.update({ accountId, groupId }, { active: value, updateDate: new Date() });
@@ -61,11 +87,14 @@ export class GroupMemberService {
                 'g.createDate',
             ])
             .where({ accountId })
-            .leftJoin('gm.groupId', 'g')
+            .leftJoin('gm.group', 'g')
             .skip(skip)
             .take(take)
             .getManyAndCount();
         
         return { list, count };
+    }
+    deleteItemByAccountId({ accountId }) {
+        return this.groupMemberRepository.delete({ accountId });
     }
 }
