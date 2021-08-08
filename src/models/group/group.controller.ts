@@ -15,9 +15,11 @@ import {
 import { JwtStrategyGuard } from '@auth/guards/jwt.guard';
 import { successMessageGenerator } from '@common/lib';
 import { failMessage } from '@common/constants';
+import GroupMember from '@models/groupMember/entities';
 import { GroupService } from './group.service';
 import { GroupMemberService } from '../groupMember/groupMember.service';
 import GroupDto from './dto/group.dto';
+import GroupUpdateDto from './dto/groupUpdate.dto';
 import ListQuery from './dto/list.query';
 import IdParams from './dto/id.params';
 import BooleanUpdateDto from './dto/booleanUpdate.dto';
@@ -48,7 +50,12 @@ export class GroupController {
 
             const groupMemberCreatePromises = [];
             for (let i = 0; i < groupMembers.length; i++) {
-                groupMemberCreatePromises.push(this.groupMemberService.createItem({ accountId: groupMembers[i], groupId: group.id, nickname: `member${i + 1}` }));
+                groupMemberCreatePromises.push(this.groupMemberService.createItem({
+                    accountId: groupMembers[i],
+                    groupId: group.id,
+                    nickname: `member${i + 1}`,
+                    isManager: groupMembers[i] === id,
+                }));
             }
             await Promise.all(groupMemberCreatePromises);
 
@@ -113,6 +120,50 @@ export class GroupController {
             }
 
             return successMessageGenerator({ group, groupMembers });
+        } catch (err) {
+            console.log(err);
+            if (err instanceof HttpException) {
+                throw err;
+            }
+            
+            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @UseGuards(JwtStrategyGuard)
+    @Patch('/groups/:id')
+    @HttpCode(200)
+    async UpdateGroupInfo(@Param() params: IdParams, @Body() groupUpdateData: GroupUpdateDto) {
+        try {
+            // TODO: permission 처리
+            // TODO: 추가된, 삭제된 멤버의 housework log 처리
+            const { id: groupId } = params;
+            const { groupMembers, ...groupUpdateDataParams } = groupUpdateData;
+            
+            const result = await this.groupService.updateItem({ id: groupId, ...groupUpdateDataParams });
+            if (result.affected === 0) {
+                throw new HttpException(failMessage.ERR_GROUP_NOT_FOUND, HttpStatus.NOT_FOUND);
+            }
+
+            const originalGroupMembers = await this.groupMemberService.getListByGroupId({ groupId });
+            const originalGroupMemberIds = originalGroupMembers.map((item: GroupMember) => item.accountId.id);
+
+            const groupMemberCreatePromises = [];
+            for (let i = 0; i < groupMembers.length; i++) {
+                if (originalGroupMemberIds.includes(groupMembers[i])) {
+                    throw new HttpException(failMessage.ERR_ALREADY_EXISTS_GROUP_MEMBER, HttpStatus.CONFLICT);
+                }
+
+                groupMemberCreatePromises.push(this.groupMemberService.createItem({
+                    accountId: groupMembers[i],
+                    groupId,
+                    nickname: `member${originalGroupMemberIds.length + i + 1}`,
+                    isManager: false,
+                }));
+            }
+            await Promise.all(groupMemberCreatePromises);
+
+            return successMessageGenerator();
         } catch (err) {
             console.log(err);
             if (err instanceof HttpException) {

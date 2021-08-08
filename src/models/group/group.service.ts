@@ -19,4 +19,7 @@ export class GroupService {
     getInfo({ id }) {
         return this.groupRepository.findOne({ id });
     }
+    updateItem({ id, name, managerPermissionActive }) {
+        return this.groupRepository.update({ id }, { name, managerPermissionActive });
+    }
 }

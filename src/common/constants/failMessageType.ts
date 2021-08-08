@@ -20,6 +20,11 @@ export const ERR_ALREADY_EXISTS: FailMessageType = {
     description: '...'
 }
 
+export const ERR_ALREADY_EXISTS_GROUP_MEMBER: FailMessageType = {
+    errorCode: 'ALREADY_EXISTS_GROUP_MEMBER',
+    description: '...'
+}
+
 export const ERR_ALREADY_CREATED: FailMessageType = {
     errorCode: 'ALREADY_CREATED',
     description: '...'

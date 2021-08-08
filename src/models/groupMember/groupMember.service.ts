@@ -10,8 +10,11 @@ export class GroupMemberService {
     ) {
         this.groupMemberRepository = groupMemberRepository;
     }
-    createItem({ accountId, groupId, nickname }) {
-        return this.groupMemberRepository.save({ accountId, groupId, nickname });
+    createItem({ accountId, groupId, nickname, isManager }) {
+        return this.groupMemberRepository.save({ accountId, groupId, nickname, isManager });
+    }
+    getListByGroupId({ groupId }) {
+        return this.groupMemberRepository.find({ groupId });
     }
     getGroupMemberListAndGroupInfo({ groupId }) {
         return this.groupMemberRepository
@@ -67,5 +70,8 @@ export class GroupMemberService {
             .getManyAndCount();
         
         return { list, count };
+    }
+    deleteItemByAccountId({ accountId }) {
+        return this.groupMemberRepository.delete({ accountId });
     }
 }
