@@ -8,17 +8,17 @@ export default class HouseworkLog {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
-    @ManyToOne(type => Group, group => group.id)
+    @ManyToOne(type => Group, { onDelete: 'SET NULL' })
     @JoinColumn({ name: 'group_id' })
-    groupId: string;
+    groupId: Group;
 
-    @ManyToOne(type => GroupMember, groupMember => groupMember.id)
+    @ManyToOne(type => GroupMember, { onDelete: 'SET NULL' })
     @JoinColumn({ name: 'worker_id' })
-    workerId: string;
+    workerId: GroupMember;
 
-    @ManyToOne(type => Housework, housework => housework.id)
+    @ManyToOne(type => Housework, { onDelete: 'SET NULL' })
     @JoinColumn({ name: 'housework_id' })
-    houseworkId: string;
+    houseworkId: Housework;
 
     @Column({ name: 'is_complete' })
     isComplete: boolean;

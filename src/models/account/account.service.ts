@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Like, Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
-import Account from '@models/account/entities';
+import Account from './entities';
 
 @Injectable()
 export class AccountService {
@@ -115,6 +115,6 @@ export class AccountService {
         );
     }
     deleteItem({ id }) {
-        return this.accountRepository.update({ id, active: true }, { active: false, deleteDate: new Date() });
+        return this.accountRepository.delete({ id, active: true });
     }
 }

@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { DefaultAdminController } from './default.admin.controller';
+import { DefaultAdminController } from './admin.default.controller';
 import { DefaultController } from './default.controller';
 import { DefaultService } from './default.service';
 import {

@@ -1,11 +1,11 @@
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Like, Repository, UpdateResult } from 'typeorm';
+import { DeleteResult, Like, Repository, UpdateResult } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import * as faker from 'faker';
 import MockDate from 'mockdate';
-import { AccountService } from '@models/account/account.service';
-import Account from '@models/account/entities';
+import { AccountService } from './account.service';
+import Account from './entities';
 
 type MockRepository<T = any> = Partial<Record<keyof Repository<T>, jest.Mock>>;
 
@@ -338,11 +338,11 @@ describe('AccountService', () => {
     it('should delete a account', async () => {
         const id = faker.datatype.uuid();
 
-        const accountRepositoryUpdateSpy = jest.spyOn(accountRepository, 'update').mockResolvedValueOnce(new UpdateResult());
+        const accountRepositoryDeleteSpy = jest.spyOn(accountRepository, 'delete').mockResolvedValueOnce(new DeleteResult());
 
         await accountService.deleteItem({ id });
 
-        expect(accountRepositoryUpdateSpy).toBeCalledTimes(1);
-        expect(accountRepositoryUpdateSpy).toHaveBeenCalledWith({ id, active: true }, { active: false, deleteDate: new Date() });
+        expect(accountRepositoryDeleteSpy).toBeCalledTimes(1);
+        expect(accountRepositoryDeleteSpy).toHaveBeenCalledWith({ id, active: true });
     });
 });

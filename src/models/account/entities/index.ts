@@ -1,7 +1,7 @@
 import { Column, CreateDateColumn, UpdateDateColumn, PrimaryGeneratedColumn, Entity, Index, DeleteDateColumn } from 'typeorm';
 
 @Entity('account')
-// @Index(['email', 'name', 'nickname'], { fulltext: true })
+@Index(['email', 'name', 'nickname'], { fulltext: true })
 export default class Account {
     @PrimaryGeneratedColumn('uuid')
     id: string;
@@ -47,9 +47,6 @@ export default class Account {
 
     @CreateDateColumn({ name: 'create_date' })
     createDate: Date;
-
-    @DeleteDateColumn({ name: 'delete_date' })
-    deleteDate: Date;
 
     @Column({ default: false })
     active: boolean;

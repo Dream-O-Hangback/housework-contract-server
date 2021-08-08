@@ -9,21 +9,21 @@ export default class CoinBankLog {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
-    @ManyToOne(type => Group, group => group.id)
+    @ManyToOne(type => Group, { onDelete: 'SET NULL' })
     @JoinColumn({ name: 'group_id' })
-    groupId: string;
+    groupId: Group;
 
-    @ManyToOne(type => GroupMember, groupMember => groupMember.id)
+    @ManyToOne(type => GroupMember, { onDelete: 'SET NULL' })
     @JoinColumn({ name: 'group_member_id' })
-    groupMemberId: string;
+    groupMemberId: GroupMember;
 
-    @OneToOne(type => HouseworkLog, houseworkLog => houseworkLog.id)
+    @OneToOne(type => HouseworkLog, { onDelete: 'SET NULL' })
     @JoinColumn({ name: 'housework_log_id' })
-    houseworkLogId: string;
+    houseworkLogId: HouseworkLog;
 
-    @ManyToOne(type => Award, award => award.id)
+    @ManyToOne(type => Award, { onDelete: 'SET NULL' })
     @JoinColumn({ name: 'award_id' })
-    awardId: string;
+    awardId: Award;
 
     @Column({ type: 'varchar', length: 255, name: 'bank_account_number' })
     bankAccountNumber: string;

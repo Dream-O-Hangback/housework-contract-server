@@ -20,6 +20,7 @@ import { successMessageGenerator } from '@common/lib';
 import { failMessage } from '@common/constants';
 import { MailService } from '@mails/mails.service';
 import { AccountService } from './account.service';
+import { WithdrawService } from '@models/withdraw/withdraw.service';
 import NicknameDto from './dto/nickname.dto';
 import EmailDto from './dto/email.dto';
 import SearchQuery from './dto/search.query';
@@ -33,9 +34,11 @@ import BooleanUpdateDto from './dto/booleanUpdate.dto';
 export class AccountController {
     constructor(
         private accountService: AccountService,
+        private withdrawService: WithdrawService,
         private mailService: MailService,
     ) {
         this.accountService = accountService;
+        this.withdrawService = withdrawService;
         this.mailService = mailService;
     }
 
@@ -50,9 +53,9 @@ export class AccountController {
             offset = isNaN(offset) ? 0 : offset;
             limit = isNaN(limit) ? 10 : limit;
 
-            const list = await this.accountService.getList({ searchWord, skip: offset * limit, take: limit });
+            const result = await this.accountService.getList({ searchWord, skip: offset * limit, take: limit });
 
-            return successMessageGenerator(list); 
+            return successMessageGenerator(result); 
         } catch (err) {
             console.log(err);
             if (err instanceof HttpException) {
@@ -352,6 +355,10 @@ export class AccountController {
     async DeleteMyAccount(@Request() req) {
         try {
             const { id } = req.user;
+
+            const account = await this.accountService.getActiveItem({ id });
+
+            await this.withdrawService.createItem({ ...account });
 
             await this.accountService.deleteItem({ id });
 

@@ -1,4 +1,5 @@
 import { Column, UpdateDateColumn, CreateDateColumn, PrimaryGeneratedColumn, Entity, ManyToOne, JoinColumn, OneToOne } from 'typeorm';
+import Account from '@models/account/entities';
 import Group from '@models/group/entities';
 import Award from '@models/award/entities';
 
@@ -7,13 +8,20 @@ export default class GroupMember {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
-    @ManyToOne(type => Group, group => group.id)
-    @JoinColumn({ name: 'group_id' })
-    groupId: string;
+    @ManyToOne(type => Account, { onDelete: 'SET NULL' })
+    @JoinColumn({ name: 'account_id' })
+    accountId: Account;
 
-    @OneToOne(type => Award, award => award.id)
+    @ManyToOne(type => Group, { onDelete: 'SET NULL' })
+    @JoinColumn({ name: 'group_id' })
+    groupId: Group;
+
+    @OneToOne(type => Award, {
+        nullable: true,
+        onDelete: 'SET NULL',
+    })
     @JoinColumn({ name: 'select_award_id' })
-    selectAwardId: string;
+    selectAwardId: Award;
 
     @Column({ type: 'varchar', length: 20 })
     nickname: string;

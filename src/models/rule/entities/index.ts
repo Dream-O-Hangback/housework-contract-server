@@ -6,9 +6,9 @@ export default class Rule {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
-    @ManyToOne(type => Group, group => group.id)
+    @ManyToOne(type => Group, { onDelete: 'SET NULL' })
     @JoinColumn({ name: 'group_id' })
-    groupId: string;
+    groupId: Group;
 
     @Column({ type: 'varchar', length: 255 })
     content: string;

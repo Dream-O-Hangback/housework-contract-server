@@ -11,25 +11,22 @@ export default class Group {
     @Column({ type: 'varchar', length: 20 })
     name: string;
 
-    @Column({ name: 'is_fluid' })
-    isFluid: boolean;
-
     @Column({ type: 'text', nullable: true, name: 'logo_image_url' })
     logoImageUrl: string;
 
     @Column({ name: 'manager_permission_active' })
     managerPermissionActive: boolean;
 
-    @Column({ name: 'skip_limit' })
+    @Column({ default: 0, name: 'skip_limit' })
     skipLimit: number;
 
     @Column({ nullable: true, name: 'bank_account_number' })
     bankAccountNumber: number;
 
-    @Column({ name: 'alternative_payment_active' })
+    @Column({ default: false, name: 'alternative_payment_active' })
     alternativePaymentActive: boolean;
 
-    @Column({ name: 'payment_active' })
+    @Column({ default: false, name: 'payment_active' })
     paymentActive: boolean;
     
     @Column({ nullable: true, name: 'total_coin' })
@@ -47,7 +44,7 @@ export default class Group {
     @Column({ nullable: true, name: 'penalty_money' })
     penaltyMoney: number;
 
-    @Column({ name: 'payment_combo_active' })
+    @Column({ default: false, name: 'payment_combo_active' })
     paymentComboActive: boolean;
 
     @Column({ nullable: true, name: 'award_payment_combo' })

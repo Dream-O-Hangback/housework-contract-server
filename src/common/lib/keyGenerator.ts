@@ -1,4 +1,4 @@
-export default () => {
+export const keyGenerator = () => {
     let key = '';
 
     for (let i = 0; i < 10; i++) {
