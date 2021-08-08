@@ -10,35 +10,47 @@ export default class AlternativePaymentLog {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
-    @ManyToOne(type => Group, { onDelete: 'SET NULL' })
+    @ManyToOne(type => Group, { onDelete: 'SET NULL', nullable: true })
     @JoinColumn({ name: 'group_id' })
-    groupId: Group;
+    group: Group;
 
-    @OneToOne(type => HouseworkLog, { onDelete: 'SET NULL' })
+    @Column({ name: 'group_id', nullable: true })
+    groupId: string;
+
+    @OneToOne(type => HouseworkLog, { onDelete: 'SET NULL', nullable: true })
     @JoinColumn({ name: 'housework_log_id' })
-    houseworkLogId: HouseworkLog;
+    houseworkLog: HouseworkLog;
 
-    @ManyToOne(type => Award, { onDelete: 'SET NULL' })
+    @Column({ name: 'housework_log_id', nullable: true })
+    houseworkLogId: string;
+
+    @ManyToOne(type => Award, { onDelete: 'SET NULL', nullable: true })
     @JoinColumn({ name: 'award_id' })
-    awardId: Award;
+    award: Award;
 
-    @ManyToOne(type => AlternativePayment, { onDelete: 'SET NULL' })
+    @Column({ name: 'award_id', nullable: true })
+    awardId: string;
+
+    @ManyToOne(type => AlternativePayment, { onDelete: 'SET NULL', nullable: true })
     @JoinColumn({ name: 'alternative_payment_id' })
-    alternativePaymentId: AlternativePayment;
+    alternativePayment: AlternativePayment;
 
-    @ManyToOne(type => GroupMember, {
-        nullable: true,
-        onDelete: 'SET NULL',
-    })
+    @Column({ name: 'alternative_payment_id', nullable: true })
+    alternativePaymentId: string;
+
+    @ManyToOne(type => GroupMember, { onDelete: 'SET NULL', nullable: true })
     @JoinColumn({ name: 'award_worker_id' })
-    awardWorkerId: GroupMember;
+    awardWorker: GroupMember;
 
-    @ManyToOne(type => GroupMember, {
-        nullable: true,
-        onDelete: 'SET NULL',
-    })
+    @Column({ name: 'award_worker_id', nullable: true })
+    awardWorkerId: string;
+
+    @ManyToOne(type => GroupMember, { onDelete: 'SET NULL', nullable: true })
     @JoinColumn({ name: 'penalty_worker_id' })
-    penaltyWorkerId: GroupMember;
+    penaltyWorker: GroupMember;
+
+    @Column({ name: 'penalty_worker_id', nullable: true })
+    penaltyWorkerId: string;
 
     @Column({ default: false, name: 'is_receive' })
     isReceive: boolean;

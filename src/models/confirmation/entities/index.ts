@@ -7,9 +7,12 @@ export default class Confirmation {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
-    @ManyToOne(type => Group, { onDelete: 'SET NULL' })
+    @ManyToOne(type => Group, { onDelete: 'SET NULL', nullable: true })
     @JoinColumn({ name: 'group_id' })
-    groupId: Group;
+    group: Group;
+
+    @Column({ name: 'group_id', nullable: true })
+    groupId: string;
 
     @Column({ type: 'varchar', length: 30 })
     type: string;

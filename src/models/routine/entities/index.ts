@@ -8,9 +8,12 @@ export class Routine {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
-    @ManyToOne(type => Group, { onDelete: 'SET NULL' })
+    @ManyToOne(type => Group, { onDelete: 'SET NULL', nullable: true })
     @JoinColumn({ name: 'group_id' })
-    groupId: Group;
+    group: Group;
+
+    @Column({ name: 'group_id', nullable: true })
+    groupId: string;
 
     @Column({ type: 'tinyint', name: 'start_day' })
     startDay: number;
@@ -36,17 +39,26 @@ export class RoutineFullCharge {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
-    @ManyToOne(type => Group, { onDelete: 'SET NULL' })
+    @ManyToOne(type => Group, { onDelete: 'SET NULL', nullable: true })
     @JoinColumn({ name: 'group_id' })
-    groupId: Group;
+    group: Group;
 
-    @ManyToOne(type => GroupMember, { onDelete: 'SET NULL' })
+    @Column({ name: 'group_id', nullable: true })
+    groupId: string;
+
+    @ManyToOne(type => GroupMember, { onDelete: 'SET NULL', nullable: true })
     @JoinColumn({ name: 'group_member_id' })
-    groupMemberId: GroupMember;
+    groupMember: GroupMember;
 
-    @ManyToOne(type => Housework, { onDelete: 'SET NULL' })
+    @Column({ name: 'group_member_id', nullable: true })
+    groupMemberId: string;
+
+    @ManyToOne(type => Housework, { onDelete: 'SET NULL', nullable: true })
     @JoinColumn({ name: 'housework_id' })
-    houseworkId: Housework;
+    housework: Housework;
+
+    @Column({ name: 'housework_id', nullable: true })
+    houseworkId: string;
 
     @Column({ name: 'start_date' })
     startDate: Date;
@@ -63,17 +75,26 @@ export class RoutineRotation {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
-    @ManyToOne(type => Group, { onDelete: 'SET NULL' })
+    @ManyToOne(type => Group, { onDelete: 'SET NULL', nullable: true })
     @JoinColumn({ name: 'group_id' })
-    groupId: Group;
+    group: Group;
 
-    @ManyToOne(type => GroupMember, { onDelete: 'SET NULL' })
+    @Column({ name: 'group_id', nullable: true })
+    groupId: string;
+
+    @ManyToOne(type => GroupMember, { onDelete: 'SET NULL', nullable: true })
     @JoinColumn({ name: 'group_member_id' })
-    groupMemberId: GroupMember;
+    groupMember: GroupMember;
 
-    @ManyToOne(type => Housework, { onDelete: 'SET NULL' })
+    @Column({ name: 'group_member_id', nullable: true })
+    groupMemberId: string;
+
+    @ManyToOne(type => Housework, { onDelete: 'SET NULL', nullable: true })
     @JoinColumn({ name: 'housework_id' })
-    houseworkId: Housework;
+    housework: Housework;
+
+    @Column({ name: 'housework_id', nullable: true })
+    houseworkId: string;
 
     @Column({ name: 'cycle' })
     cycle:  number;

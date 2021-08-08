@@ -8,17 +8,26 @@ export default class ConfirmationLog {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
-    @ManyToOne(type => Confirmation, { onDelete: 'SET NULL' })
+    @ManyToOne(type => Confirmation, { onDelete: 'SET NULL', nullable: true })
     @JoinColumn({ name: 'confirmation_id' })
-    confirmationId: Confirmation;
+    confirmation: Confirmation;
 
-    @ManyToOne(type => Group, { onDelete: 'SET NULL' })
+    @Column({ name: 'confirmation_id', nullable: true })
+    confirmationId: string;
+
+    @ManyToOne(type => Group, { onDelete: 'SET NULL', nullable: true })
     @JoinColumn({ name: 'group_id' })
-    groupId: Group;
+    group: Group;
 
-    @ManyToOne(type => GroupMember, { onDelete: 'SET NULL' })
+    @Column({ name: 'group_id', nullable: true })
+    groupId: string;
+
+    @ManyToOne(type => GroupMember, { onDelete: 'SET NULL', nullable: true })
     @JoinColumn({ name: 'group_member_id' })
-    groupMemberId: GroupMember;
+    groupMember: GroupMember;
+
+    @Column({ name: 'group_member_id', nullable: true })
+    groupMemberId: string;
 
     @Column({ default: false,  name: 'is_confirm' })
     isConfirm: boolean;

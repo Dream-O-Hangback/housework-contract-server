@@ -7,20 +7,26 @@ export default class RuleLog {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
-    @ManyToOne(type => Rule, { onDelete: 'SET NULL' })
+    @ManyToOne(type => Rule, { onDelete: 'SET NULL', nullable: true })
     @JoinColumn({ name: 'rule_id' })
-    ruleId: Rule;
+    rule: Rule;
 
-    @ManyToOne(type => GroupMember, { onDelete: 'SET NULL' })
+    @Column({ name: 'rule_id', nullable: true })
+    ruleId: string;
+
+    @ManyToOne(type => GroupMember, { onDelete: 'SET NULL', nullable: true })
     @JoinColumn({ name: 'target_id' })
-    targetId: GroupMember;
+    target: GroupMember;
+
+    @Column({ name: 'target_id', nullable: true })
+    targetId: string;
     
-    @ManyToOne(type => GroupMember, {
-        nullable: true,
-        onDelete: 'SET NULL',
-    })
+    @ManyToOne(type => GroupMember, { onDelete: 'SET NULL', nullable: true })
     @JoinColumn({ name: 'accuser_id' })
-    accuserId: GroupMember;
+    accuser: GroupMember;
+
+    @Column({ name: 'accuser_id', nullable: true })
+    accuserId: string;
 
     @Column({ type: 'varchar', length: 255 })
     reason: string;

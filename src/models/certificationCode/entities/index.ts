@@ -6,12 +6,12 @@ export default class CertificationCode {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
+    @ManyToOne(type => Account, { onDelete: 'SET NULL', nullable: true })
+    @JoinColumn({ name: 'account_id' })
+    account: Account;
+
     @Column({ name: 'account_id', nullable: true })
     accountId: string;
-
-    @ManyToOne(type => Account, { onDelete: 'SET NULL' })
-    @JoinColumn()
-    account: Account;
 
     @Column({ type: 'varchar', length: 255 })
     email: string;

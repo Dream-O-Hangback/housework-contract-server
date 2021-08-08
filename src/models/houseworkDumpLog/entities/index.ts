@@ -9,21 +9,33 @@ export default class HouseworkDumpLog {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
-    @ManyToOne(type => Group, { onDelete: 'SET NULL' })
+    @ManyToOne(type => Group, { onDelete: 'SET NULL', nullable: true })
     @JoinColumn({ name: 'group_id' })
-    groupId: Group;
+    group: Group;
 
-    @ManyToOne(type => GroupMember, { onDelete: 'SET NULL' })
+    @Column({ name: 'group_id', nullable: true })
+    groupId: string;
+
+    @ManyToOne(type => GroupMember, { onDelete: 'SET NULL', nullable: true })
     @JoinColumn({ name: 'group_member_id' })
-    groupMemberId: GroupMember;
+    groupMember: GroupMember;
 
-    @OneToOne(type => HouseworkLog, { onDelete: 'SET NULL' })
+    @Column({ name: 'group_member_id', nullable: true })
+    groupMemberId: string;
+
+    @OneToOne(type => HouseworkLog, { onDelete: 'SET NULL', nullable: true })
     @JoinColumn({ name: 'housework_log_id' })
-    houseworkLogId: HouseworkLog;
+    houseworkLog: HouseworkLog;
 
-    @ManyToOne(type => Award, { onDelete: 'SET NULL' })
+    @Column({ name: 'housework_log_id', nullable: true })
+    houseworkLogId: string;
+
+    @ManyToOne(type => Award, { onDelete: 'SET NULL', nullable: true })
     @JoinColumn({ name: 'award_id' })
-    awardId: Award;
+    award: Award;
+
+    @Column({ name: 'award_id', nullable: true })
+    awardId: string;
 
     @Column({ type: 'varchar', length: 36, name: 'target_id' })
     targetId: string;
