@@ -1,7 +1,7 @@
 import { Type } from 'class-transformer';
 import { IsNumber, IsOptional } from 'class-validator';
 
-export default class ListQuery {
+export class ListQuery {
     @IsNumber()
     @Type(() => Number)
     @IsOptional()

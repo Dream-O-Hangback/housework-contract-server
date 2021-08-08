@@ -1,6 +1,6 @@
 import { IsString, IsBoolean, IsNotEmpty, IsArray, Length } from 'class-validator';
 
-export default class GroupDto {
+export class GroupDto {
     @IsNotEmpty()
     @IsString()
     readonly type: string;

@@ -1,6 +1,6 @@
 import { IsString, IsNotEmpty, Length } from 'class-validator';
 
-export default class IdParams {
+export class IdParams {
     @IsNotEmpty()
     @IsString()
     @Length(36)

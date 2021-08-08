@@ -18,12 +18,15 @@ import { failMessage } from '@common/constants';
 import GroupMember from '@models/groupMember/entities';
 import { GroupService } from './group.service';
 import { GroupMemberService } from '../groupMember/groupMember.service';
-import GroupDto from './dto/group.dto';
-import GroupUpdateDto from './dto/groupUpdate.dto';
-import ListQuery from './dto/list.query';
-import IdParams from './dto/id.params';
-import BooleanUpdateDto from './dto/booleanUpdate.dto';
-import NicknameDto from './dto/nickname.dto';
+import {
+    GroupDto,
+    GroupUpdateDto,
+    GroupActiveUpdateDto,
+    ListQuery,
+    IdParams,
+    BooleanUpdateDto,
+    NicknameDto
+} from './dto';
 import { RedefinedGroupMemberInfo } from './interfaces';
 
 @Controller()
@@ -163,6 +166,32 @@ export class GroupController {
                 }));
             }
             await Promise.all(groupMemberCreatePromises);
+
+            return successMessageGenerator();
+        } catch (err) {
+            console.log(err);
+            if (err instanceof HttpException) {
+                throw err;
+            }
+            
+            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @UseGuards(JwtStrategyGuard)
+    @Patch('/groups/:id/active')
+    @HttpCode(200)
+    async UpdateGroupActive(@Param() params: IdParams, @Body() groupActiveUpdateData: GroupActiveUpdateDto) {
+        try {
+            // TODO: permission 처리
+            // TODO: housework log 처리
+            const { id: groupId } = params;
+            const { value, reason } = groupActiveUpdateData;
+            
+            const result = await this.groupService.updateItemActive({ id: groupId, active: value, lastInactivateReason: reason });
+            if (result.affected === 0) {
+                throw new HttpException(failMessage.ERR_GROUP_NOT_FOUND, HttpStatus.NOT_FOUND);
+            }
 
             return successMessageGenerator();
         } catch (err) {

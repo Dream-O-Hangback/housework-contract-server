@@ -1,6 +1,6 @@
 import { IsString, IsBoolean, IsNotEmpty, IsArray, Length } from 'class-validator';
 
-export default class GroupUpdateDto {
+export class GroupUpdateDto {
     @IsNotEmpty()
     @IsString()
     readonly name: string;
