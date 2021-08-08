@@ -24,6 +24,7 @@ import ListQuery from './dto/list.query';
 import IdParams from './dto/id.params';
 import BooleanUpdateDto from './dto/booleanUpdate.dto';
 import NicknameDto from './dto/nickname.dto';
+import { RedefinedGroupMemberInfo } from './interfaces';
 
 @Controller()
 @UseGuards(JwtStrategyGuard)
@@ -109,17 +110,17 @@ export class GroupController {
 
             let groupMembers = await this.groupMemberService.getGroupMemberListAndGroupInfo({ groupId });
 
-            groupMembers = groupMembers.map((item: any) => {
-                const { accountId, ...groupMemberParams } = item;
-                const { id, profileImageUrl } = accountId
+            const redefinedGroupMembers: RedefinedGroupMemberInfo[] = groupMembers.map((item: any) => {
+                const { account, ...groupMemberParams } = item;
+                const { id, profileImageUrl } = account;
                 return { accountId: id, profileImageUrl, ...groupMemberParams };
             });
 
-            if (!groupMembers.filter((item: any) => item.accountId === userId).length) {
+            if (!redefinedGroupMembers.filter((item) => item.accountId === userId).length) {
                 throw new HttpException(failMessage.ERR_GROUP_MEMBER_NOT_FOUND, HttpStatus.NOT_FOUND);
             }
 
-            return successMessageGenerator({ group, groupMembers });
+            return successMessageGenerator({ group, groupMembers: redefinedGroupMembers });
         } catch (err) {
             console.log(err);
             if (err instanceof HttpException) {
@@ -146,7 +147,7 @@ export class GroupController {
             }
 
             const originalGroupMembers = await this.groupMemberService.getListByGroupId({ groupId });
-            const originalGroupMemberIds = originalGroupMembers.map((item: GroupMember) => item.accountId.id);
+            const originalGroupMemberIds = originalGroupMembers.map((item: GroupMember) => item.accountId);
 
             const groupMemberCreatePromises = [];
             for (let i = 0; i < groupMembers.length; i++) {

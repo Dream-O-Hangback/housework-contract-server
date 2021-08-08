@@ -28,8 +28,7 @@ export class GroupMemberService {
                 'a.profileImageUrl',
             ])
             .where({ groupId })
-            .leftJoin('gm.accountId', 'a')
-            .where({ groupId })
+            .leftJoin('gm.account', 'a')
             .getMany();
     }
     getItemByAccountId({ groupId, accountId }) {
@@ -64,7 +63,7 @@ export class GroupMemberService {
                 'g.createDate',
             ])
             .where({ accountId })
-            .leftJoin('gm.groupId', 'g')
+            .leftJoin('gm.group', 'g')
             .skip(skip)
             .take(take)
             .getManyAndCount();
