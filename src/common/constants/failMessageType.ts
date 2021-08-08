@@ -1,4 +1,4 @@
-import FailMessageType from "../interfaces/failMessageType";
+import { FailMessageType } from "../interfaces";
 
 export const ERR_INVALID_PARAM: FailMessageType = {
     errorCode: 'INVALID_PARAM',

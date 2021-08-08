@@ -4,16 +4,15 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { MailModule } from '@mails/mails.module';
-import { AccountService } from '@models/account/account.service';
-import { CertificationCodeService } from '@models/certificationCode/certificationCode.service';
-import { RefreshTokenService } from '@models/refreshToken/refreshToken.service';
+import { AccountModule } from '@models/account/account.module';
+import { CertificationCodeModule } from '@models/certificationCode/certificationCode.module';
+import { RefreshTokenModule } from '@models/refreshToken/refreshToken.module';
 import Account from '@models/account/entities';
 import CertificationCode from '@models/certificationCode/entities';
 import RefreshToken from '@models/refreshToken/entities';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
-import { LocalStrategy } from './strategies/local.strategy';
-import { JwtStrategy } from './strategies/jwt.strategy';
+import { LocalStrategy, JwtStrategy } from './strategies';
 
 @Module({
     imports: [
@@ -34,14 +33,14 @@ import { JwtStrategy } from './strategies/jwt.strategy';
             Account,
             CertificationCode,
             RefreshToken,
-        ],
-    )],
+        ]),
+        AccountModule,
+        CertificationCodeModule,
+        RefreshTokenModule,
+    ],
     controllers: [AuthController],
     providers: [
         AuthService,
-        AccountService,
-        CertificationCodeService,
-        RefreshTokenService,
         LocalStrategy,
         JwtStrategy,
     ],

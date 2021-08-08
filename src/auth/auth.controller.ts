@@ -15,11 +15,8 @@ import { MailService } from '@mails/mails.service';
 import { AccountService } from '@models/account/account.service';
 import { CertificationCodeService } from '@models/certificationCode/certificationCode.service';
 import { AuthService } from './auth.service';
-import AccountDto from './dto/account.dto';
-import EmailDto from './dto/email.dto';
-import CodeDto from './dto/code.dto';
-import { LocalStrategyGuard } from './guards/local.guard';
-import { JwtStrategyGuard } from './guards/jwt.guard';
+import { AccountDto, EmailDto, CodeDto } from './dto';
+import { LocalStrategyGuard, JwtStrategyGuard } from './guards';
 
 @Controller('auth')
 export class AuthController {

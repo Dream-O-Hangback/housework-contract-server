@@ -19,16 +19,18 @@ import { JwtStrategyGuard } from '@auth/guards/jwt.guard';
 import { successMessageGenerator } from '@common/lib';
 import { failMessage } from '@common/constants';
 import { MailService } from '@mails/mails.service';
-import { AccountService } from './account.service';
 import { WithdrawService } from '@models/withdraw/withdraw.service';
-import NicknameDto from './dto/nickname.dto';
-import EmailDto from './dto/email.dto';
-import SearchQuery from './dto/search.query';
-import EmailQuery from './dto/email.query';
-import NicknameUpdateDto from './dto/nicknameUpdate.dto';
-import ProfileUpdateDto from './dto/profileUpdate.dto';
-import PasswordUpdateDto from './dto/passwordUpdate.dto';
-import BooleanUpdateDto from './dto/booleanUpdate.dto';
+import { AccountService } from './account.service';
+import {
+    BooleanUpdateDto,
+    EmailDto,
+    EmailQuery,
+    NicknameDto,
+    NicknameUpdateDto,
+    PasswordUpdateDto,
+    ProfileUpdateDto,
+    SearchQuery,
+} from './dto';
 
 @Controller('accounts')
 export class AccountController {

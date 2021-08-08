@@ -1,7 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { HttpException, HttpStatus, ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
-import failMessage from '@common/constants/failMessage';
+import { failMessage } from '@common/constants';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });

@@ -1,6 +1,6 @@
 import { IsString, IsNotEmpty } from 'class-validator';
 
-export default class TypeDto {
+export class TypeDto {
     @IsNotEmpty()
     @IsString()
     readonly title: string;

@@ -1,7 +1,7 @@
 import { Type } from 'class-transformer';
 import { IsString, IsNotEmpty, IsNumber, IsOptional, Length } from 'class-validator';
 
-export default class SearchQuery {
+export class SearchQuery {
     @IsNotEmpty()
     @IsString()
     @Length(2)

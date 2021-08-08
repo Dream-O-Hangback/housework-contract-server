@@ -15,9 +15,7 @@ import { AdminGuard } from '@auth/guards/admin.guard';
 import { successMessageGenerator } from '@common/lib';
 import { failMessage } from '@common/constants';
 import { DefaultService } from './default.service';
-import TypeDto from './dto/type.dto';
-import ContentDto from './dto/content.dto';
-import IdParams from './dto/id.params';
+import { ContentDto, IdParams, TypeDto } from './dto';
 
 @Controller('admin/default')
 @UseGuards(AdminGuard)

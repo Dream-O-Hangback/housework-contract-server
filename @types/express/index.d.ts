@@ -1,4 +1,4 @@
-import JwtPayload from "../../src/auth/interfaces/jwt-payload.interface";
+import { JwtPayload } from '../../src/auth/interfaces';
 
 export {};
 

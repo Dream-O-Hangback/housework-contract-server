@@ -21,7 +21,10 @@ import {
             DefaultGroupType,
         ]),
     ],
-    controllers: [DefaultAdminController, DefaultController],
+    controllers: [
+        DefaultAdminController,
+        DefaultController,
+    ],
     providers: [DefaultService],
 })
 export class DefaultModule {}
