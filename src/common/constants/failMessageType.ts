@@ -30,6 +30,11 @@ export const ERR_ALREADY_CREATED: FailMessageType = {
     description: '...'
 }
 
+export const ERR_MANAGER_CANNOT_WITHDRAW: FailMessageType = {
+    errorCode: 'MANAGER_CANNOT_WITHDRAW',
+    description: '...'
+}
+
 export const ERR_NOT_FOUND: FailMessageType = {
     errorCode: 'NOT_FOUND',
     description: '...'

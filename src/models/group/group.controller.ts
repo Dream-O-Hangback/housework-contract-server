@@ -3,6 +3,7 @@ import {
     Get,
     Post,
     Patch,
+    Delete,
     HttpException,
     HttpStatus,
     HttpCode,
@@ -274,6 +275,41 @@ export class GroupController {
             if (!result.affected) {
                 throw new HttpException(failMessage.ERR_GROUP_MEMBER_NOT_FOUND, HttpStatus.NOT_FOUND);
             }
+
+            return successMessageGenerator();
+        } catch (err) {
+            console.log(err);
+            if (err instanceof HttpException) {
+                throw err;
+            }
+            
+            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @UseGuards(JwtStrategyGuard)
+    @Delete('/groups/:id/me')
+    @HttpCode(200)
+    async DeleteMyGroupMember(@Param() params: IdParams, @Request() req) {
+        try {
+            // TODO: housework log 처리
+            const { id: userId } = req.user;
+            const { id: groupId } = params;
+            
+            const group = await this.groupService.getInfo({ id: groupId });
+            if (!group) {
+                throw new HttpException(failMessage.ERR_GROUP_NOT_FOUND, HttpStatus.NOT_FOUND);
+            }
+            
+            const groupMember = await this.groupMemberService.getItemByAccountId({ groupId, accountId: userId });
+            if (!groupMember) {
+                throw new HttpException(failMessage.ERR_GROUP_MEMBER_NOT_FOUND, HttpStatus.NOT_FOUND);
+            }
+            if (groupMember.isManager === true) {
+                throw new HttpException(failMessage.ERR_MANAGER_CANNOT_WITHDRAW, HttpStatus.BAD_REQUEST);
+            }
+
+            await this.groupMemberService.deleteItemByAccountId({ groupId, accountId: userId })
 
             return successMessageGenerator();
         } catch (err) {

@@ -8,6 +8,7 @@ export default {
     ERR_ALREADY_EXISTS: failMessageTypeGenerator(failMessageType.ERR_ALREADY_EXISTS),
     ERR_ALREADY_EXISTS_GROUP_MEMBER: failMessageTypeGenerator(failMessageType.ERR_ALREADY_EXISTS_GROUP_MEMBER),
     ERR_ALREADY_CREATED: failMessageTypeGenerator(failMessageType.ERR_ALREADY_CREATED),
+    ERR_MANAGER_CANNOT_WITHDRAW: failMessageTypeGenerator(failMessageType.ERR_MANAGER_CANNOT_WITHDRAW),
     ERR_NOT_FOUND: failMessageTypeGenerator(failMessageType.ERR_NOT_FOUND),
     ERR_AWARD_NOT_FOUND: failMessageTypeGenerator(failMessageType.ERR_AWARD_NOT_FOUND),
     ERR_GROUP_NOT_FOUND: failMessageTypeGenerator(failMessageType.ERR_GROUP_NOT_FOUND),
