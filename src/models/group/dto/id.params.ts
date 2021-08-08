@@ -3,7 +3,7 @@ import { IsString, IsNotEmpty, Length } from 'class-validator';
 export class IdParams {
     @IsNotEmpty()
     @IsString()
-    @Length(36)
+    @Length(36, 36)
     readonly id: string;
 
     constructor(id: string) {

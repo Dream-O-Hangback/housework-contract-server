@@ -58,6 +58,9 @@ export class GroupMemberService {
     getItemByNickname({ groupId, nickname }) {
         return this.groupMemberRepository.findOne({ groupId, nickname });
     }
+    updateItem({ accountId, groupId, selectAwardId }) {
+        return this.groupMemberRepository.update({ accountId, groupId }, { selectAwardId, updateDate: new Date() });
+    }
     updateItemActive({ accountId, groupId, value }) {
         return this.groupMemberRepository.update({ accountId, groupId }, { active: value, updateDate: new Date() });
     }

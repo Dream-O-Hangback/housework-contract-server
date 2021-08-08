@@ -22,6 +22,7 @@ import {
     GroupDto,
     GroupUpdateDto,
     GroupActiveUpdateDto,
+    GroupMemberUpdateDto,
     ListQuery,
     IdParams,
     BooleanUpdateDto,
@@ -239,6 +240,42 @@ export class GroupController {
                 updateDate,
                 createDate,
             });
+        } catch (err) {
+            console.log(err);
+            if (err instanceof HttpException) {
+                throw err;
+            }
+            
+            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @UseGuards(JwtStrategyGuard)
+    @Patch('/groups/:id/me')
+    @HttpCode(200)
+    async UpdateMyGroupMemberInfo(@Param() params: IdParams, @Body() groupMemberUpdatedate: GroupMemberUpdateDto, @Request() req) {
+        try {
+            const { id: userId } = req.user;
+            const { id: groupId } = params;
+            const { selectAwardId } = groupMemberUpdatedate;
+
+            const group = await this.groupService.getItem({ id: groupId });
+            if (!group) {
+                throw new HttpException(failMessage.ERR_GROUP_NOT_FOUND, HttpStatus.NOT_FOUND);
+            }
+            
+            // TODO: 404 AWARD_NOT_FOUND 오류 처리
+            // const award = await this.awardService.getItem({ id: selectedAwardId });
+            // if (!award) {
+            //     throw new HttpException(failMessage.ERR_AWARD_NOT_FOUND, HttpStatus.NOT_FOUND);
+            // }
+
+            const result = await this.groupMemberService.updateItem({ accountId: userId, groupId, selectAwardId });
+            if (!result.affected) {
+                throw new HttpException(failMessage.ERR_GROUP_MEMBER_NOT_FOUND, HttpStatus.NOT_FOUND);
+            }
+
+            return successMessageGenerator();
         } catch (err) {
             console.log(err);
             if (err instanceof HttpException) {

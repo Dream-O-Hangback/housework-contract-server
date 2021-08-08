@@ -35,6 +35,11 @@ export const ERR_NOT_FOUND: FailMessageType = {
     description: '...'
 }
 
+export const ERR_AWARD_NOT_FOUND: FailMessageType = {
+    errorCode: 'AWARD_NOT_FOUND',
+    description: '...'
+}
+
 export const ERR_GROUP_NOT_FOUND: FailMessageType = {
     errorCode: 'GROUP_NOT_FOUND',
     description: '...'
