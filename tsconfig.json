@@ -1,15 +1,14 @@
 {
   "compilerOptions": {
     "module": "commonjs",
-    "target": "es2017",
+		"target": "es2017",
+		"outDir": "./dist",
+		"baseUrl": "./",
+		"sourceMap": true,
     "declaration": true,
     "removeComments": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "allowSyntheticDefaultImports": true,
-    "sourceMap": true,
-    "baseUrl": "./",
-    "outDir": "./dist",
     "incremental": true,
     "paths": {
       "@auth/*": [

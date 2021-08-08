@@ -3,10 +3,9 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { MoreThan, Repository } from 'typeorm';
 import * as faker from 'faker';
 import MockDate from 'mockdate';
+import * as keyGenerator from '@common/lib/keyGenerator';
 import { CertificationCodeService } from './certificationCode.service';
 import CertificationCode from './entities';
-import * as lib from '@common/lib';
-import { keyGenerator } from '@common/lib';
 
 type MockRepository<T = any> = Partial<Record<keyof Repository<T>, jest.Mock>>;
 
@@ -38,7 +37,7 @@ describe('CertificationCodeService', () => {
     it('should get a certification code', async () => {
         const codeData = {
             email: faker.internet.email(),
-            code: keyGenerator(),
+            code: keyGenerator.keyGenerator(),
         };
         const { email, code } = codeData;
 
@@ -68,7 +67,7 @@ describe('CertificationCodeService', () => {
         const accountId = faker.datatype.uuid();
         const email = faker.internet.email();
 
-        const code = keyGenerator();
+        const code = keyGenerator.keyGenerator();
         const expireDate = new Date();
         expireDate.setDate(expireDate.getDate() + 1);
 
@@ -79,7 +78,7 @@ describe('CertificationCodeService', () => {
             expireDate,
         };
 
-        const keyGeneratorSpy = jest.spyOn(lib, 'keyGenerator').mockReturnValue(code);
+        const keyGeneratorSpy = jest.spyOn(keyGenerator, 'keyGenerator').mockReturnValue(code);
         const certificationCodeRepositoryFindOneSpy = jest.spyOn(certificationCodeRepository, 'findOne').mockResolvedValueOnce(undefined);
         const certificationCodeRepositorySaveSpy = jest.spyOn(certificationCodeRepository, 'save').mockResolvedValueOnce(certificationCode);
 

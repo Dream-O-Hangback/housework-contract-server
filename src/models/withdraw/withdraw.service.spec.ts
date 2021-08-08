@@ -3,9 +3,9 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as faker from 'faker';
 import MockDate from 'mockdate';
-import { WithdrawService } from './withdraw.service';
-import Withdraw from '@models/withdraw/entities';
 import Account from '@models/account/entities';
+import { WithdrawService } from './withdraw.service';
+import Withdraw from './entities';
 
 type MockRepository<T = any> = Partial<Record<keyof Repository<T>, jest.Mock>>;
 
@@ -33,7 +33,7 @@ describe('WithdrawService', () => {
         withdrawRepository = moduleRef.get(getRepositoryToken(Withdraw));
     });
 
-    it('should create a new account', async () => {
+    it('should create a new withdraw', async () => {
         const account = {
             id: faker.datatype.uuid(),
             email: faker.internet.email(),
@@ -56,7 +56,7 @@ describe('WithdrawService', () => {
         const withdrawRepositorySaveSpy = jest.spyOn(withdrawRepository, 'save').mockResolvedValueOnce({ ...account, deleteDate: new Date() });
         const result = await withdrawService.createItem(account as Account);
 
-        expect(result).toBe({ ...account, deleteDate: new Date() });
+        expect(result).toStrictEqual({ ...account, deleteDate: new Date() });
         expect(withdrawRepositorySaveSpy).toBeCalledTimes(1);
         expect(withdrawRepositorySaveSpy).toHaveBeenCalledWith(expect.objectContaining(account));
     });

@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import Account from '@models/account/entities';
-import Withdraw from '@models/withdraw/entities';
+import Withdraw from './entities';
 
 @Injectable()
 export class WithdrawService {
