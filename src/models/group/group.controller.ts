@@ -246,6 +246,37 @@ export class GroupController {
     }
 
     @UseGuards(JwtStrategyGuard)
+    @Delete('/groups/:id/logo/reset')
+    @HttpCode(200)
+    async ResetGroupLogoImage(@Param() params: IdParams, @Request() req) {
+        try {
+            const { id: userId } = req.user;
+            const { id: groupId } = params;
+
+            const group = await this.groupService.getInfo({ id: groupId });
+            if (!group) {
+                throw new HttpException(failMessage.ERR_GROUP_NOT_FOUND, HttpStatus.NOT_FOUND);
+            }
+
+            const groupMember = await this.groupMemberService.getInfoByAccountId({ groupId, accountId: userId });
+            if (!groupMember) {
+                throw new HttpException(failMessage.ERR_GROUP_MEMBER_NOT_FOUND, HttpStatus.NOT_FOUND);
+            }
+
+            await this.groupService.updateItemLogoImage({ id: groupId, logoImageUrl: undefined });
+
+            return successMessageGenerator();
+        } catch (err) {
+            console.log(err);
+            if (err instanceof HttpException) {
+                throw err;
+            }
+            
+            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @UseGuards(JwtStrategyGuard)
     @Get('/groups/:id/me')
     @HttpCode(200)
     async GetMyGroupMemberInfo(@Param() params: IdParams, @Request() req) {
