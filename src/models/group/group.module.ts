@@ -1,6 +1,9 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { MulterModule } from '@nestjs/platform-express';
+import { FileModule } from '@providers/file.module';
+import { FileService } from '@providers/file.service';
 import { GroupController } from './group.controller';
 import { GroupService } from './group.service';
 import { GroupMemberModule } from '../groupMember/groupMember.module';
@@ -11,6 +14,14 @@ import Group from './entities';
         ConfigModule,
         TypeOrmModule.forFeature([Group]),
         GroupMemberModule,
+        FileModule,
+        MulterModule.registerAsync({
+            imports: [ConfigModule],
+            useFactory: async (configService: ConfigService) => {
+                return FileService.createMulterOptions(configService.get<string>('PATH_GROUP_IMAGE_LOGO'));
+            },
+            inject: [ConfigService]
+        }),
     ],
     controllers: [GroupController],
     providers: [GroupService],

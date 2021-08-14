@@ -127,7 +127,6 @@ describe('AuthService', () => {
         expect(jwtServiceSignSpyForRefreshToken).toBeCalledTimes(2);
         expect(jwtServiceSignSpyForRefreshToken).toHaveBeenCalledWith(expect.objectContaining({ id }), expect.anything());
         expect(executeSpy).toBeCalledTimes(1);
-        expect(executeSpy).toBeInstanceOf(InsertResult);
     });
 
     it('should verify a access token', () => {

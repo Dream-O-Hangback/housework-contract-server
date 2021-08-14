@@ -12,7 +12,9 @@ import {
     Body,
     Query,
     Param,
+    UseInterceptors,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { JwtStrategyGuard } from '@auth/guards/jwt.guard';
 import { successMessageGenerator } from '@common/lib';
 import { failMessage } from '@common/constants';
@@ -183,7 +185,7 @@ export class GroupController {
     @UseGuards(JwtStrategyGuard)
     @Patch('/groups/:id/active')
     @HttpCode(200)
-    async UpdateGroupActive(@Param() params: IdParams, @Body() groupActiveUpdateData: GroupActiveUpdateDto) {
+    async UpdateGroupLogo(@Param() params: IdParams, @Body() groupActiveUpdateData: GroupActiveUpdateDto) {
         try {
             // TODO: permission 처리
             // TODO: housework log 처리
@@ -196,6 +198,43 @@ export class GroupController {
             }
 
             return successMessageGenerator();
+        } catch (err) {
+            console.log(err);
+            if (err instanceof HttpException) {
+                throw err;
+            }
+            
+            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @UseGuards(JwtStrategyGuard)
+    @UseInterceptors(FileInterceptor('files'))
+    @Post('/groups/:id/logo/upload')
+    @HttpCode(200)
+    async UpdateGroupLogoImage(@Param() params: IdParams, @Request() req) {
+        try {
+            const { id: userId } = req.user;
+            const { id: groupId } = params;
+
+            const logoImageUrl = req.file.location;
+            if (!logoImageUrl) {
+                throw new HttpException(failMessage.ERR_NOT_UPLOADED, HttpStatus.BAD_REQUEST);
+            }
+
+            const group = await this.groupService.getInfo({ id: groupId });
+            if (!group) {
+                throw new HttpException(failMessage.ERR_GROUP_NOT_FOUND, HttpStatus.NOT_FOUND);
+            }
+
+            const groupMember = await this.groupMemberService.getInfoByAccountId({ groupId, accountId: userId });
+            if (!groupMember) {
+                throw new HttpException(failMessage.ERR_GROUP_MEMBER_NOT_FOUND, HttpStatus.NOT_FOUND);
+            }
+
+            await this.groupService.updateItemLogoImage({ id: groupId, logoImageUrl });
+
+            return successMessageGenerator({ logoImageUrl });
         } catch (err) {
             console.log(err);
             if (err instanceof HttpException) {

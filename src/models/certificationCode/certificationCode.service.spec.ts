@@ -109,6 +109,5 @@ describe('CertificationCodeService', () => {
         expect(keyGeneratorSpy).toBeCalledTimes(1);
         expect(resultCertificationCode).toStrictEqual(new InsertResult());
         expect(executeSpy).toBeCalledTimes(1);
-        expect(executeSpy).toBeInstanceOf(InsertResult);
     });
 });

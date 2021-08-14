@@ -32,4 +32,7 @@ export class GroupService {
         
         return this.groupRepository.update({ id }, updateQuery);
     }
+    updateItemLogoImage({ id, logoImageUrl }) {
+        return this.groupRepository.update({ id }, { logoImageUrl });
+    }
 }
