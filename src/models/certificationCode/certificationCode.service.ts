@@ -18,23 +18,24 @@ export class CertificationCodeService {
       expireDate: MoreThan(new Date()),
     });
   }
-  async upsertItem({ accountId, email }) {
+  getItemByAccountId({ accountId }) {
+    return this.certificationCodeRepository.findOne({ accountId });
+  }
+  upsertItem({ accountId, email }) {
     const code = keyGenerator();
     const expireDate = new Date();
     expireDate.setDate(expireDate.getDate() + 1);
 
-    const duplicatedCertificationCode = await this.certificationCodeRepository.findOne({ email });
-    
-    if (duplicatedCertificationCode) {
-      duplicatedCertificationCode.code = code;
-      duplicatedCertificationCode.expireDate = expireDate;
-      return this.certificationCodeRepository.save(duplicatedCertificationCode);
-    }
-    return this.certificationCodeRepository.save({
-      accountId,
-      email,
-      code,
-      expireDate,
-    });
+    return this.certificationCodeRepository
+      .createQueryBuilder()
+      .insert()
+      .values({
+        accountId,
+        email,
+        code,
+        expireDate,
+      })
+      .orUpdate({ conflict_target: ['email'], overwrite: ['account_id', 'code', 'expire_date'] })
+      .execute();
   }
 }

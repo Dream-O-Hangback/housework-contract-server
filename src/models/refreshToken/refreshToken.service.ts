@@ -12,19 +12,16 @@ export class RefreshTokenService {
     this.refreshTokenRepository = refreshTokenRepository;
   }
   async upsertItem({ accountId, token, expireDate }) {
-    const refreshToken = await this.refreshTokenRepository.findOne({ accountId });
-    
-    if (refreshToken) {
-      return this.refreshTokenRepository.update(
-        { accountId },
-        { token, expireDate }
-      );
-    }
-    return this.refreshTokenRepository.save({
-      accountId,
-      token,
-      expireDate
-    });
+    return this.refreshTokenRepository
+      .createQueryBuilder()
+      .insert()
+      .values({
+        accountId,
+        token,
+        expireDate
+      })
+      .orUpdate({ conflict_target: ['account_id'], overwrite: ['token', 'expire_date'] })
+      .execute();
   }
   getItem({ accountId }) {
     return this.refreshTokenRepository.findOne({ accountId }, { select: ['token', 'expireDate'] });

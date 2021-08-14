@@ -2,7 +2,7 @@ import { Test } from '@nestjs/testing';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { InsertResult, Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import * as faker from 'faker';
 import MockDate from 'mockdate';
@@ -33,11 +33,19 @@ const mockConfigService = {
 
 type MockRepository<T = any> = Partial<Record<keyof Repository<T>, jest.Mock>>;
 
+const executeSpy = jest.fn().mockResolvedValue(new InsertResult());
+
 const mockRepository = () => ({
     save: jest.fn(),
     findOne: jest.fn(),
     update: jest.fn(),
     delete: jest.fn(),
+    createQueryBuilder: jest.fn(() => ({
+        insert: jest.fn().mockReturnThis(),
+        values: jest.fn().mockReturnThis(),
+        orUpdate: jest.fn().mockReturnThis(),
+        execute: executeSpy,
+    })),
 });
 
 describe('AuthService', () => {
@@ -110,14 +118,7 @@ describe('AuthService', () => {
 
         const currentDate = new Date();
         currentDate.setDate(currentDate.getDate() + 15);
-
-        const refreshTokenRepositoryFindOneSpy = jest.spyOn(refreshTokenRepository, 'findOne').mockResolvedValueOnce(null);
-        const refreshTokenRepositorySaveSpy = jest.spyOn(refreshTokenRepository, 'save').mockResolvedValueOnce({
-            accountId: id,
-            token: refreshToken,
-            expireDate: currentDate,
-        });
-
+        
         const result = await authService.issueAccessToken({ id });
         
         expect(result).toStrictEqual({ accessToken });
@@ -125,14 +126,8 @@ describe('AuthService', () => {
         expect(jwtServiceSignSpyForAccessToken).toHaveBeenCalledWith(expect.objectContaining({ id }), expect.anything());
         expect(jwtServiceSignSpyForRefreshToken).toBeCalledTimes(2);
         expect(jwtServiceSignSpyForRefreshToken).toHaveBeenCalledWith(expect.objectContaining({ id }), expect.anything());
-        expect(refreshTokenRepositoryFindOneSpy).toBeCalledTimes(1);
-        expect(refreshTokenRepositoryFindOneSpy).toHaveBeenCalledWith({ accountId: id });
-        expect(refreshTokenRepositorySaveSpy).toBeCalledTimes(1);
-        expect(refreshTokenRepositorySaveSpy).toHaveBeenCalledWith({
-            accountId: id,
-            token: refreshToken,
-            expireDate: currentDate,
-        });
+        expect(executeSpy).toBeCalledTimes(1);
+        expect(executeSpy).toBeInstanceOf(InsertResult);
     });
 
     it('should verify a access token', () => {

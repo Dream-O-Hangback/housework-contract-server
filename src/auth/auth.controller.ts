@@ -140,7 +140,8 @@ export class AuthController {
             }
 
             const { id: accountId } = account;
-            const certificationCode = await this.certificationCodeService.upsertItem({ accountId, email });
+            await this.certificationCodeService.upsertItem({ accountId, email });
+            const certificationCode = await this.certificationCodeService.getItemByAccountId({ accountId });
             const { code, createDate } = certificationCode;
 
             this.mailService.sendEmailCodeEmail(emailData.email, code, createDate).catch((err) => console.log(err));
