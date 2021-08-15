@@ -23,6 +23,9 @@ export class GroupService {
     updateItem({ id, name, managerPermissionActive }) {
         return this.groupRepository.update({ id }, { name, managerPermissionActive });
     }
+    updateItemManagerPermissionActive({ id, managerPermissionActive }) {
+        return this.groupRepository.update({ id }, { managerPermissionActive });
+    }
     updateItemActive({ id, active, lastInactivateReason }) {
         const updateQuery: UpdateItemActiveQuery = { active };
         if (!active) {

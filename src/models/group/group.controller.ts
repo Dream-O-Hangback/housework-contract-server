@@ -209,6 +209,37 @@ export class GroupController {
     }
 
     @UseGuards(JwtStrategyGuard)
+    @Patch('/groups/:id/manager-permission')
+    @HttpCode(200)
+    async UpdateGroupManagerPermissionActive(@Param() params: IdParams, @Body() groupManagerPermisssionUpdateData: BooleanUpdateDto, @Request() req) {
+        try {
+            // TODO: permission 처리
+            const { id: userId } = req.user;
+            const { id: groupId } = params;
+            const { value } = groupManagerPermisssionUpdateData;
+
+            const groupMember = await this.groupMemberService.getInfoByAccountId({ groupId, accountId: userId });
+            if (!groupMember) {
+                throw new HttpException(failMessage.ERR_GROUP_MEMBER_NOT_FOUND, HttpStatus.NOT_FOUND);
+            }
+
+            const result = await this.groupService.updateItemManagerPermissionActive({ id: groupId, managerPermissionActive: value });
+            if (result.affected === 0) {
+                throw new HttpException(failMessage.ERR_GROUP_NOT_FOUND, HttpStatus.NOT_FOUND);
+            }
+
+            return successMessageGenerator();
+        } catch (err) {
+            console.log(err);
+            if (err instanceof HttpException) {
+                throw err;
+            }
+            
+            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @UseGuards(JwtStrategyGuard)
     @UseInterceptors(FileInterceptor('files'))
     @Post('/groups/:id/logo/upload')
     @HttpCode(200)
@@ -222,17 +253,15 @@ export class GroupController {
                 throw new HttpException(failMessage.ERR_NOT_UPLOADED, HttpStatus.BAD_REQUEST);
             }
 
-            const group = await this.groupService.getInfo({ id: groupId });
-            if (!group) {
-                throw new HttpException(failMessage.ERR_GROUP_NOT_FOUND, HttpStatus.NOT_FOUND);
-            }
-
             const groupMember = await this.groupMemberService.getInfoByAccountId({ groupId, accountId: userId });
             if (!groupMember) {
                 throw new HttpException(failMessage.ERR_GROUP_MEMBER_NOT_FOUND, HttpStatus.NOT_FOUND);
             }
 
-            await this.groupService.updateItemLogoImage({ id: groupId, logoImageUrl });
+            const result = await this.groupService.updateItemLogoImage({ id: groupId, logoImageUrl });
+            if (result.affected === 0) {
+                throw new HttpException(failMessage.ERR_GROUP_NOT_FOUND, HttpStatus.NOT_FOUND);
+            }
 
             return successMessageGenerator({ logoImageUrl });
         } catch (err) {
@@ -253,17 +282,15 @@ export class GroupController {
             const { id: userId } = req.user;
             const { id: groupId } = params;
 
-            const group = await this.groupService.getInfo({ id: groupId });
-            if (!group) {
-                throw new HttpException(failMessage.ERR_GROUP_NOT_FOUND, HttpStatus.NOT_FOUND);
-            }
-
             const groupMember = await this.groupMemberService.getInfoByAccountId({ groupId, accountId: userId });
             if (!groupMember) {
                 throw new HttpException(failMessage.ERR_GROUP_MEMBER_NOT_FOUND, HttpStatus.NOT_FOUND);
             }
 
-            await this.groupService.updateItemLogoImage({ id: groupId, logoImageUrl: undefined });
+            const result = await this.groupService.updateItemLogoImage({ id: groupId, logoImageUrl: undefined });
+            if (result.affected === 0) {
+                throw new HttpException(failMessage.ERR_GROUP_NOT_FOUND, HttpStatus.NOT_FOUND);
+            }
 
             return successMessageGenerator();
         } catch (err) {
