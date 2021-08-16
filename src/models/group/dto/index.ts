@@ -1,3 +1,4 @@
+export * from './alternativePayment.dto';
 export * from './booleanUpdate.dto';
 export * from './group.dto';
 export * from './groupActiveUpdate.dto';

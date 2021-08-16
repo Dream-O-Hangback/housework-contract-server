@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { MulterModule } from '@nestjs/platform-express';
+import { AlternativePaymentModule } from '@models/alternativePayment/alternativePayment.module';
 import { FileModule } from '@providers/file.module';
 import { FileService } from '@providers/file.service';
 import { GroupController } from './group.controller';
@@ -13,6 +14,7 @@ import Group from './entities';
     imports: [
         ConfigModule,
         TypeOrmModule.forFeature([Group]),
+        AlternativePaymentModule,
         GroupMemberModule,
         FileModule,
         MulterModule.registerAsync({

@@ -18,6 +18,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { JwtStrategyGuard } from '@auth/guards/jwt.guard';
 import { successMessageGenerator } from '@common/lib';
 import { failMessage } from '@common/constants';
+import { AlternativePaymentService } from '@models/alternativePayment/alternativePayment.service';
 import GroupMember from '@models/groupMember/entities';
 import { GroupService } from './group.service';
 import { GroupMemberService } from '../groupMember/groupMember.service';
@@ -26,6 +27,7 @@ import {
     GroupUpdateDto,
     GroupActiveUpdateDto,
     GroupMemberUpdateDto,
+    AlternativePaymentDto,
     ListQuery,
     IdParams,
     BooleanUpdateDto,
@@ -39,9 +41,11 @@ export class GroupController {
     constructor(
         private groupService: GroupService,
         private groupMemberService: GroupMemberService,
+        private alternativePaymentService: AlternativePaymentService,
     ) {
         this.groupService = groupService;
         this.groupMemberService = groupMemberService;
+        this.alternativePaymentService = alternativePaymentService;
     }
 
     @UseGuards(JwtStrategyGuard)
@@ -455,7 +459,7 @@ export class GroupController {
     async UpdateMyGroupMemberNickname(@Param() params: IdParams, @Body() nicknameData: NicknameDto, @Request() req) {
         try {
             const { id: userId } = req.user;
-            const { id: groupId } = params
+            const { id: groupId } = params;
             const { nickname } = nicknameData;
 
             const group = await this.groupService.getItem({ id: groupId });
@@ -484,7 +488,7 @@ export class GroupController {
     @HttpCode(200)
     async CheckNicknameDuplication(@Param() params: IdParams, @Body() nicknameData: NicknameDto) {
         try {
-            const { id: groupId } = params
+            const { id: groupId } = params;
             const { nickname } = nicknameData;
 
             const group = await this.groupService.getItem({ id: groupId });
@@ -498,6 +502,38 @@ export class GroupController {
             }
 
             return successMessageGenerator(); 
+        } catch (err) {
+            console.log(err);
+            if (err instanceof HttpException) {
+                throw err;
+            }
+            
+            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @UseGuards(JwtStrategyGuard)
+    @Post('/groups/:id/alternative-payment')
+    @HttpCode(200)
+    async CreateGroupAlternativePayment(@Param() params: IdParams, @Body() alternativePaymentData: AlternativePaymentDto, @Request() req) {
+        try {
+            const { id: userId } = req.user;
+            const { id: groupId } = params;
+            const { type, name, reason } = alternativePaymentData;
+
+            const group = await this.groupService.getItem({ id: groupId });
+            if (!group) {
+                throw new HttpException(failMessage.ERR_GROUP_NOT_FOUND, HttpStatus.NOT_FOUND);
+            }
+
+            const groupMember = await this.groupMemberService.getItemByAccountId({ groupId, accountId: userId });
+            if (!groupMember) {
+                throw new HttpException(failMessage.ERR_GROUP_MEMBER_NOT_FOUND, HttpStatus.NOT_FOUND);
+            }
+
+            await this.alternativePaymentService.createItem({ groupId, type, name, reason });
+
+            return successMessageGenerator();
         } catch (err) {
             console.log(err);
             if (err instanceof HttpException) {
