@@ -10,7 +10,12 @@ export class AlternativePaymentService {
     ) {
         this.alternativePaymentRepository = alternativePaymentRepository;
     }
-    async createItem({ groupId, type, name, reason }) {
+    createItem({ groupId, type, name, reason }) {
         return this.alternativePaymentRepository.save({ groupId, type, name, reason });
+    }
+    async getList({ groupId }) {
+        const [list, count] = await this.alternativePaymentRepository.findAndCount({ groupId });
+
+        return { list, count };
     }
 }
