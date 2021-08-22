@@ -28,7 +28,9 @@ import {
     GroupActiveUpdateDto,
     GroupMemberUpdateDto,
     AlternativePaymentDto,
+    AlternativePaymentUpdateDto,
     ListQuery,
+    AlternativePaymentIdParams,
     IdParams,
     BooleanUpdateDto,
     NicknameDto
@@ -355,11 +357,11 @@ export class GroupController {
     @UseGuards(JwtStrategyGuard)
     @Patch('/groups/:id/me')
     @HttpCode(200)
-    async UpdateMyGroupMemberInfo(@Param() params: IdParams, @Body() groupMemberUpdatedate: GroupMemberUpdateDto, @Request() req) {
+    async UpdateMyGroupMemberInfo(@Param() params: IdParams, @Body() groupMemberUpdatedata: GroupMemberUpdateDto, @Request() req) {
         try {
             const { id: userId } = req.user;
             const { id: groupId } = params;
-            const { selectAwardId } = groupMemberUpdatedate;
+            const { selectAwardId } = groupMemberUpdatedata;
 
             const group = await this.groupService.getItem({ id: groupId });
             if (!group) {
@@ -426,11 +428,11 @@ export class GroupController {
     @UseGuards(JwtStrategyGuard)
     @Patch('/groups/:id/me/active')
     @HttpCode(200)
-    async UpdateMyGroupMemberActive(@Param() params: IdParams, @Body() booleanUpdatedate: BooleanUpdateDto, @Request() req) {
+    async UpdateMyGroupMemberActive(@Param() params: IdParams, @Body() booleanUpdatedata: BooleanUpdateDto, @Request() req) {
         try {
             const { id: userId } = req.user;
             const { id: groupId } = params;
-            const { value } = booleanUpdatedate;
+            const { value } = booleanUpdatedata;
 
             const group = await this.groupService.getItem({ id: groupId });
             if (!group) {
@@ -565,6 +567,40 @@ export class GroupController {
             const result = await this.alternativePaymentService.getList({ groupId });
 
             return successMessageGenerator(result);
+        } catch (err) {
+            console.log(err);
+            if (err instanceof HttpException) {
+                throw err;
+            }
+            
+            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @UseGuards(JwtStrategyGuard)
+    @Patch('/groups/:groupid/alternative-payment/:id')
+    async UpdateGroupAlternativePayment(@Param() params: AlternativePaymentIdParams, @Body() alternativePaymentUpdateData: AlternativePaymentUpdateDto, @Request() req) {
+        try {
+            const { id: userId } = req.user;
+            const { groupid: groupId, id } = params;
+            const { type, name, reason } = alternativePaymentUpdateData;
+
+            const group = await this.groupService.getItem({ id: groupId });
+            if (!group) {
+                throw new HttpException(failMessage.ERR_GROUP_NOT_FOUND, HttpStatus.NOT_FOUND);
+            }
+
+            const groupMember = await this.groupMemberService.getItemByAccountId({ groupId, accountId: userId });
+            if (!groupMember) {
+                throw new HttpException(failMessage.ERR_GROUP_MEMBER_NOT_FOUND, HttpStatus.NOT_FOUND);
+            }
+
+            const result = await this.alternativePaymentService.updateItem({ groupId, id, type, name, reason });
+            if (!result.affected) {
+                throw new HttpException(failMessage.ERR_GROUP_MEMBER_NOT_FOUND, HttpStatus.NOT_FOUND);
+            }
+
+            return successMessageGenerator();
         } catch (err) {
             console.log(err);
             if (err instanceof HttpException) {

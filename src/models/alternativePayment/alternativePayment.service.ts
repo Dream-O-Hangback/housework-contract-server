@@ -13,6 +13,9 @@ export class AlternativePaymentService {
     createItem({ groupId, type, name, reason }) {
         return this.alternativePaymentRepository.save({ groupId, type, name, reason });
     }
+    updateItem({ groupId, id, type, name, reason }) {
+        return this.alternativePaymentRepository.update({ groupId, id }, { type, name, reason });
+    }
     async getList({ groupId }) {
         const [list, count] = await this.alternativePaymentRepository.findAndCount({ groupId });
 
