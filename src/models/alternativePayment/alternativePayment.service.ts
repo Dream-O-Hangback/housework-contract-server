@@ -16,6 +16,9 @@ export class AlternativePaymentService {
     updateItem({ groupId, id, type, name, reason }) {
         return this.alternativePaymentRepository.update({ groupId, id }, { type, name, reason });
     }
+    deleteItem({ groupId, id }) {
+        return this.alternativePaymentRepository.delete({ groupId, id });
+    }
     async getList({ groupId }) {
         const [list, count] = await this.alternativePaymentRepository.findAndCount({ groupId });
 
