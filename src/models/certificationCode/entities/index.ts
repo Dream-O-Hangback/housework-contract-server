@@ -13,7 +13,7 @@ export default class CertificationCode {
     @Column({ name: 'account_id', nullable: true })
     accountId: string;
 
-    @Column({ type: 'varchar', length: 255 })
+    @Column({ type: 'varchar', length: 255, unique: true })
     email: string;
 
     @Column({ type: 'varchar', length: 50 })

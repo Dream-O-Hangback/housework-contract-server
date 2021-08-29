@@ -1,3 +1,3 @@
-export default interface JwtPayload {
+export interface JwtPayload {
     id: string;
 }

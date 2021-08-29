@@ -1,7 +1,7 @@
 import { Type } from 'class-transformer';
 import { IsString, IsNotEmpty } from 'class-validator';
 
-export default class SearchQuery {
+export class EmailQuery {
     @IsNotEmpty()
     @IsString()
     @Type(() => String)

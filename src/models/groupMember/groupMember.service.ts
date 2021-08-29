@@ -94,7 +94,7 @@ export class GroupMemberService {
         
         return { list, count };
     }
-    deleteItemByAccountId({ accountId }) {
-        return this.groupMemberRepository.delete({ accountId });
+    deleteItemByAccountId({ groupId, accountId }) {
+        return this.groupMemberRepository.delete({ groupId, accountId, isManager: false });
     }
 }

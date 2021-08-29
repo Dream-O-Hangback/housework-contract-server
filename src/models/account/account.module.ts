@@ -27,7 +27,6 @@ import Account from './entities';
     controllers: [AccountController],
     providers: [
         ConfigService,
-        FileService,
         AccountService,
     ],
     exports: [AccountService],

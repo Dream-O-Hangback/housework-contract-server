@@ -1,6 +1,6 @@
 import { IsString, IsNotEmpty } from 'class-validator';
 
-export default class ProfileUpdateDto {
+export class ProfileUpdateDto {
     @IsNotEmpty()
     @IsString()
     readonly profile: string;

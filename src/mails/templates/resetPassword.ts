@@ -1,4 +1,4 @@
-export default (email: string, resetPasswordLink: string, emailNotificationDisableLink: string) => {
+export const resetPassword = (email: string, resetPasswordLink: string, emailNotificationDisableLink: string) => {
     return `
         <div class="module-list previewtable ng-pristine ng-untouched ng-valid ng-scope ng-not-empty"
         ng-class="{'dragging' : isModuleDragging}" id="previewtable" data-as-sortable="$ctrl.sortableMain"

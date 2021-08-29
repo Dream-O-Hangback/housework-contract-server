@@ -1,6 +1,6 @@
 import { IsEmail, IsString, IsNotEmpty } from 'class-validator';
 
-export default class CodeDto {
+export class CodeDto {
     @IsNotEmpty()
     @IsEmail()
     @IsString()

@@ -1,4 +1,4 @@
-import FailMessageType from "../interfaces/failMessageType";
+import { FailMessageType } from "../interfaces";
 
 export const ERR_INVALID_PARAM: FailMessageType = {
     errorCode: 'INVALID_PARAM',
@@ -27,6 +27,11 @@ export const ERR_ALREADY_EXISTS_GROUP_MEMBER: FailMessageType = {
 
 export const ERR_ALREADY_CREATED: FailMessageType = {
     errorCode: 'ALREADY_CREATED',
+    description: '...'
+}
+
+export const ERR_MANAGER_CANNOT_WITHDRAW: FailMessageType = {
+    errorCode: 'MANAGER_CANNOT_WITHDRAW',
     description: '...'
 }
 

@@ -1,6 +1,6 @@
 import { IsString, IsNotEmpty } from 'class-validator';
 
-export default class ContentDto {
+export class ContentDto {
     @IsNotEmpty()
     @IsString()
     readonly type: string;

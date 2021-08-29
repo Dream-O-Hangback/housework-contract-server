@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { MailerService } from '@nestjs-modules/mailer';
-import mailTemplate from './templates';
+import * as mailTemplate from './templates';
 
 const mailOption = {
     to: undefined,

@@ -1,6 +1,6 @@
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { MoreThan, Repository } from 'typeorm';
+import { InsertResult, MoreThan, Repository } from 'typeorm';
 import * as faker from 'faker';
 import MockDate from 'mockdate';
 import * as keyGenerator from '@common/lib/keyGenerator';
@@ -9,10 +9,19 @@ import CertificationCode from './entities';
 
 type MockRepository<T = any> = Partial<Record<keyof Repository<T>, jest.Mock>>;
 
-const mockRepository = () => ({
+const executeSpy = jest.fn().mockReturnValue(new InsertResult());
+
+const mockRepository = jest.fn(() => ({
     save: jest.fn(),
     findOne: jest.fn(),
-});
+    createQueryBuilder: jest.fn(() => ({
+        insert: jest.fn().mockReturnThis(),
+        values: jest.fn().mockReturnThis(),
+        orUpdate: jest.fn().mockReturnThis(),
+        execute: executeSpy,
+    })),
+}));
+
 
 describe('CertificationCodeService', () => {
     let certificationCodeService: CertificationCodeService;
@@ -63,6 +72,28 @@ describe('CertificationCodeService', () => {
         });
     });
 
+    it('should get a certification code by account id', async () => {
+        const accountId = faker.datatype.uuid();
+
+        const expireDate = new Date();
+        expireDate.setDate(expireDate.getDate() + 1);
+
+        const certificationCode = {
+            email: faker.internet.email(),
+            code: keyGenerator.keyGenerator(),
+            accountId,
+            expireDate,
+        };
+
+        const certificationCodeRepositoryFindOneSpy = jest.spyOn(certificationCodeRepository, 'findOne').mockResolvedValueOnce(certificationCode as CertificationCode);
+
+        const resultCertificationCode = await certificationCodeService.getItemByAccountId({ accountId });
+
+        expect(resultCertificationCode).toBe(certificationCode as CertificationCode);
+        expect(certificationCodeRepositoryFindOneSpy).toBeCalledTimes(1);
+        expect(certificationCodeRepositoryFindOneSpy).toHaveBeenCalledWith({ accountId });
+    });
+
     it('should upsert a certification code', async () => {
         const accountId = faker.datatype.uuid();
         const email = faker.internet.email();
@@ -71,24 +102,12 @@ describe('CertificationCodeService', () => {
         const expireDate = new Date();
         expireDate.setDate(expireDate.getDate() + 1);
 
-        const certificationCode = {
-            accountId,
-            email,
-            code,
-            expireDate,
-        };
-
         const keyGeneratorSpy = jest.spyOn(keyGenerator, 'keyGenerator').mockReturnValue(code);
-        const certificationCodeRepositoryFindOneSpy = jest.spyOn(certificationCodeRepository, 'findOne').mockResolvedValueOnce(undefined);
-        const certificationCodeRepositorySaveSpy = jest.spyOn(certificationCodeRepository, 'save').mockResolvedValueOnce(certificationCode);
 
         const resultCertificationCode = await certificationCodeService.upsertItem({ accountId, email });
 
         expect(keyGeneratorSpy).toBeCalledTimes(1);
-        expect(resultCertificationCode).toBe(certificationCode as CertificationCode);
-        expect(certificationCodeRepositoryFindOneSpy).toBeCalledTimes(1);
-        expect(certificationCodeRepositoryFindOneSpy).toHaveBeenCalledWith({ email });
-        expect(certificationCodeRepositorySaveSpy).toBeCalledTimes(1);
-        expect(certificationCodeRepositorySaveSpy).toHaveBeenCalledWith(certificationCode);
+        expect(resultCertificationCode).toStrictEqual(new InsertResult());
+        expect(executeSpy).toBeCalledTimes(1);
     });
 });

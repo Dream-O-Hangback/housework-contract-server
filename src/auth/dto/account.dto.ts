@@ -1,6 +1,6 @@
 import { IsBoolean, IsEmail, IsNotEmpty, IsString, IsOptional } from 'class-validator';
 
-export default class AccountDto {
+export class AccountDto {
     @IsNotEmpty()
     @IsEmail()
     @IsString()
