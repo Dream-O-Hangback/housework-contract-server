@@ -10,3 +10,5 @@ export * from './id.params';
 export * from './list.query';
 export * from './nickname.dto';
 export * from './rule.dto';
+export * from './ruleId.params';
+export * from './ruleUpdate.dto';
