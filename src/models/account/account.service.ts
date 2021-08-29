@@ -48,6 +48,7 @@ export class AccountService {
             select: ['id', 'email', 'name', 'nickname', 'profileImageUrl', 'profile'],
             skip,
             take,
+            order: { createDate: -1 },
         });
 
         return { list, count };

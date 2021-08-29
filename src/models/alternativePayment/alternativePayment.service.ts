@@ -20,7 +20,10 @@ export class AlternativePaymentService {
         return this.alternativePaymentRepository.delete({ groupId, id });
     }
     async getList({ groupId }) {
-        const [list, count] = await this.alternativePaymentRepository.findAndCount({ groupId });
+        const [list, count] = await this.alternativePaymentRepository.findAndCount({
+            where: { groupId },
+            order: { updateDate: -1 },
+        });
 
         return { list, count };
     }

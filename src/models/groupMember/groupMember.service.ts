@@ -29,6 +29,7 @@ export class GroupMemberService {
             ])
             .where({ groupId })
             .leftJoin('gm.account', 'a')
+            .orderBy('gm.updateDate', 'DESC')
             .getMany();
     }
     getInfoByAccountId({ groupId, accountId }) {
@@ -88,6 +89,7 @@ export class GroupMemberService {
             ])
             .where({ accountId })
             .leftJoin('gm.group', 'g')
+            .orderBy('gm.updateDate', 'DESC')
             .skip(skip)
             .take(take)
             .getManyAndCount();

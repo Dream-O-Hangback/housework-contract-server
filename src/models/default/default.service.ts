@@ -25,10 +25,13 @@ export class DefaultService {
         return this.defaultGroupTypeRepository.save({ title, displayTitle });
     }
     getAllDefaultGroupTypes() {
-        return this.defaultGroupTypeRepository.find();
+        return this.defaultGroupTypeRepository.find({ order: { displayTitle: 1, createDate: -1 } });
     }
     getAllActiveDefaultGroupTypes() {
-        return this.defaultGroupTypeRepository.find({ active: true });
+        return this.defaultGroupTypeRepository.find({
+            where: { active: true },
+            order: { displayTitle: 1, createDate: -1 },
+        });
     }
     updateDefaultGroupType({ id, title, displayTitle }) {
         return this.defaultGroupTypeRepository.update({ id }, { title, displayTitle });
@@ -40,10 +43,16 @@ export class DefaultService {
         return this.defaultAlternativePaymentTypeRepository.save({ title, displayTitle });
     }
     getAllDefaultAlternativePaymentTypes() {
-        return this.defaultAlternativePaymentTypeRepository.find();
+        return this.defaultAlternativePaymentTypeRepository.find({ order: { displayTitle: 1, createDate: -1 } });
     }
     getAllActiveDefaultAlternativePaymentTypes() {
-        return this.defaultAlternativePaymentTypeRepository.find({ active: true });
+        return this.defaultAlternativePaymentTypeRepository.find({
+            where: { active: true },
+            order: {
+                displayTitle: 1,
+                createDate: -1,
+            },
+        });
     }
     updateDefaultAlternativePaymentType({ id, title, displayTitle }) {
         return this.defaultAlternativePaymentTypeRepository.update({ id }, { title, displayTitle });
@@ -55,10 +64,16 @@ export class DefaultService {
         return this.defaultHouseworkRepository.save({ type, title, description });
     }
     getAllDefaultHousework() {
-        return this.defaultHouseworkRepository.find();
+        return this.defaultHouseworkRepository.find({ order: { type: 1, title: 1 } });
     }
     getAllActiveDefaultHousework() {
-        return this.defaultHouseworkRepository.find({ active: true });
+        return this.defaultHouseworkRepository.find({
+            where: { active: true },
+            order: {
+                type: 1,
+                title: 1,
+            },
+        });
     }
     updateDefaultHousework({ id, type, title, description }) {
         return this.defaultHouseworkRepository.update({ id }, { type, title, description });
@@ -70,10 +85,16 @@ export class DefaultService {
         return this.defaultAwardRepository.save({ type, title, description });
     }
     getAllDefaultAwards() {
-        return this.defaultAwardRepository.find();
+        return this.defaultAwardRepository.find({ order: { type: 1, title: 1 } });
     }
     getAllActiveDefaultAwards() {
-        return this.defaultAwardRepository.find({ active: true });
+        return this.defaultAwardRepository.find({
+            where: { active: true },
+            order: {
+                type: 1,
+                title: 1,
+            },
+        });
     }
     updateDefaultAward({ id, type, title, description }) {
         return this.defaultAwardRepository.update({ id }, { type, title, description });
