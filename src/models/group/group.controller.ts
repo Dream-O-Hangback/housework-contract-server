@@ -22,6 +22,7 @@ import { AlternativePaymentService } from '@models/alternativePayment/alternativ
 import GroupMember from '@models/groupMember/entities';
 import { GroupService } from './group.service';
 import { GroupMemberService } from '../groupMember/groupMember.service';
+import { HouseworkService } from '../housework/housework.service';
 import { RuleService } from '../rule/rule.service';
 import {
     GroupDto,
@@ -35,6 +36,7 @@ import {
     IdParams,
     BooleanUpdateDto,
     NicknameDto,
+    HouseworkDto,
     RuleDto,
     RuleIdParams,
     RuleUpdateDto,
@@ -48,11 +50,13 @@ export class GroupController {
         private groupService: GroupService,
         private groupMemberService: GroupMemberService,
         private alternativePaymentService: AlternativePaymentService,
+        private houseworkService: HouseworkService,
         private ruleService: RuleService,
     ) {
         this.groupService = groupService;
         this.groupMemberService = groupMemberService;
         this.alternativePaymentService = alternativePaymentService;
+        this.houseworkService = houseworkService;
         this.ruleService = ruleService
     }
 
@@ -748,6 +752,37 @@ export class GroupController {
             }
 
             const result = await this.ruleService.deleteItem({ groupId, id });
+
+            return successMessageGenerator();
+        } catch (err) {
+            console.log(err);
+            if (err instanceof HttpException) {
+                throw err;
+            }
+            
+            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @UseGuards(JwtStrategyGuard)
+    @Post('/groups/:id/housework')
+    async CreateGroupHousework(@Param() params: IdParams, @Body() houseworkData: HouseworkDto, @Request() req) {
+        try {
+            const { id: userId } = req.user;
+            const { id: groupId } = params;
+            const { title, description, deployCount, frequency } = houseworkData;
+
+            const group = await this.groupService.getItem({ id: groupId });
+            if (!group) {
+                throw new HttpException(failMessage.ERR_GROUP_NOT_FOUND, HttpStatus.NOT_FOUND);
+            }
+
+            const groupMember = await this.groupMemberService.getItemByAccountId({ groupId, accountId: userId });
+            if (!groupMember) {
+                throw new HttpException(failMessage.ERR_GROUP_MEMBER_NOT_FOUND, HttpStatus.NOT_FOUND);
+            }
+
+            await this.houseworkService.createItem({ groupId, title, description, deployCount, frequency });
 
             return successMessageGenerator();
         } catch (err) {

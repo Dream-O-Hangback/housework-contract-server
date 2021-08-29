@@ -8,6 +8,7 @@ import { FileService } from '@providers/file.service';
 import { GroupController } from './group.controller';
 import { GroupService } from './group.service';
 import { GroupMemberModule } from '../groupMember/groupMember.module';
+import { HouseworkModule } from '@models/housework/housework.module';
 import { RuleModule } from '../rule/rule.module';
 import Group from './entities';
 
@@ -17,6 +18,7 @@ import Group from './entities';
         TypeOrmModule.forFeature([Group]),
         AlternativePaymentModule,
         GroupMemberModule,
+        HouseworkModule,
         RuleModule,
         FileModule,
         MulterModule.registerAsync({

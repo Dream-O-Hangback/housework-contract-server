@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, PrimaryGeneratedColumn, Entity, ManyToOne, JoinColumn } from 'typeorm';
+import { Column, CreateDateColumn, UpdateDateColumn, PrimaryGeneratedColumn, Entity, ManyToOne, JoinColumn } from 'typeorm';
 import Group from '@models/group/entities';
 
 @Entity('housework')
@@ -25,8 +25,11 @@ export default class Housework {
     @Column({ type: 'int' })
     frequency: string;
 
-    @Column({ name: 'expire_date' })
+    @Column({ name: 'expire_date', nullable: true })
     expireDate: Date;
+
+    @UpdateDateColumn({ name: 'update_date' })
+    updateDate: Date;
 
     @CreateDateColumn({ name: 'create_date' })
     createDate: Date;
