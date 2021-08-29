@@ -729,4 +729,34 @@ export class GroupController {
             throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @UseGuards(JwtStrategyGuard)
+    @Delete('/groups/:groupid/rules/:id')
+    async DeleteGroupRule(@Param() params: RuleIdParams, @Request() req) {
+        try {
+            const { id: userId } = req.user;
+            const { groupid: groupId, id } = params;
+
+            const group = await this.groupService.getItem({ id: groupId });
+            if (!group) {
+                throw new HttpException(failMessage.ERR_GROUP_NOT_FOUND, HttpStatus.NOT_FOUND);
+            }
+
+            const groupMember = await this.groupMemberService.getItemByAccountId({ groupId, accountId: userId });
+            if (!groupMember) {
+                throw new HttpException(failMessage.ERR_GROUP_MEMBER_NOT_FOUND, HttpStatus.NOT_FOUND);
+            }
+
+            const result = await this.ruleService.deleteItem({ groupId, id });
+
+            return successMessageGenerator();
+        } catch (err) {
+            console.log(err);
+            if (err instanceof HttpException) {
+                throw err;
+            }
+            
+            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }
