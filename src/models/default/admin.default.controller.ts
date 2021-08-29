@@ -25,7 +25,6 @@ export class DefaultAdminController {
     }
 
     @Post('/group/type')
-    @HttpCode(200)
     async CreateGroupType(@Body() groupTypeData: TypeDto) {
         try {
             const { title, displayTitle } = groupTypeData;
@@ -44,7 +43,6 @@ export class DefaultAdminController {
     }
 
     @Post('/alternative-payment/type')
-    @HttpCode(200)
     async CreateAlternativePaymentType(@Body() alternativePaymentTypeData: TypeDto) {
         try {
             const { title, displayTitle } = alternativePaymentTypeData;
@@ -63,7 +61,6 @@ export class DefaultAdminController {
     }
 
     @Post('/housework')
-    @HttpCode(200)
     async CreateHousework(@Body() houseworkData: ContentDto) {
         try {
             const { type, title, description } = houseworkData;
@@ -82,7 +79,6 @@ export class DefaultAdminController {
     }
 
     @Post('/award')
-    @HttpCode(200)
     async CreateAward(@Body() awardData: ContentDto) {
         try {
             const { type, title, description } = awardData;
@@ -101,7 +97,6 @@ export class DefaultAdminController {
     }
 
     @Get('/group/types')
-    @HttpCode(200)
     async GetAllGroupTypes() {
         try {
             const list = await this.defaultService.getAllDefaultGroupTypes();
@@ -118,7 +113,6 @@ export class DefaultAdminController {
     }
 
     @Get('/alternative-payment/types')
-    @HttpCode(200)
     async GetAllAlternativePaymentTypes() {
         try {
             const list = await this.defaultService.getAllDefaultAlternativePaymentTypes();
@@ -135,7 +129,6 @@ export class DefaultAdminController {
     }
 
     @Get('/housework')
-    @HttpCode(200)
     async GetAllHousework() {
         try {
             const list = await this.defaultService.getAllDefaultHousework();
@@ -152,7 +145,6 @@ export class DefaultAdminController {
     }
 
     @Get('/awards')
-    @HttpCode(200)
     async GetAllAwards() {
         try {
             const list = await this.defaultService.getAllDefaultAwards();
@@ -169,7 +161,6 @@ export class DefaultAdminController {
     }
 
     @Patch('/group/types/:id')
-    @HttpCode(200)
     async UpdateGroupType(@Param() params: IdParams, @Body() groupTypeUpdateData: TypeDto) {
         try {
             const { id } = params;
@@ -189,7 +180,6 @@ export class DefaultAdminController {
     }
 
     @Patch('/alternative-payment/types/:id')
-    @HttpCode(200)
     async UpdateAlternativePaymentType(@Param() params: IdParams, @Body() alternativePaymentTypeUpdateData: TypeDto) {
         try {
             const { id } = params;
@@ -209,7 +199,6 @@ export class DefaultAdminController {
     }
 
     @Patch('/housework/:id')
-    @HttpCode(200)
     async UpdateHousework(@Param() params: IdParams, @Body() houseworkUpdateData: ContentDto) {
         try {
             const { id } = params;
@@ -229,7 +218,6 @@ export class DefaultAdminController {
     }
 
     @Patch('/awards/:id')
-    @HttpCode(200)
     async UpdateAward(@Param() params: IdParams, @Body() awardUpdateData: ContentDto) {
         try {
             const { id } = params;
@@ -249,7 +237,6 @@ export class DefaultAdminController {
     }
 
     @Delete('/group/types/:id')
-    @HttpCode(200)
     async DeleteGroupType(@Param() params: IdParams) {
         try {
             const { id } = params;
@@ -268,7 +255,6 @@ export class DefaultAdminController {
     }
 
     @Delete('/alternative-payment/types/:id')
-    @HttpCode(200)
     async DeleteAlternativePaymentType(@Param() params: IdParams) {
         try {
             const { id } = params;
@@ -287,7 +273,6 @@ export class DefaultAdminController {
     }
 
     @Delete('/housework/:id')
-    @HttpCode(200)
     async DeleteHousework(@Param() params: IdParams) {
         try {
             const { id } = params;
@@ -306,7 +291,6 @@ export class DefaultAdminController {
     }
 
     @Delete('/awards/:id')
-    @HttpCode(200)
     async DeleteAward(@Param() params: IdParams) {
         try {
             const { id } = params;

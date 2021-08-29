@@ -46,7 +46,6 @@ export class AccountController {
 
     @UseGuards(JwtStrategyGuard)
     @Get('/')
-    @HttpCode(200)
     async GetAccountList(@Query() searchData: SearchQuery) {
         try {
             let { offset, limit } = searchData;
@@ -70,7 +69,6 @@ export class AccountController {
 
     @UseGuards(JwtStrategyGuard)
     @Get('/me')
-    @HttpCode(200)
     async GetMyAccountInfo(@Request() req) {
         try {
             const { id } = req.user;
@@ -89,7 +87,6 @@ export class AccountController {
     }
 
     @Post('/password/reset')
-    @HttpCode(200)
     async SendResetPassword(@Body() emailData: EmailDto) {
         try {
             const { email } = emailData;
@@ -113,7 +110,6 @@ export class AccountController {
     }
 
     @Get('/password/reset')
-    @HttpCode(200)
     async ResetPassword(@Query() emailData: EmailQuery) {
         try {
             const { email } = emailData;
@@ -146,7 +142,6 @@ export class AccountController {
     @UseGuards(JwtStrategyGuard)
     @UseInterceptors(FileInterceptor('files'))
     @Post('/me/profile/upload')
-    @HttpCode(200)
     async UpdateMyProfileImage(@Request() req) {
         try {
             const { id } = req.user;
@@ -171,7 +166,6 @@ export class AccountController {
 
     @UseGuards(JwtStrategyGuard)
     @Delete('/me/profile')
-    @HttpCode(200)
     async DeleteMyProfileImage(@Request() req) {
         try {
             const { id } = req.user;
@@ -191,7 +185,6 @@ export class AccountController {
 
     @UseGuards(JwtStrategyGuard)
     @Patch('/me/nickname')
-    @HttpCode(200)
     async UpdateMyAccountNickname(@Request() req, @Body() nicknameUpdateData: NicknameUpdateDto) {
         try {
             const { id } = req.user;
@@ -217,7 +210,6 @@ export class AccountController {
 
     @UseGuards(JwtStrategyGuard)
     @Patch('/me/profile')
-    @HttpCode(200)
     async UpdateMyAccountProfile(@Request() req, @Body() profileUpdateData: ProfileUpdateDto) {
         try {
             const { id } = req.user;
@@ -238,7 +230,6 @@ export class AccountController {
 
     @UseGuards(JwtStrategyGuard)
     @Patch('/me/password')
-    @HttpCode(200)
     async UpdateMyAccountPassword(@Request() req, @Body() passwordUpdateData: PasswordUpdateDto) {
         try {
             const { id } = req.user;
@@ -264,7 +255,6 @@ export class AccountController {
 
     @UseGuards(JwtStrategyGuard)
     @Patch('/me/notifications')
-    @HttpCode(200)
     async UpdateNotificationOption(@Request() req, @Body() notificationOptionUpdateData: BooleanUpdateDto) {
         try {
             const { id } = req.user;
@@ -285,7 +275,6 @@ export class AccountController {
 
     @UseGuards(JwtStrategyGuard)
     @Patch('/me/email-notifications')
-    @HttpCode(200)
     async UpdateEmailNotificationOption(@Request() req, @Body() emailNotificationOptionUpdateData: BooleanUpdateDto) {
         try {
             const { id } = req.user;
@@ -305,7 +294,6 @@ export class AccountController {
     }
 
     @Get('/email-notifications/disable')
-    @HttpCode(200)
     async DisableEmailNotificationOption(@Query() emailData: EmailQuery) {
         try {
             const { email } = emailData;
@@ -330,7 +318,6 @@ export class AccountController {
     }
 
     @Post('/nickname/exists')
-    @HttpCode(200)
     async CheckNicknameDuplication(@Body() nicknameData: NicknameDto) {
         try {
             const { nickname } = nicknameData;
@@ -353,7 +340,6 @@ export class AccountController {
 
     @UseGuards(JwtStrategyGuard)
     @Delete('/me')
-    @HttpCode(200)
     async DeleteMyAccount(@Request() req) {
         try {
             const { id } = req.user;

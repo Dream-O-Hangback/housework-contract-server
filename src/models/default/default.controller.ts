@@ -19,7 +19,6 @@ export class DefaultController {
     }
 
     @Get('/group/types')
-    @HttpCode(200)
     async GetAllGroupTypes() {
         try {
             const list = await this.defaultService.getAllActiveDefaultGroupTypes();
@@ -36,7 +35,6 @@ export class DefaultController {
     }
 
     @Get('/alternative-payment/types')
-    @HttpCode(200)
     async GetAllAlternativePaymentTypes() {
         try {
             const list = await this.defaultService.getAllActiveDefaultAlternativePaymentTypes();
@@ -53,7 +51,6 @@ export class DefaultController {
     }
 
     @Get('/housework')
-    @HttpCode(200)
     async GetAllHousework() {
         try {
             const list = await this.defaultService.getAllActiveDefaultHousework();
@@ -70,7 +67,6 @@ export class DefaultController {
     }
 
     @Get('/awards')
-    @HttpCode(200)
     async GetAllAwards() {
         try {
             const list = await this.defaultService.getAllActiveDefaultAwards();
