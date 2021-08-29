@@ -10,8 +10,8 @@ export class RuleService {
     ) {
         this.ruleRepository = ruleRepository;
     }
-    createItem({ groupId, content }) {
-        return this.ruleRepository.save({ groupId, content });
+    createItem({ groupId, content, createDate }) {
+        return this.ruleRepository.save({ groupId, content, createDate });
     }
     updateItem({ groupId, id, content }) {
         return this.ruleRepository.update({ groupId, id }, { content });
@@ -20,7 +20,10 @@ export class RuleService {
         return this.ruleRepository.delete({ groupId, id });
     }
     async getList({ groupId }) {
-        const [list, count] = await this.ruleRepository.findAndCount({ groupId });
+        const [list, count] = await this.ruleRepository.findAndCount({
+            where: { groupId },
+            order: { updateDate: -1 }
+        });
 
         return { list, count };
     }

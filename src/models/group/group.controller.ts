@@ -666,7 +666,7 @@ export class GroupController {
 
             const promises = [];
             for (let i = 0; i < rules.length; i++) {
-                promises.push(this.ruleService.createItem({ groupId, content: rules[i] }))
+                promises.push(this.ruleService.createItem({ groupId, content: rules[i], createDate: new Date() }))
             }
             await Promise.all(promises);
 
@@ -680,4 +680,36 @@ export class GroupController {
             throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @UseGuards(JwtStrategyGuard)
+    @Get('/groups/:id/rules')
+    @HttpCode(200)
+    async GetGroupRuleList(@Param() params: IdParams, @Request() req) {
+        try {
+            const { id: userId } = req.user;
+            const { id: groupId } = params;
+
+            const group = await this.groupService.getItem({ id: groupId });
+            if (!group) {
+                throw new HttpException(failMessage.ERR_GROUP_NOT_FOUND, HttpStatus.NOT_FOUND);
+            }
+
+            const groupMember = await this.groupMemberService.getItemByAccountId({ groupId, accountId: userId });
+            if (!groupMember) {
+                throw new HttpException(failMessage.ERR_GROUP_MEMBER_NOT_FOUND, HttpStatus.NOT_FOUND);
+            }
+
+            const result = await this.ruleService.getList({ groupId });
+
+            return successMessageGenerator(result);
+        } catch (err) {
+            console.log(err);
+            if (err instanceof HttpException) {
+                throw err;
+            }
+            
+            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 }
