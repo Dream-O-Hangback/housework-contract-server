@@ -22,6 +22,7 @@ import { AlternativePaymentService } from '@models/alternativePayment/alternativ
 import GroupMember from '@models/groupMember/entities';
 import { GroupService } from './group.service';
 import { GroupMemberService } from '../groupMember/groupMember.service';
+import { RuleService } from '../rule/rule.service';
 import {
     GroupDto,
     GroupUpdateDto,
@@ -33,7 +34,8 @@ import {
     AlternativePaymentIdParams,
     IdParams,
     BooleanUpdateDto,
-    NicknameDto
+    NicknameDto,
+    RuleDto,
 } from './dto';
 import { RedefinedGroupMemberInfo } from './interfaces';
 
@@ -44,10 +46,12 @@ export class GroupController {
         private groupService: GroupService,
         private groupMemberService: GroupMemberService,
         private alternativePaymentService: AlternativePaymentService,
+        private ruleService: RuleService,
     ) {
         this.groupService = groupService;
         this.groupMemberService = groupMemberService;
         this.alternativePaymentService = alternativePaymentService;
+        this.ruleService = ruleService
     }
 
     @UseGuards(JwtStrategyGuard)
@@ -629,6 +633,42 @@ export class GroupController {
             }
 
             await this.alternativePaymentService.deleteItem({ groupId, id });
+
+            return successMessageGenerator();
+        } catch (err) {
+            console.log(err);
+            if (err instanceof HttpException) {
+                throw err;
+            }
+            
+            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @UseGuards(JwtStrategyGuard)
+    @Post('/groups/:id/rules')
+    @HttpCode(200)
+    async CreateGroupRule(@Param() params: IdParams, @Body() ruleData: RuleDto, @Request() req) {
+        try {
+            const { id: userId } = req.user;
+            const { id: groupId } = params;
+            const { rules } = ruleData;
+
+            const group = await this.groupService.getItem({ id: groupId });
+            if (!group) {
+                throw new HttpException(failMessage.ERR_GROUP_NOT_FOUND, HttpStatus.NOT_FOUND);
+            }
+
+            const groupMember = await this.groupMemberService.getItemByAccountId({ groupId, accountId: userId });
+            if (!groupMember) {
+                throw new HttpException(failMessage.ERR_GROUP_MEMBER_NOT_FOUND, HttpStatus.NOT_FOUND);
+            }
+
+            const promises = [];
+            for (let i = 0; i < rules.length; i++) {
+                promises.push(this.ruleService.createItem({ groupId, content: rules[i] }))
+            }
+            await Promise.all(promises);
 
             return successMessageGenerator();
         } catch (err) {

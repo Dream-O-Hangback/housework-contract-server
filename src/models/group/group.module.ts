@@ -8,6 +8,7 @@ import { FileService } from '@providers/file.service';
 import { GroupController } from './group.controller';
 import { GroupService } from './group.service';
 import { GroupMemberModule } from '../groupMember/groupMember.module';
+import { RuleModule } from '../rule/rule.module';
 import Group from './entities';
 
 @Module({
@@ -16,6 +17,7 @@ import Group from './entities';
         TypeOrmModule.forFeature([Group]),
         AlternativePaymentModule,
         GroupMemberModule,
+        RuleModule,
         FileModule,
         MulterModule.registerAsync({
             imports: [ConfigModule],
