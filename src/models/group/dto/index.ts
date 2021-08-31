@@ -8,6 +8,7 @@ export * from './groupmember.dto';
 export * from './groupUpdate.dto';
 export * from './housework.dto';
 export * from './houseworkId.params';
+export * from './houseworkUpdate.dto';
 export * from './id.params';
 export * from './list.query';
 export * from './nickname.dto';
