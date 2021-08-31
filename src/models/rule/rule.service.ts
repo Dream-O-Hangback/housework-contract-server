@@ -17,11 +17,11 @@ export class RuleService {
         return this.ruleRepository.update({ groupId, id }, { content });
     }
     deleteItem({ groupId, id }) {
-        return this.ruleRepository.delete({ groupId, id });
+        return this.ruleRepository.update({ groupId, id }, { active: false });
     }
     async getList({ groupId }) {
         const [list, count] = await this.ruleRepository.findAndCount({
-            where: { groupId },
+            where: { groupId, active: true },
             order: { updateDate: -1 }
         });
 

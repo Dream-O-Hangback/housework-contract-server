@@ -17,11 +17,11 @@ export class AlternativePaymentService {
         return this.alternativePaymentRepository.update({ groupId, id }, { type, name, reason });
     }
     deleteItem({ groupId, id }) {
-        return this.alternativePaymentRepository.delete({ groupId, id });
+        return this.alternativePaymentRepository.update({ groupId, id }, { active: false });
     }
     async getList({ groupId }) {
         const [list, count] = await this.alternativePaymentRepository.findAndCount({
-            where: { groupId },
+            where: { groupId, active: true },
             order: { updateDate: -1 },
         });
 

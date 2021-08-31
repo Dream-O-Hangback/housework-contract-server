@@ -27,4 +27,7 @@ export default class AlternativePayment {
 
     @CreateDateColumn({ name: 'create_date' })
     createDate: Date;
+
+    @Column({ default: true })
+    active: boolean;
 }

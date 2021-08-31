@@ -17,11 +17,11 @@ export class HouseworkService {
         return this.houseworkRepository.update({ groupId, id }, { title, description, deployCount, frequency });
     }
     deleteItem({ groupId, id }) {
-        return this.houseworkRepository.delete({ groupId, id });
+        return this.houseworkRepository.update({ groupId, id }, { active: false });
     }
     async getList({ groupId }) {
         const [list, count] = await this.houseworkRepository.findAndCount({
-            where: { groupId },
+            where: { groupId, active: true },
             order: { updateDate: -1 },
         });
 
