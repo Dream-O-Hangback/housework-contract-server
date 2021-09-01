@@ -27,4 +27,7 @@ export class HouseworkService {
 
         return { list, count };
     }
+    getCount({ groupId }) {
+        return this.houseworkRepository.count({ groupId, active: true });
+    }
 }

@@ -17,12 +17,13 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { JwtStrategyGuard } from '@auth/guards/jwt.guard';
 import { successMessageGenerator } from '@common/lib';
-import { failMessage } from '@common/constants';
+import { failMessage, ShareMethodType } from '@common/constants';
 import { AlternativePaymentService } from '@models/alternativePayment/alternativePayment.service';
 import GroupMember from '@models/groupMember/entities';
 import { GroupService } from './group.service';
 import { GroupMemberService } from '../groupMember/groupMember.service';
 import { HouseworkService } from '../housework/housework.service';
+import { RoutineService } from '../routine/routine.service';
 import { RuleService } from '../rule/rule.service';
 import {
     GroupDto,
@@ -38,6 +39,7 @@ import {
     NicknameDto,
     HouseworkDto,
     HouseworkIdParams,
+    HouseworkOptionUpdateDto,
     HouseworkUpdateDto,
     RuleDto,
     RuleIdParams,
@@ -53,12 +55,14 @@ export class GroupController {
         private groupMemberService: GroupMemberService,
         private alternativePaymentService: AlternativePaymentService,
         private houseworkService: HouseworkService,
+        private routineService: RoutineService,
         private ruleService: RuleService,
     ) {
         this.groupService = groupService;
         this.groupMemberService = groupMemberService;
         this.alternativePaymentService = alternativePaymentService;
         this.houseworkService = houseworkService;
+        this.routineService = routineService;
         this.ruleService = ruleService
     }
 
@@ -238,6 +242,51 @@ export class GroupController {
             const result = await this.groupService.updateItemManagerPermissionActive({ id: groupId, managerPermissionActive: value });
             if (result.affected === 0) {
                 throw new HttpException(failMessage.ERR_GROUP_NOT_FOUND, HttpStatus.NOT_FOUND);
+            }
+
+            return successMessageGenerator();
+        } catch (err) {
+            console.log(err);
+            if (err instanceof HttpException) {
+                throw err;
+            }
+            
+            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @UseGuards(JwtStrategyGuard)
+    @Patch('/groups/:id/options/housework')
+    async UpdateGroupHouseworkOptions(@Param() params: IdParams, @Body() houseworkOptionUpdateData: HouseworkOptionUpdateDto, @Request() req) {
+        try {
+            // TODO: permission 처리
+            const { id: userId } = req.user;
+            const { id: groupId } = params;
+            const { startDay, shareMethod } = houseworkOptionUpdateData;
+            let { skipLimit } = houseworkOptionUpdateData;
+
+            const houseworkCount = await this.houseworkService.getCount({ groupId });
+            skipLimit = Math.min(skipLimit, houseworkCount);
+
+            const groupMember = await this.groupMemberService.getInfoByAccountId({ groupId, accountId: userId });
+            if (!groupMember) {
+                throw new HttpException(failMessage.ERR_GROUP_MEMBER_NOT_FOUND, HttpStatus.NOT_FOUND);
+            }
+
+            const groupUpdateResult = await this.groupService.updateItemHouseworkOptions({ id: groupId, skipLimit });
+            if (groupUpdateResult.affected === 0) {
+                throw new HttpException(failMessage.ERR_GROUP_NOT_FOUND, HttpStatus.NOT_FOUND);
+            }
+
+            const routine = await this.routineService.getItem({ groupId });
+            if (routine) {
+                // TODO add lastValue update condition
+                const routineUpdateResult = await this.routineService.updateItem({ groupId, startDay, shareMethod, startDayLastValue: routine.startDay, shareMethodLastValue: routine.shareMethod });
+                if (routineUpdateResult.affected === 0) {
+                    throw new HttpException(failMessage.ERR_GROUP_NOT_FOUND, HttpStatus.NOT_FOUND);
+                }
+            } else {
+                await this.routineService.createItem({ groupId, startDay, shareMethod });
             }
 
             return successMessageGenerator();

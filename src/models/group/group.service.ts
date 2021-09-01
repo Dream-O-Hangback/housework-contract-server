@@ -26,6 +26,9 @@ export class GroupService {
     updateItemManagerPermissionActive({ id, managerPermissionActive }) {
         return this.groupRepository.update({ id }, { managerPermissionActive });
     }
+    updateItemHouseworkOptions({ id, skipLimit }) {
+        return this.groupRepository.update({ id }, { skipLimit });
+    }
     updateItemActive({ id, active, lastInactivateReason }) {
         const updateQuery: UpdateItemActiveQuery = { active };
         if (!active) {
