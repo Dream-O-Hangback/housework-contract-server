@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, PrimaryGeneratedColumn, Entity, ManyToOne, JoinColumn } from 'typeorm';
+import { Column, CreateDateColumn, PrimaryGeneratedColumn, Entity, ManyToOne, JoinColumn, UpdateDateColumn } from 'typeorm';
 import Group from '@models/group/entities';
 import { DefaultAward } from '@models/default/entities';
 
@@ -32,6 +32,9 @@ export default class Award {
 
     @Column({ default: false, name: 'include_content' })
     includeContent: boolean;
+
+    @UpdateDateColumn({ name: 'update_data' })
+    updateDate: Date;
 
     @CreateDateColumn({ name: 'create_date' })
     createDate: Date;

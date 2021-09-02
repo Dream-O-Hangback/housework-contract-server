@@ -1,4 +1,9 @@
 export enum StartDayType {
-    Sunday,
-    Monday,
+    Sun,
+    Mon,
+    Tue,
+    Wed,
+    Thur,
+    Fri,
+    Sat
 }

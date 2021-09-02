@@ -18,13 +18,14 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { JwtStrategyGuard } from '@auth/guards/jwt.guard';
 import { successMessageGenerator } from '@common/lib';
 import { failMessage, ShareMethodType } from '@common/constants';
-import { AlternativePaymentService } from '@models/alternativePayment/alternativePayment.service';
 import GroupMember from '@models/groupMember/entities';
 import { GroupService } from './group.service';
 import { GroupMemberService } from '../groupMember/groupMember.service';
+import { AlternativePaymentService } from '../alternativePayment/alternativePayment.service';
+import { AwardService } from '../award/award.service';
 import { HouseworkService } from '../housework/housework.service';
-import { RoutineService } from '../routine/routine.service';
 import { RuleService } from '../rule/rule.service';
+import { RoutineService } from '../routine/routine.service';
 import {
     GroupDto,
     GroupUpdateDto,
@@ -32,6 +33,7 @@ import {
     GroupMemberUpdateDto,
     AlternativePaymentDto,
     AlternativePaymentUpdateDto,
+    AwardDto,
     ListQuery,
     AlternativePaymentIdParams,
     IdParams,
@@ -54,6 +56,7 @@ export class GroupController {
         private groupService: GroupService,
         private groupMemberService: GroupMemberService,
         private alternativePaymentService: AlternativePaymentService,
+        private awardService: AwardService,
         private houseworkService: HouseworkService,
         private routineService: RoutineService,
         private ruleService: RuleService,
@@ -61,6 +64,7 @@ export class GroupController {
         this.groupService = groupService;
         this.groupMemberService = groupMemberService;
         this.alternativePaymentService = alternativePaymentService;
+        this.awardService = awardService;
         this.houseworkService = houseworkService;
         this.routineService = routineService;
         this.ruleService = ruleService
@@ -674,6 +678,37 @@ export class GroupController {
             }
 
             await this.alternativePaymentService.deleteItem({ groupId, id });
+
+            return successMessageGenerator();
+        } catch (err) {
+            console.log(err);
+            if (err instanceof HttpException) {
+                throw err;
+            }
+            
+            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @UseGuards(JwtStrategyGuard)
+    @Post('/groups/:id/award')
+    async CreateGroupAward(@Param() params: IdParams, @Body() awardData: AwardDto, @Request() req) {
+        try {
+            const { id: userId } = req.user;
+            const { id: groupId } = params;
+            const { type, title, description, defaultAwardId, includeContent } = awardData;
+
+            const group = await this.groupService.getItem({ id: groupId });
+            if (!group) {
+                throw new HttpException(failMessage.ERR_GROUP_NOT_FOUND, HttpStatus.NOT_FOUND);
+            }
+
+            const groupMember = await this.groupMemberService.getItemByAccountId({ groupId, accountId: userId });
+            if (!groupMember) {
+                throw new HttpException(failMessage.ERR_GROUP_MEMBER_NOT_FOUND, HttpStatus.NOT_FOUND);
+            }
+
+            await this.awardService.createItem({ groupId, type, title, description, defaultAwardId, includeContent });
 
             return successMessageGenerator();
         } catch (err) {
