@@ -1,5 +1,5 @@
 import { AwardType } from '@common/constants';
-import { IsString, IsNotEmpty, IsNumber, IsOptional, IsUUID, IsIn, IsBoolean } from 'class-validator';
+import { IsString, IsNotEmpty, IsNumber, IsOptional, IsIn, IsBoolean } from 'class-validator';
 
 export class AwardDto {
     @IsNotEmpty()
@@ -16,15 +16,14 @@ export class AwardDto {
     readonly description: string;
 
     @IsOptional()
-    @IsString()
-    @IsUUID()
-    readonly defaultAwardId: string;
+    @IsNumber()
+    readonly defaultAwardId: number;
 
     @IsNotEmpty()
     @IsBoolean()
     readonly includeContent: boolean;
 
-    constructor(type: string, title: string, description: string, defaultAwardId: string, includeContent: boolean) {
+    constructor(type: string, title: string, description: string, defaultAwardId: number, includeContent: boolean) {
         this.type = type;
         this.title = title;
         this.description = description;
