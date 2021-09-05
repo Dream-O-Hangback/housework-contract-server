@@ -2,6 +2,7 @@ export * from './alternativePayment.dto';
 export * from './alternativePaymentId.params';
 export * from './alternativePaymentUpdate.dto';
 export * from './award.dto';
+export * from './awardId.params';
 export * from './booleanUpdate.dto';
 export * from './group.dto';
 export * from './groupActiveUpdate.dto';
