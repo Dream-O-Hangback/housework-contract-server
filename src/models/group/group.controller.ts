@@ -36,6 +36,7 @@ import {
     AlternativePaymentUpdateDto,
     AwardDto,
     AwardIdParams,
+    AwardUpdateDto,
     ListQuery,
     IdParams,
     BooleanUpdateDto,
@@ -742,6 +743,37 @@ export class GroupController {
             const result = await this.awardService.getList({ groupId });
 
             return successMessageGenerator(result);
+        } catch (err) {
+            console.log(err);
+            if (err instanceof HttpException) {
+                throw err;
+            }
+            
+            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @UseGuards(JwtStrategyGuard)
+    @Patch('/groups/:groupid/award/:id')
+    async UpdateGroupAward(@Param() params: AwardIdParams, @Body() awardUpdateData: AwardUpdateDto, @Request() req) {
+        try {
+            const { id: userId } = req.user;
+            const { groupid: groupId, id } = params;
+            const { type, title, description, defaultAwardId, includeContent } = awardUpdateData;
+
+            const group = await this.groupService.getItem({ id: groupId });
+            if (!group) {
+                throw new HttpException(failMessage.ERR_GROUP_NOT_FOUND, HttpStatus.NOT_FOUND);
+            }
+
+            const groupMember = await this.groupMemberService.getItemByAccountId({ groupId, accountId: userId });
+            if (!groupMember) {
+                throw new HttpException(failMessage.ERR_GROUP_MEMBER_NOT_FOUND, HttpStatus.NOT_FOUND);
+            }
+
+            await this.awardService.updateItem({ groupId, id, type, title, description, defaultAwardId, includeContent });
+
+            return successMessageGenerator();
         } catch (err) {
             console.log(err);
             if (err instanceof HttpException) {
