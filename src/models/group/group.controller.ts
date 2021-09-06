@@ -1009,7 +1009,7 @@ export class GroupController {
         try {
             const { id: userId } = req.user;
             const { id: groupId } = params;
-            const { title, description, deployCount, frequency } = houseworkData;
+            const { type, title, description, deployCount, frequency } = houseworkData;
 
             const group = await this.groupService.getItem({ id: groupId });
             if (!group) {
@@ -1021,7 +1021,7 @@ export class GroupController {
                 throw new HttpException(failMessage.ERR_GROUP_MEMBER_NOT_FOUND, HttpStatus.NOT_FOUND);
             }
 
-            await this.houseworkService.createItem({ groupId, title, description, deployCount, frequency });
+            await this.houseworkService.createItem({ groupId, type, title, description, deployCount, frequency });
 
             return successMessageGenerator();
         } catch (err) {
@@ -1070,7 +1070,7 @@ export class GroupController {
         try {
             const { id: userId } = req.user;
             const { groupid: groupId, id } = params;
-            const { title, description, deployCount, frequency } = houseworkUpdateData;
+            const { type, title, description, deployCount, frequency } = houseworkUpdateData;
 
             const group = await this.groupService.getItem({ id: groupId });
             if (!group) {
@@ -1082,7 +1082,7 @@ export class GroupController {
                 throw new HttpException(failMessage.ERR_GROUP_MEMBER_NOT_FOUND, HttpStatus.NOT_FOUND);
             }
 
-            await this.houseworkService.updateItem({ groupId, id, title, description, deployCount, frequency });
+            await this.houseworkService.updateItem({ groupId, id, type, title, description, deployCount, frequency });
 
             return successMessageGenerator();
         } catch (err) {

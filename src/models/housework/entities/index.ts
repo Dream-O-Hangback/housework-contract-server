@@ -13,6 +13,9 @@ export default class Housework {
     @Column({ name: 'group_id', nullable: true })
     groupId: string;
 
+    @Column({ type: 'varchar', length: 30 })
+    type: string;
+
     @Column({ type: 'varchar', length: 40 })
     title: string;
 

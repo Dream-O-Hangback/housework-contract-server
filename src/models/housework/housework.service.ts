@@ -10,11 +10,11 @@ export class HouseworkService {
     ) {
         this.houseworkRepository = houseworkRepository;
     }
-    createItem({ groupId, title, description, deployCount, frequency }) {
-        return this.houseworkRepository.save({ groupId, title, description, deployCount, frequency });
+    createItem({ groupId, type, title, description, deployCount, frequency }) {
+        return this.houseworkRepository.save({ groupId, type, title, description, deployCount, frequency });
     }
-    updateItem({ groupId, id, title, description, deployCount, frequency }) {
-        return this.houseworkRepository.update({ groupId, id }, { title, description, deployCount, frequency });
+    updateItem({ groupId, id, type, title, description, deployCount, frequency }) {
+        return this.houseworkRepository.update({ groupId, id }, { type, title, description, deployCount, frequency });
     }
     deleteItem({ groupId, id }) {
         return this.houseworkRepository.update({ groupId, id }, { active: false });
