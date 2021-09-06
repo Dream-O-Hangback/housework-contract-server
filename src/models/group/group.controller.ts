@@ -36,6 +36,7 @@ import {
     AlternativePaymentUpdateDto,
     AwardDto,
     AwardIdParams,
+    AwardOptionUpdateDto,
     AwardUpdateDto,
     ListQuery,
     IdParams,
@@ -293,6 +294,65 @@ export class GroupController {
                 }
             } else {
                 await this.routineService.createItem({ groupId, startDay, shareMethod });
+            }
+
+            return successMessageGenerator();
+        } catch (err) {
+            console.log(err);
+            if (err instanceof HttpException) {
+                throw err;
+            }
+            
+            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @UseGuards(JwtStrategyGuard)
+    @Patch('/groups/:id/options/award')
+    async UpdateGroupAwardOptions(@Param() params: IdParams, @Body() awardOptionUpdateData: AwardOptionUpdateDto, @Request() req) {
+        try {
+            // TODO: permission 처리
+            const { id: userId } = req.user;
+            const { id: groupId } = params;
+            const {
+                alternativePaymentActive,
+                paymentActive,
+                awardStandard,
+                penaltyStandard,
+                awardMoney,
+                penaltyMoney,
+                paymentComboActive,
+                awardPaymentCombo,
+                penaltyPaymentCombo,
+                awardPaymentComboStart,
+                penaltyPaymentComboStart,
+                awardPaymentComboLimit,
+                penaltyPaymentComboLimit,
+            } = awardOptionUpdateData;
+
+            const groupMember = await this.groupMemberService.getInfoByAccountId({ groupId, accountId: userId });
+            if (!groupMember) {
+                throw new HttpException(failMessage.ERR_GROUP_MEMBER_NOT_FOUND, HttpStatus.NOT_FOUND);
+            }
+
+            const groupUpdateResult = await this.groupService.updateItemAwardOptions({
+                id: groupId,
+                alternativePaymentActive,
+                paymentActive,
+                awardStandard,
+                penaltyStandard,
+                awardMoney,
+                penaltyMoney,
+                paymentComboActive,
+                awardPaymentCombo,
+                penaltyPaymentCombo,
+                awardPaymentComboStart,
+                penaltyPaymentComboStart,
+                awardPaymentComboLimit,
+                penaltyPaymentComboLimit,
+            });
+            if (groupUpdateResult.affected === 0) {
+                throw new HttpException(failMessage.ERR_GROUP_NOT_FOUND, HttpStatus.NOT_FOUND);
             }
 
             return successMessageGenerator();
