@@ -9,13 +9,13 @@ import { JwtStrategyGuard } from '@auth/guards/jwt.guard';
 import { successMessageGenerator } from '@common/lib';
 import { HouseworkType, failMessage } from '@common/constants';
 
-@Controller()
+@Controller('/housework')
 @UseGuards(JwtStrategyGuard)
 export class HouseworkController {
     constructor() {}
 
     @UseGuards(JwtStrategyGuard)
-    @Get('/housework/types')
+    @Get('/types')
     async GetHouseworkType() {
         try {
             return successMessageGenerator(HouseworkType);

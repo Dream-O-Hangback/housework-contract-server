@@ -17,7 +17,7 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { JwtStrategyGuard } from '@auth/guards/jwt.guard';
 import { successMessageGenerator } from '@common/lib';
-import { failMessage, ShareMethodType } from '@common/constants';
+import { failMessage } from '@common/constants';
 import GroupMember from '@models/groupMember/entities';
 import { GroupService } from './group.service';
 import { GroupMemberService } from '../groupMember/groupMember.service';
@@ -52,7 +52,7 @@ import {
 } from './dto';
 import { RedefinedGroupMemberInfo } from './interfaces';
 
-@Controller()
+@Controller('/groups')
 @UseGuards(JwtStrategyGuard)
 export class GroupController {
     constructor(
@@ -74,7 +74,7 @@ export class GroupController {
     }
 
     @UseGuards(JwtStrategyGuard)
-    @Post('/group')
+    @Post('/')
     async CreateGroup(@Request() req, @Body() groupData: GroupDto) {
         try {
             const { id } = req.user;
@@ -107,7 +107,7 @@ export class GroupController {
     }
 
     @UseGuards(JwtStrategyGuard)
-    @Get('/groups/me')
+    @Get('/me')
     async GetMyGroupList(@Request() req, @Query() listData: ListQuery) {
         try {
             const { id } = req.user;
@@ -130,7 +130,7 @@ export class GroupController {
     }
 
     @UseGuards(JwtStrategyGuard)
-    @Get('/groups/:id')
+    @Get('/:id')
     async GetGroupInfo(@Param() params: IdParams, @Request() req) {
         try {
             const { id: userId } = req.user;
@@ -165,7 +165,7 @@ export class GroupController {
     }
 
     @UseGuards(JwtStrategyGuard)
-    @Patch('/groups/:id')
+    @Patch('/:id')
     async UpdateGroupInfo(@Param() params: IdParams, @Body() groupUpdateData: GroupUpdateDto) {
         try {
             // TODO: permission 처리
@@ -208,7 +208,7 @@ export class GroupController {
     }
 
     @UseGuards(JwtStrategyGuard)
-    @Patch('/groups/:id/active')
+    @Patch('/:id/active')
     async UpdateGroupLogo(@Param() params: IdParams, @Body() groupActiveUpdateData: GroupActiveUpdateDto) {
         try {
             // TODO: permission 처리
@@ -233,7 +233,7 @@ export class GroupController {
     }
 
     @UseGuards(JwtStrategyGuard)
-    @Patch('/groups/:id/manager-permission')
+    @Patch('/:id/manager-permission')
     async UpdateGroupManagerPermissionActive(@Param() params: IdParams, @Body() groupManagerPermisssionUpdateData: BooleanUpdateDto, @Request() req) {
         try {
             // TODO: permission 처리
@@ -263,7 +263,7 @@ export class GroupController {
     }
 
     @UseGuards(JwtStrategyGuard)
-    @Patch('/groups/:id/options/housework')
+    @Patch('/:id/options/housework')
     async UpdateGroupHouseworkOptions(@Param() params: IdParams, @Body() houseworkOptionUpdateData: HouseworkOptionUpdateDto, @Request() req) {
         try {
             // TODO: permission 처리
@@ -308,7 +308,7 @@ export class GroupController {
     }
 
     @UseGuards(JwtStrategyGuard)
-    @Patch('/groups/:id/options/award')
+    @Patch('/:id/options/award')
     async UpdateGroupAwardOptions(@Param() params: IdParams, @Body() awardOptionUpdateData: AwardOptionUpdateDto, @Request() req) {
         try {
             // TODO: permission 처리
@@ -368,7 +368,7 @@ export class GroupController {
 
     @UseGuards(JwtStrategyGuard)
     @UseInterceptors(FileInterceptor('files'))
-    @Post('/groups/:id/logo/upload')
+    @Post('/:id/logo/upload')
     async UpdateGroupLogoImage(@Param() params: IdParams, @Request() req) {
         try {
             const { id: userId } = req.user;
@@ -401,7 +401,7 @@ export class GroupController {
     }
 
     @UseGuards(JwtStrategyGuard)
-    @Delete('/groups/:id/logo/reset')
+    @Delete('/:id/logo/reset')
     async ResetGroupLogoImage(@Param() params: IdParams, @Request() req) {
         try {
             const { id: userId } = req.user;
@@ -429,7 +429,7 @@ export class GroupController {
     }
 
     @UseGuards(JwtStrategyGuard)
-    @Get('/groups/:id/me')
+    @Get('/:id/me')
     async GetMyGroupMemberInfo(@Param() params: IdParams, @Request() req) {
         try {
             const { id: userId } = req.user;
@@ -473,7 +473,7 @@ export class GroupController {
     }
 
     @UseGuards(JwtStrategyGuard)
-    @Patch('/groups/:id/me')
+    @Patch('/:id/me')
     async UpdateMyGroupMemberInfo(@Param() params: IdParams, @Body() groupMemberUpdatedata: GroupMemberUpdateDto, @Request() req) {
         try {
             const { id: userId } = req.user;
@@ -508,7 +508,7 @@ export class GroupController {
     }
 
     @UseGuards(JwtStrategyGuard)
-    @Delete('/groups/:id/me')
+    @Delete('/:id/me')
     async DeleteMyGroupMember(@Param() params: IdParams, @Request() req) {
         try {
             // TODO: housework log 처리
@@ -542,7 +542,7 @@ export class GroupController {
     }
 
     @UseGuards(JwtStrategyGuard)
-    @Patch('/groups/:id/me/active')
+    @Patch('/:id/me/active')
     async UpdateMyGroupMemberActive(@Param() params: IdParams, @Body() booleanUpdatedata: BooleanUpdateDto, @Request() req) {
         try {
             const { id: userId } = req.user;
@@ -571,7 +571,7 @@ export class GroupController {
     }
 
     @UseGuards(JwtStrategyGuard)
-    @Patch('/groups/:id/me/nickname')
+    @Patch('/:id/me/nickname')
     async UpdateMyGroupMemberNickname(@Param() params: IdParams, @Body() nicknameData: NicknameDto, @Request() req) {
         try {
             const { id: userId } = req.user;
@@ -600,7 +600,7 @@ export class GroupController {
     }
 
     @UseGuards(JwtStrategyGuard)
-    @Post('/groups/:id/nickname/exists')
+    @Post('/:id/nickname/exists')
     async CheckNicknameDuplication(@Param() params: IdParams, @Body() nicknameData: NicknameDto) {
         try {
             const { id: groupId } = params;
@@ -628,7 +628,7 @@ export class GroupController {
     }
 
     @UseGuards(JwtStrategyGuard)
-    @Post('/groups/:id/alternative-payment')
+    @Post('/:id/alternative-payments')
     async CreateGroupAlternativePayment(@Param() params: IdParams, @Body() alternativePaymentData: AlternativePaymentDto, @Request() req) {
         try {
             const { id: userId } = req.user;
@@ -659,7 +659,7 @@ export class GroupController {
     }
 
     @UseGuards(JwtStrategyGuard)
-    @Get('/groups/:id/alternative-payment')
+    @Get('/:id/alternative-payments')
     async GetGroupAlternativePaymentList(@Param() params: IdParams, @Request() req) {
         try {
             const { id: userId } = req.user;
@@ -689,7 +689,7 @@ export class GroupController {
     }
 
     @UseGuards(JwtStrategyGuard)
-    @Patch('/groups/:groupid/alternative-payment/:id')
+    @Patch('/:groupid/alternative-payments/:id')
     async UpdateGroupAlternativePayment(@Param() params: AlternativePaymentIdParams, @Body() alternativePaymentUpdateData: AlternativePaymentUpdateDto, @Request() req) {
         try {
             const { id: userId } = req.user;
@@ -723,7 +723,7 @@ export class GroupController {
     }
 
     @UseGuards(JwtStrategyGuard)
-    @Delete('/groups/:groupid/alternative-payment/:id')
+    @Delete('/:groupid/alternative-payments/:id')
     async DeleteGroupAlternativePayment(@Param() params: AlternativePaymentIdParams, @Request() req) {
         try {
             const { id: userId } = req.user;
@@ -753,7 +753,7 @@ export class GroupController {
     }
 
     @UseGuards(JwtStrategyGuard)
-    @Post('/groups/:id/award')
+    @Post('/:id/awards')
     async CreateGroupAward(@Param() params: IdParams, @Body() awardData: AwardDto, @Request() req) {
         try {
             const { id: userId } = req.user;
@@ -784,7 +784,7 @@ export class GroupController {
     }
 
     @UseGuards(JwtStrategyGuard)
-    @Get('/groups/:id/award')
+    @Get('/:id/awards')
     async GetGroupAwardList(@Param() params: IdParams, @Request() req) {
         try {
             const { id: userId } = req.user;
@@ -814,7 +814,7 @@ export class GroupController {
     }
 
     @UseGuards(JwtStrategyGuard)
-    @Patch('/groups/:groupid/award/:id')
+    @Patch('/:groupid/awards/:id')
     async UpdateGroupAward(@Param() params: AwardIdParams, @Body() awardUpdateData: AwardUpdateDto, @Request() req) {
         try {
             const { id: userId } = req.user;
@@ -845,7 +845,7 @@ export class GroupController {
     }
 
     @UseGuards(JwtStrategyGuard)
-    @Delete('/groups/:groupid/award/:id')
+    @Delete('/:groupid/awards/:id')
     async DeleteGroupAward(@Param() params: AwardIdParams, @Request() req) {
         try {
             const { id: userId } = req.user;
@@ -875,7 +875,7 @@ export class GroupController {
     }
 
     @UseGuards(JwtStrategyGuard)
-    @Post('/groups/:id/rules')
+    @Post('/:id/rules')
     async CreateGroupRule(@Param() params: IdParams, @Body() ruleData: RuleDto, @Request() req) {
         try {
             const { id: userId } = req.user;
@@ -910,7 +910,7 @@ export class GroupController {
     }
 
     @UseGuards(JwtStrategyGuard)
-    @Get('/groups/:id/rules')
+    @Get('/:id/rules')
     async GetGroupRuleList(@Param() params: IdParams, @Request() req) {
         try {
             const { id: userId } = req.user;
@@ -940,7 +940,7 @@ export class GroupController {
     }
 
     @UseGuards(JwtStrategyGuard)
-    @Patch('/groups/:groupid/rules/:id')
+    @Patch('/:groupid/rules/:id')
     async UpdateGroupRule(@Param() params: RuleIdParams, @Body() ruleUpdateData: RuleUpdateDto, @Request() req) {
         try {
             const { id: userId } = req.user;
@@ -974,7 +974,7 @@ export class GroupController {
     }
 
     @UseGuards(JwtStrategyGuard)
-    @Delete('/groups/:groupid/rules/:id')
+    @Delete('/:groupid/rules/:id')
     async DeleteGroupRule(@Param() params: RuleIdParams, @Request() req) {
         try {
             const { id: userId } = req.user;
@@ -1004,7 +1004,7 @@ export class GroupController {
     }
 
     @UseGuards(JwtStrategyGuard)
-    @Post('/groups/:id/housework')
+    @Post('/:id/housework')
     async CreateGroupHousework(@Param() params: IdParams, @Body() houseworkData: HouseworkDto, @Request() req) {
         try {
             const { id: userId } = req.user;
@@ -1035,7 +1035,7 @@ export class GroupController {
     }
 
     @UseGuards(JwtStrategyGuard)
-    @Get('/groups/:id/housework')
+    @Get('/:id/housework')
     async GetGroupHouseworkList(@Param() params: IdParams, @Request() req) {
         try {
             const { id: userId } = req.user;
@@ -1065,7 +1065,7 @@ export class GroupController {
     }
 
     @UseGuards(JwtStrategyGuard)
-    @Patch('/groups/:groupid/housework/:id')
+    @Patch('/:groupid/housework/:id')
     async UpdateGroupHousework(@Param() params: HouseworkIdParams, @Body() houseworkUpdateData: HouseworkUpdateDto, @Request() req) {
         try {
             const { id: userId } = req.user;
@@ -1096,7 +1096,7 @@ export class GroupController {
     }
 
     @UseGuards(JwtStrategyGuard)
-    @Delete('/groups/:groupid/housework/:id')
+    @Delete('/:groupid/housework/:id')
     async DeleteGroupHouseworkList(@Param() params: HouseworkIdParams, @Request() req) {
         try {
             const { id: userId } = req.user;
