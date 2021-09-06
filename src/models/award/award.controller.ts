@@ -9,12 +9,11 @@ import { JwtStrategyGuard } from '@auth/guards/jwt.guard';
 import { successMessageGenerator } from '@common/lib';
 import { AwardType, failMessage } from '@common/constants';
 
-@Controller('/awards')
+@Controller('awards')
 @UseGuards(JwtStrategyGuard)
 export class AwardController {
     constructor() {}
 
-    @UseGuards(JwtStrategyGuard)
     @Get('/types')
     async GetAwardType() {
         try {

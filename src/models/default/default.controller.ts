@@ -3,7 +3,6 @@ import {
     Get,
     HttpException,
     HttpStatus,
-    HttpCode,
     UseGuards,
 } from '@nestjs/common';
 import { JwtStrategyGuard } from '@auth/guards/jwt.guard';

@@ -7,7 +7,6 @@ import {
     HttpStatus,
     UseGuards,
     Request,
-    HttpCode,
 } from '@nestjs/common';
 import { successMessageGenerator } from '@common/lib';
 import { failMessage } from '@common/constants';
