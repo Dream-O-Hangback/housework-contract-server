@@ -37,6 +37,9 @@ export class RoutineService {
     getFullChargeItem({ groupId, groupMemberId, houseworkId }) {
         return this.routineFullChargeRepository.findOne({ groupId, groupMemberId, houseworkId });
     }
+    updateFullChargeItem({ groupId, id, endDate }) {
+        return this.routineFullChargeRepository.update({ groupId, id }, { endDate });
+    }
     createRotationItem({ groupId, groupMemberId, houseworkId, cycle }) {
         return this.routineRotationRepository.save({ groupId, groupMemberId, houseworkId, cycle });
     }

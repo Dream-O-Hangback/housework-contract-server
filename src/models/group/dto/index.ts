@@ -18,6 +18,7 @@ export * from './id.params';
 export * from './list.query';
 export * from './nickname.dto';
 export * from './routineFullCharge.dto';
+export * from './routineFullChargeId.params';
 export * from './rule.dto';
 export * from './ruleId.params';
 export * from './ruleUpdate.dto';
