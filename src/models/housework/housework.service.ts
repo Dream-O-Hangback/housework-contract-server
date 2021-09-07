@@ -30,4 +30,7 @@ export class HouseworkService {
     getCount({ groupId }) {
         return this.houseworkRepository.count({ groupId, active: true });
     }
+    getItem({ groupId, id }) {
+        return this.houseworkRepository.findOne({ groupId, id });
+    }
 }

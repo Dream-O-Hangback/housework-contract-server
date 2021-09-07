@@ -63,7 +63,7 @@ export class RoutineFullCharge {
     @Column({ name: 'start_date' })
     startDate: Date;
 
-    @Column({ name: 'end_date' })
+    @Column({ name: 'end_date', nullable: true })
     endDate: Date;
 
     @CreateDateColumn({ name: 'create_date' })

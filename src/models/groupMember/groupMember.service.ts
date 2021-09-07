@@ -53,6 +53,9 @@ export class GroupMemberService {
             .leftJoin('gm.selectAward', 'a')
             .getOne();
     }
+    getItem({ groupId, id }) {
+        return this.groupMemberRepository.findOne({ groupId, id });
+    }
     getItemByAccountId({ groupId, accountId }) {
         return this.groupMemberRepository.findOne({ groupId, accountId });
     }

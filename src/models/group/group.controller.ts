@@ -16,7 +16,7 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { JwtStrategyGuard } from '@auth/guards/jwt.guard';
 import { successMessageGenerator } from '@common/lib';
-import { failMessage } from '@common/constants';
+import { failMessage, ShareMethodType } from '@common/constants';
 import GroupMember from '@models/groupMember/entities';
 import { GroupService } from './group.service';
 import { GroupMemberService } from '../groupMember/groupMember.service';
@@ -45,6 +45,7 @@ import {
     HouseworkIdParams,
     HouseworkOptionUpdateDto,
     HouseworkUpdateDto,
+    RoutineFullChargeDto,
     RuleDto,
     RuleIdParams,
     RuleUpdateDto,
@@ -837,6 +838,60 @@ export class GroupController {
             }
 
             await this.awardService.deleteItem({ groupId, id });
+
+            return successMessageGenerator();
+        } catch (err) {
+            console.log(err);
+            if (err instanceof HttpException) {
+                throw err;
+            }
+            
+            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Post('/:id/routines/full-charge')
+    async CreateGroupRoutineFullCharge(@Param() params: IdParams, @Body() routineFullChargeData: RoutineFullChargeDto, @Request() req) {
+        try {
+            const { id: userId } = req.user;
+            const { id: groupId } = params;
+            const { groupMemberId, houseworkId } = routineFullChargeData;
+
+            const group = await this.groupService.getItem({ id: groupId });
+            if (!group) {
+                throw new HttpException(failMessage.ERR_GROUP_NOT_FOUND, HttpStatus.NOT_FOUND);
+            }
+
+            const groupMember = await this.groupMemberService.getItemByAccountId({ groupId, accountId: userId });
+            if (!groupMember) {
+                throw new HttpException(failMessage.ERR_GROUP_MEMBER_NOT_FOUND, HttpStatus.NOT_FOUND);
+            }
+
+            const doesExistGroupMember = await this.groupMemberService.getItem({ groupId, id: groupMemberId });
+            if (!doesExistGroupMember) {
+                throw new HttpException(failMessage.ERR_GROUP_MEMBER_NOT_FOUND, HttpStatus.NOT_FOUND);
+            }
+
+            const doesExistHousework = await this.houseworkService.getItem({ groupId, id: houseworkId });
+            if (!doesExistHousework) {
+                throw new HttpException(failMessage.ERR_HOUSEWORK_NOT_FOUND, HttpStatus.NOT_FOUND);
+            }
+
+            const doesExistRoutineFullCharge = await this.routineService.getFullChargeItem({ groupId, groupMemberId, houseworkId });
+            if (doesExistRoutineFullCharge) {
+                throw new HttpException(failMessage.ERR_ALREADY_CREATED, HttpStatus.CONFLICT);
+            }
+
+            const routine = await this.routineService.getItem({ groupId });
+
+            const startDate = new Date();
+            const diff = routine.startDay - startDate.getDay();
+            startDate.setDate(startDate.getDate() + (7 - Math.abs(diff)));
+            startDate.setHours(0);
+            startDate.setMinutes(0);
+            startDate.setSeconds(0);
+
+            await this.routineService.createFullChargeItem({ groupId, groupMemberId, houseworkId, startDate });
 
             return successMessageGenerator();
         } catch (err) {
