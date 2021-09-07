@@ -40,6 +40,9 @@ export class RoutineService {
     updateFullChargeItem({ groupId, id, endDate }) {
         return this.routineFullChargeRepository.update({ groupId, id }, { endDate });
     }
+    deleteFullChargeItem({ groupId, id }) {
+        return this.routineFullChargeRepository.delete({ groupId, id });
+    }
     createRotationItem({ groupId, groupMemberId, houseworkId, cycle }) {
         return this.routineRotationRepository.save({ groupId, groupMemberId, houseworkId, cycle });
     }
