@@ -18,7 +18,7 @@ export class RoutineService {
         return this.routineRepository.save({ groupId, startDay, shareMethod });
     }
     getItem({ groupId }) {
-        return this.routineRepository.findOne( groupId );
+        return this.routineRepository.findOne({ groupId });
     }
     updateItem({ groupId, startDay, shareMethod, startDayLastValue, shareMethodLastValue }) {
         return this.routineRepository.update({ groupId }, { startDay, shareMethod, startDayLastValue, shareMethodLastValue });

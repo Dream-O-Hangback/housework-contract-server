@@ -46,6 +46,7 @@ import {
     HouseworkOptionUpdateDto,
     HouseworkUpdateDto,
     RoutineFullChargeDto,
+    RoutineFullChargeIdParams,
     RuleDto,
     RuleIdParams,
     RuleUpdateDto,
@@ -883,15 +884,11 @@ export class GroupController {
             }
 
             const routine = await this.routineService.getItem({ groupId });
+            if (!routine) {
+                throw new HttpException(failMessage.ERR_ROUTINE_NOT_FOUND, HttpStatus.NOT_FOUND);
+            }
 
-            const startDate = new Date();
-            const diff = routine.startDay - startDate.getDay();
-            startDate.setDate(startDate.getDate() + (7 - Math.abs(diff)));
-            startDate.setHours(0);
-            startDate.setMinutes(0);
-            startDate.setSeconds(0);
-
-            await this.routineService.createFullChargeItem({ groupId, groupMemberId, houseworkId, startDate });
+            await this.routineService.createFullChargeItem({ groupId, groupMemberId, houseworkId, startDate: new Date() });
 
             return successMessageGenerator();
         } catch (err) {
