@@ -32,25 +32,20 @@ import {
     GroupActiveUpdateDto,
     GroupMemberUpdateDto,
     AlternativePaymentDto,
-    AlternativePaymentIdParams,
     AlternativePaymentUpdateDto,
     AwardDto,
-    AwardIdParams,
     AwardOptionUpdateDto,
     AwardUpdateDto,
     ListQuery,
     IdParams,
+    SpecificIdParams,
     BooleanUpdateDto,
     NicknameDto,
     HouseworkDto,
-    HouseworkIdParams,
     HouseworkOptionUpdateDto,
     HouseworkUpdateDto,
     RoutineFullChargeDto,
-    RoutineFullChargeIdParams,
     RuleDto,
-    RuleReportCancelIdParams,
-    RuleIdParams,
     RuleLogDto,
     RuleUpdateDto,
 } from './dto';
@@ -677,7 +672,7 @@ export class GroupController {
     }
 
     @Patch('/:groupid/alternative-payments/:id')
-    async UpdateGroupAlternativePayment(@Param() params: AlternativePaymentIdParams, @Body() alternativePaymentUpdateData: AlternativePaymentUpdateDto, @Request() req) {
+    async UpdateGroupAlternativePayment(@Param() params: SpecificIdParams, @Body() alternativePaymentUpdateData: AlternativePaymentUpdateDto, @Request() req) {
         try {
             const { id: userId } = req.user;
             const { groupid: groupId, id } = params;
@@ -710,7 +705,7 @@ export class GroupController {
     }
 
     @Delete('/:groupid/alternative-payments/:id')
-    async DeleteGroupAlternativePayment(@Param() params: AlternativePaymentIdParams, @Request() req) {
+    async DeleteGroupAlternativePayment(@Param() params: SpecificIdParams, @Request() req) {
         try {
             const { id: userId } = req.user;
             const { groupid: groupId, id } = params;
@@ -798,7 +793,7 @@ export class GroupController {
     }
 
     @Patch('/:groupid/awards/:id')
-    async UpdateGroupAward(@Param() params: AwardIdParams, @Body() awardUpdateData: AwardUpdateDto, @Request() req) {
+    async UpdateGroupAward(@Param() params: SpecificIdParams, @Body() awardUpdateData: AwardUpdateDto, @Request() req) {
         try {
             const { id: userId } = req.user;
             const { groupid: groupId, id } = params;
@@ -828,7 +823,7 @@ export class GroupController {
     }
 
     @Delete('/:groupid/awards/:id')
-    async DeleteGroupAward(@Param() params: AwardIdParams, @Request() req) {
+    async DeleteGroupAward(@Param() params: SpecificIdParams, @Request() req) {
         try {
             const { id: userId } = req.user;
             const { groupid: groupId, id } = params;
@@ -936,7 +931,7 @@ export class GroupController {
     }
 
     @Patch('/:groupid/routines/full-charge/:id/complete')
-    async UpdateGroupRoutineFullChargeComplete(@Param() params: RoutineFullChargeIdParams, @Request() req) {
+    async UpdateGroupRoutineFullChargeComplete(@Param() params: SpecificIdParams, @Request() req) {
         try {
             const { id: userId } = req.user;
             const { groupid: groupId, id } = params;
@@ -965,7 +960,7 @@ export class GroupController {
     }
 
     @Delete('/:groupid/routines/full-charge/:id')
-    async DeleteGroupRoutineFullCharge(@Param() params: RoutineFullChargeIdParams, @Request() req) {
+    async DeleteGroupRoutineFullCharge(@Param() params: SpecificIdParams, @Request() req) {
         try {
             const { id: userId } = req.user;
             const { groupid: groupId, id } = params;
@@ -1060,7 +1055,7 @@ export class GroupController {
     }
 
     @Patch('/:groupid/rules/:id')
-    async UpdateGroupRule(@Param() params: RuleIdParams, @Body() ruleUpdateData: RuleUpdateDto, @Request() req) {
+    async UpdateGroupRule(@Param() params: SpecificIdParams, @Body() ruleUpdateData: RuleUpdateDto, @Request() req) {
         try {
             const { id: userId } = req.user;
             const { groupid: groupId, id } = params;
@@ -1093,7 +1088,7 @@ export class GroupController {
     }
 
     @Delete('/:groupid/rules/:id')
-    async DeleteGroupRule(@Param() params: RuleIdParams, @Request() req) {
+    async DeleteGroupRule(@Param() params: SpecificIdParams, @Request() req) {
         try {
             const { id: userId } = req.user;
             const { groupid: groupId, id } = params;
@@ -1165,7 +1160,7 @@ export class GroupController {
     }
 
     @Delete('/:groupid/rules/report/:id')
-    async CancelReport(@Param() params: RuleReportCancelIdParams, @Request() req) {
+    async CancelReport(@Param() params: SpecificIdParams, @Request() req) {
         try {
             const { id: userId } = req.user;
             const { groupid: groupId, id: reportId } = params;
@@ -1314,7 +1309,7 @@ export class GroupController {
     }
 
     @Patch('/:groupid/housework/:id')
-    async UpdateGroupHousework(@Param() params: HouseworkIdParams, @Body() houseworkUpdateData: HouseworkUpdateDto, @Request() req) {
+    async UpdateGroupHousework(@Param() params: SpecificIdParams, @Body() houseworkUpdateData: HouseworkUpdateDto, @Request() req) {
         try {
             const { id: userId } = req.user;
             const { groupid: groupId, id } = params;
@@ -1344,7 +1339,7 @@ export class GroupController {
     }
 
     @Delete('/:groupid/housework/:id')
-    async DeleteGroupHouseworkList(@Param() params: HouseworkIdParams, @Request() req) {
+    async DeleteGroupHouseworkList(@Param() params: SpecificIdParams, @Request() req) {
         try {
             const { id: userId } = req.user;
             const { groupid: groupId, id } = params;

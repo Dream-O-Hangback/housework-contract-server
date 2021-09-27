@@ -1,6 +1,6 @@
 import { IsString, IsNotEmpty, IsUUID } from 'class-validator';
 
-export class RoutineFullChargeIdParams {
+export class SpecificIdParams {
     @IsNotEmpty()
     @IsString()
     @IsUUID()
