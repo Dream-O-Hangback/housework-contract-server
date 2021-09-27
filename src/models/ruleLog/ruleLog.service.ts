@@ -13,6 +13,9 @@ export class RuleLogService {
     createItem({ groupId, ruleId, targetId, accuserId, reason }) {
         return this.ruleLogRepository.save({ groupId, ruleId, targetId, accuserId, reason });
     }
+    cancelItem({ id, accuserId }) {
+        return this.ruleLogRepository.update({ id, accuserId }, { isCancel: true });
+    }
     getList({ groupId }) {
         return this.ruleLogRepository
             .createQueryBuilder('rlog')
@@ -39,5 +42,8 @@ export class RuleLogService {
             .leftJoin('rlog.accuser', 'accuser')
             .orderBy('rlog.createDate', 'DESC')
             .getMany();
+    }
+    getItem({ id, accuserId }) {
+        return this.ruleLogRepository.findOne({ id, accuserId });
     }
 }

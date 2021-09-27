@@ -49,6 +49,7 @@ import {
     RoutineFullChargeDto,
     RoutineFullChargeIdParams,
     RuleDto,
+    RuleReportCancelIdParams,
     RuleIdParams,
     RuleLogDto,
     RuleUpdateDto,
@@ -1146,9 +1147,43 @@ export class GroupController {
                 throw new HttpException(failMessage.ERR_RULE_NOT_FOUND, HttpStatus.NOT_FOUND);
             }
 
+            // TODO: confirmation
+
             const result = await this.ruleLogService.createItem({ groupId, ruleId, targetId, accuserId: groupMember.id, reason });
 
             return successMessageGenerator(result);
+        } catch (err) {
+            console.log(err);
+            if (err instanceof HttpException) {
+                throw err;
+            }
+            
+            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Delete('/:groupid/rules/report/:id')
+    async CancelReport(@Param() params: RuleReportCancelIdParams, @Request() req) {
+        try {
+            const { id: userId } = req.user;
+            const { groupid: groupId, id: reportId } = params;
+
+            const group = await this.groupService.getItem({ id: groupId });
+            if (!group) {
+                throw new HttpException(failMessage.ERR_GROUP_NOT_FOUND, HttpStatus.NOT_FOUND);
+            }
+
+            const groupMember = await this.groupMemberService.getItemByAccountId({ groupId, accountId: userId });
+            if (!groupMember) {
+                throw new HttpException(failMessage.ERR_GROUP_MEMBER_NOT_FOUND, HttpStatus.NOT_FOUND);
+            }
+
+            const result = await this.ruleLogService.cancelItem({ id: reportId, accuserId: groupMember.id })
+            if (result.affected === 0) {
+                throw new HttpException(failMessage.ERR_REPORT_NOT_FOUND, HttpStatus.NOT_FOUND);
+            }
+
+            return successMessageGenerator();
         } catch (err) {
             console.log(err);
             if (err instanceof HttpException) {

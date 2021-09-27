@@ -60,6 +60,11 @@ export const ERR_GROUP_MEMBER_NOT_FOUND: FailMessageType = {
     description: '...'
 }
 
+export const ERR_REPORT_NOT_FOUND: FailMessageType = {
+    errorCode: 'REPORT_NOT_FOUND',
+    description: '...'
+}
+
 export const ERR_ROUTINE_NOT_FOUND: FailMessageType = {
     errorCode: 'ROUTINE_NOT_FOUND',
     description: '...'

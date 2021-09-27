@@ -20,6 +20,7 @@ export * from './nickname.dto';
 export * from './routineFullCharge.dto';
 export * from './routineFullChargeId.params';
 export * from './rule.dto';
+export * from './ruleCancelReport.params';
 export * from './ruleId.params';
 export * from './ruleLog.dto';
 export * from './ruleUpdate.dto';
