@@ -27,4 +27,7 @@ export class RuleService {
 
         return { list, count };
     }
+    getItem({ id }) {
+        return this.ruleRepository.findOne({ id });
+    }
 }

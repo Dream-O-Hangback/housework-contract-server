@@ -65,6 +65,11 @@ export const ERR_ROUTINE_NOT_FOUND: FailMessageType = {
     description: '...'
 }
 
+export const ERR_RULE_NOT_FOUND: FailMessageType = {
+    errorCode: 'ERR_RULE_NOT_FOUND',
+    description: '...'
+}
+
 export const ERR_INTERVER_SERVER: FailMessageType = {
     errorCode: 'INTERVER_SERVER',
     description: '...'

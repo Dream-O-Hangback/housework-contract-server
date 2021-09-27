@@ -10,6 +10,9 @@ export class RuleLogService {
     ) {
         this.ruleLogRepository = ruleLogRepository;
     }
+    createItem({ groupId, ruleId, targetId, accuserId, reason }) {
+        return this.ruleLogRepository.save({ groupId, ruleId, targetId, accuserId, reason });
+    }
     getList({ groupId }) {
         return this.ruleLogRepository
             .createQueryBuilder('rlog')

@@ -14,4 +14,5 @@ export const ERR_HOUSEWORK_NOT_FOUND = failMessageTypeGenerator(failMessageType.
 export const ERR_GROUP_NOT_FOUND = failMessageTypeGenerator(failMessageType.ERR_GROUP_NOT_FOUND);
 export const ERR_GROUP_MEMBER_NOT_FOUND = failMessageTypeGenerator(failMessageType.ERR_GROUP_MEMBER_NOT_FOUND);
 export const ERR_ROUTINE_NOT_FOUND = failMessageTypeGenerator(failMessageType.ERR_ROUTINE_NOT_FOUND);
+export const ERR_RULE_NOT_FOUND = failMessageTypeGenerator(failMessageType.ERR_RULE_NOT_FOUND);
 export const ERR_INTERVER_SERVER = failMessageTypeGenerator(failMessageType.ERR_INTERVER_SERVER);
