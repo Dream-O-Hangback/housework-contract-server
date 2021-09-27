@@ -1249,6 +1249,40 @@ export class GroupController {
         }
     }
 
+    @Get('/:groupid/rules/progress/:id')
+    async GetGroupRuleProgressListOfGroupMember(@Param() params: SpecificIdParams, @Request() req) {
+        try {
+            const { id: userId } = req.user;
+            const { groupid: groupId, id: groupMemberId } = params;
+
+            const group = await this.groupService.getItem({ id: groupId });
+            if (!group) {
+                throw new HttpException(failMessage.ERR_GROUP_NOT_FOUND, HttpStatus.NOT_FOUND);
+            }
+
+            const me = await this.groupMemberService.getItemByAccountId({ groupId, accountId: userId });
+            if (!me) {
+                throw new HttpException(failMessage.ERR_GROUP_MEMBER_NOT_FOUND, HttpStatus.NOT_FOUND);
+            }
+
+            const groupMember = await this.groupMemberService.getItem({ groupId, id: groupMemberId });
+            if (!groupMember) {
+                throw new HttpException(failMessage.ERR_GROUP_MEMBER_NOT_FOUND, HttpStatus.NOT_FOUND);
+            }
+
+            const result = await this.ruleLogService.getListByGroupMemberId({ groupId, groupMemberId: groupMember.id });
+
+            return successMessageGenerator(result);
+        } catch (err) {
+            console.log(err);
+            if (err instanceof HttpException) {
+                throw err;
+            }
+            
+            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @Post('/:id/housework')
     async CreateGroupHousework(@Param() params: IdParams, @Body() houseworkData: HouseworkDto, @Request() req) {
         try {
