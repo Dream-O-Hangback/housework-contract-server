@@ -29,6 +29,7 @@ export class GroupMemberService {
             ])
             .where({ groupId })
             .leftJoin('gm.account', 'a')
+            .orderBy('gm.updateDate', 'DESC')
             .getMany();
     }
     getInfoByAccountId({ groupId, accountId }) {
@@ -51,6 +52,9 @@ export class GroupMemberService {
             .where({ groupId, accountId })
             .leftJoin('gm.selectAward', 'a')
             .getOne();
+    }
+    getItem({ groupId, id }) {
+        return this.groupMemberRepository.findOne({ groupId, id });
     }
     getItemByAccountId({ groupId, accountId }) {
         return this.groupMemberRepository.findOne({ groupId, accountId });
@@ -88,6 +92,7 @@ export class GroupMemberService {
             ])
             .where({ accountId })
             .leftJoin('gm.group', 'g')
+            .orderBy('gm.updateDate', 'DESC')
             .skip(skip)
             .take(take)
             .getManyAndCount();

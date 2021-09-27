@@ -2,12 +2,17 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { MulterModule } from '@nestjs/platform-express';
-import { AlternativePaymentModule } from '@models/alternativePayment/alternativePayment.module';
 import { FileModule } from '@providers/file.module';
 import { FileService } from '@providers/file.service';
+import { AlternativePaymentModule } from '@models/alternativePayment/alternativePayment.module';
+import { AwardModule } from '@models/award/award.module';
+import { GroupMemberModule } from '@models/groupMember/groupMember.module';
+import { HouseworkModule } from '@models/housework/housework.module';
+import { RoutineModule } from '@models/routine/routine.module';
+import { RuleModule } from '@models/rule/rule.module';
+import { RuleLogModule } from '@models/ruleLog/ruleLog.module';
 import { GroupController } from './group.controller';
 import { GroupService } from './group.service';
-import { GroupMemberModule } from '../groupMember/groupMember.module';
 import Group from './entities';
 
 @Module({
@@ -15,7 +20,12 @@ import Group from './entities';
         ConfigModule,
         TypeOrmModule.forFeature([Group]),
         AlternativePaymentModule,
+        AwardModule,
         GroupMemberModule,
+        HouseworkModule,
+        RoutineModule,
+        RuleModule,
+        RuleLogModule,
         FileModule,
         MulterModule.registerAsync({
             imports: [ConfigModule],

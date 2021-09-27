@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, PrimaryGeneratedColumn, Entity, ManyToOne, JoinColumn } from 'typeorm';
+import { Column, UpdateDateColumn, CreateDateColumn, PrimaryGeneratedColumn, Entity, ManyToOne, JoinColumn } from 'typeorm';
 import Group from '@models/group/entities';
 
 @Entity('alternative_payment')
@@ -22,6 +22,12 @@ export default class AlternativePayment {
     @Column({ type: 'varchar', length: 100, nullable: true })
     reason: string;
 
+    @UpdateDateColumn({ name: 'update_date' })
+    updateDate: Date;
+
     @CreateDateColumn({ name: 'create_date' })
     createDate: Date;
+
+    @Column({ default: true })
+    active: boolean;
 }
