@@ -1,9 +1,9 @@
-import { IsString, IsNotEmpty, Length } from 'class-validator';
+import { IsString, IsNotEmpty, IsUUID } from 'class-validator';
 
 export class IdParams {
     @IsNotEmpty()
     @IsString()
-    @Length(36, 36)
+    @IsUUID()
     readonly id: string;
 
     constructor(id: string) {
