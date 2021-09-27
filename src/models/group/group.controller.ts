@@ -998,6 +998,7 @@ export class GroupController {
     @Post('/:id/rules')
     async CreateGroupRule(@Param() params: IdParams, @Body() ruleData: RuleDto, @Request() req) {
         try {
+            // TODO max 10 rules
             const { id: userId } = req.user;
             const { id: groupId } = params;
             const { rules } = ruleData;
@@ -1123,6 +1124,7 @@ export class GroupController {
     @Post('/:id/rules/report')
     async ReportGroupRule(@Param() params: IdParams, @Body() ruleLogData: RuleLogDto, @Request() req) {
         try {
+            // TODO check not confirmed
             const { id: userId } = req.user;
             const { id: groupId } = params;
             const { ruleId, targetId, reason } = ruleLogData;
@@ -1210,7 +1212,36 @@ export class GroupController {
                 throw new HttpException(failMessage.ERR_GROUP_MEMBER_NOT_FOUND, HttpStatus.NOT_FOUND);
             }
 
-            const result = await this.ruleLogService.getList({ groupId });
+            const result = await this.ruleLogService.getListByGroupMemberId({ groupId, groupMemberId: groupMember.id });
+
+            return successMessageGenerator(result);
+        } catch (err) {
+            console.log(err);
+            if (err instanceof HttpException) {
+                throw err;
+            }
+            
+            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Get('/:id/rules/progress/me')
+    async GetMyGroupRuleProgressList(@Param() params: IdParams, @Request() req) {
+        try {
+            const { id: userId } = req.user;
+            const { id: groupId } = params;
+
+            const group = await this.groupService.getItem({ id: groupId });
+            if (!group) {
+                throw new HttpException(failMessage.ERR_GROUP_NOT_FOUND, HttpStatus.NOT_FOUND);
+            }
+
+            const groupMember = await this.groupMemberService.getItemByAccountId({ groupId, accountId: userId });
+            if (!groupMember) {
+                throw new HttpException(failMessage.ERR_GROUP_MEMBER_NOT_FOUND, HttpStatus.NOT_FOUND);
+            }
+
+            const result = await this.ruleLogService.getListByGroupMemberId({ groupId, groupMemberId: groupMember.id });
 
             return successMessageGenerator(result);
         } catch (err) {
