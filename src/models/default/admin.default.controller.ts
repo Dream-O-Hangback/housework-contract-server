@@ -24,7 +24,7 @@ export class DefaultAdminController {
     }
 
     @Post('/group/type')
-    async CreateGroupType(@Body() groupTypeData: TypeDto) {
+    async CreateDefaultGroupType(@Body() groupTypeData: TypeDto) {
         try {
             const { title, displayTitle } = groupTypeData;
 
@@ -42,7 +42,7 @@ export class DefaultAdminController {
     }
 
     @Post('/alternative-payment/type')
-    async CreateAlternativePaymentType(@Body() alternativePaymentTypeData: TypeDto) {
+    async CreateDefaultAlternativePaymentType(@Body() alternativePaymentTypeData: TypeDto) {
         try {
             const { title, displayTitle } = alternativePaymentTypeData;
 
@@ -60,7 +60,7 @@ export class DefaultAdminController {
     }
 
     @Post('/housework')
-    async CreateHousework(@Body() houseworkData: ContentDto) {
+    async CreateDefaultHousework(@Body() houseworkData: ContentDto) {
         try {
             const { type, title, description } = houseworkData;
 
@@ -78,7 +78,7 @@ export class DefaultAdminController {
     }
 
     @Post('/award')
-    async CreateAward(@Body() awardData: ContentDto) {
+    async CreateDefaultAward(@Body() awardData: ContentDto) {
         try {
             const { type, title, description } = awardData;
 
@@ -96,7 +96,7 @@ export class DefaultAdminController {
     }
 
     @Get('/group/types')
-    async GetAllGroupTypes() {
+    async GetAllDefaultGroupTypeList() {
         try {
             const list = await this.defaultService.getAllDefaultGroupTypes();
 
@@ -112,7 +112,7 @@ export class DefaultAdminController {
     }
 
     @Get('/alternative-payment/types')
-    async GetAllAlternativePaymentTypes() {
+    async GetAllDefaultAlternativePaymentTypeList() {
         try {
             const list = await this.defaultService.getAllDefaultAlternativePaymentTypes();
 
@@ -128,7 +128,7 @@ export class DefaultAdminController {
     }
 
     @Get('/housework')
-    async GetAllHousework() {
+    async GetAllDefaultHouseworkList() {
         try {
             const list = await this.defaultService.getAllDefaultHousework();
 
@@ -144,7 +144,7 @@ export class DefaultAdminController {
     }
 
     @Get('/awards')
-    async GetAllAwards() {
+    async GetAllDefaultAwardList() {
         try {
             const list = await this.defaultService.getAllDefaultAwards();
 
@@ -160,7 +160,7 @@ export class DefaultAdminController {
     }
 
     @Patch('/group/types/:id')
-    async UpdateGroupType(@Param() params: IdParams, @Body() groupTypeUpdateData: TypeDto) {
+    async UpdateDefaultGroupType(@Param() params: IdParams, @Body() groupTypeUpdateData: TypeDto) {
         try {
             const { id } = params;
             const { title, displayTitle } = groupTypeUpdateData;
@@ -179,7 +179,7 @@ export class DefaultAdminController {
     }
 
     @Patch('/alternative-payment/types/:id')
-    async UpdateAlternativePaymentType(@Param() params: IdParams, @Body() alternativePaymentTypeUpdateData: TypeDto) {
+    async UpdateDefaultAlternativePaymentType(@Param() params: IdParams, @Body() alternativePaymentTypeUpdateData: TypeDto) {
         try {
             const { id } = params;
             const { title, displayTitle } = alternativePaymentTypeUpdateData;
@@ -198,7 +198,7 @@ export class DefaultAdminController {
     }
 
     @Patch('/housework/:id')
-    async UpdateHousework(@Param() params: IdParams, @Body() houseworkUpdateData: ContentDto) {
+    async UpdateDefaultHousework(@Param() params: IdParams, @Body() houseworkUpdateData: ContentDto) {
         try {
             const { id } = params;
             const { type, title, description } = houseworkUpdateData;
@@ -217,7 +217,7 @@ export class DefaultAdminController {
     }
 
     @Patch('/awards/:id')
-    async UpdateAward(@Param() params: IdParams, @Body() awardUpdateData: ContentDto) {
+    async UpdateDefaultAward(@Param() params: IdParams, @Body() awardUpdateData: ContentDto) {
         try {
             const { id } = params;
             const { type, title, description } = awardUpdateData;
@@ -236,7 +236,7 @@ export class DefaultAdminController {
     }
 
     @Delete('/group/types/:id')
-    async DeleteGroupType(@Param() params: IdParams) {
+    async DeleteDefaultGroupType(@Param() params: IdParams) {
         try {
             const { id } = params;
             
@@ -254,7 +254,7 @@ export class DefaultAdminController {
     }
 
     @Delete('/alternative-payment/types/:id')
-    async DeleteAlternativePaymentType(@Param() params: IdParams) {
+    async DeleteDefaultAlternativePaymentType(@Param() params: IdParams) {
         try {
             const { id } = params;
 
@@ -272,7 +272,7 @@ export class DefaultAdminController {
     }
 
     @Delete('/housework/:id')
-    async DeleteHousework(@Param() params: IdParams) {
+    async DeleteDefaultHousework(@Param() params: IdParams) {
         try {
             const { id } = params;
 
@@ -290,7 +290,7 @@ export class DefaultAdminController {
     }
 
     @Delete('/awards/:id')
-    async DeleteAward(@Param() params: IdParams) {
+    async DeleteDefaultAward(@Param() params: IdParams) {
         try {
             const { id } = params;
 

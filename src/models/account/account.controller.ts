@@ -45,7 +45,7 @@ export class AccountController {
 
     @UseGuards(JwtStrategyGuard)
     @Get('/')
-    async GetAccountList(@Query() searchData: SearchQuery) {
+    async GetList(@Query() searchData: SearchQuery) {
         try {
             let { offset, limit } = searchData;
             const { search_word: searchWord } = searchData;
@@ -68,7 +68,7 @@ export class AccountController {
 
     @UseGuards(JwtStrategyGuard)
     @Get('/me')
-    async GetMyAccountInfo(@Request() req) {
+    async GetMyInformation(@Request() req) {
         try {
             const { id } = req.user;
 
@@ -86,13 +86,13 @@ export class AccountController {
     }
 
     @Post('/password/reset')
-    async SendResetPassword(@Body() emailData: EmailDto) {
+    async SendResetPasswordEmail(@Body() emailData: EmailDto) {
         try {
             const { email } = emailData;
 
             const doesExistAccount = await this.accountService.getItemByEmail({ email });
             if (!doesExistAccount) {
-                throw new HttpException(failMessage.ERR_NOT_FOUND, HttpStatus.NOT_FOUND);
+                throw new HttpException(failMessage.ERR_ACCOUNT_NOT_FOUND, HttpStatus.NOT_FOUND);
             }
 
             this.mailService.sendResetPassword(email).catch(err => console.log(err));
@@ -115,7 +115,7 @@ export class AccountController {
 
             const account = await this.accountService.getItemByEmail({ email });
             if (!account) { // TODO: redirect to not found page
-                throw new HttpException(failMessage.ERR_NOT_FOUND, HttpStatus.NOT_FOUND);
+                throw new HttpException(failMessage.ERR_ACCOUNT_NOT_FOUND, HttpStatus.NOT_FOUND);
             }
 
             const { id } = account;
@@ -165,7 +165,7 @@ export class AccountController {
 
     @UseGuards(JwtStrategyGuard)
     @Delete('/me/profile')
-    async DeleteMyProfileImage(@Request() req) {
+    async ResetMyProfileImage(@Request() req) {
         try {
             const { id } = req.user;
 
@@ -183,8 +183,28 @@ export class AccountController {
     }
 
     @UseGuards(JwtStrategyGuard)
+    @Patch('/me/profile')
+    async UpdateMyProfile(@Request() req, @Body() profileUpdateData: ProfileUpdateDto) {
+        try {
+            const { id } = req.user;
+            const { profile } = profileUpdateData;
+
+            await this.accountService.updateItemProfile({ id, profile });
+
+            return successMessageGenerator();
+        } catch (err) {
+            console.log(err);
+            if (err instanceof HttpException) {
+                throw err;
+            }
+            
+            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @UseGuards(JwtStrategyGuard)
     @Patch('/me/nickname')
-    async UpdateMyAccountNickname(@Request() req, @Body() nicknameUpdateData: NicknameUpdateDto) {
+    async UpdateMyNickname(@Request() req, @Body() nicknameUpdateData: NicknameUpdateDto) {
         try {
             const { id } = req.user;
             const { nickname } = nicknameUpdateData;
@@ -208,28 +228,8 @@ export class AccountController {
     }
 
     @UseGuards(JwtStrategyGuard)
-    @Patch('/me/profile')
-    async UpdateMyAccountProfile(@Request() req, @Body() profileUpdateData: ProfileUpdateDto) {
-        try {
-            const { id } = req.user;
-            const { profile } = profileUpdateData;
-
-            await this.accountService.updateItemProfile({ id, profile });
-
-            return successMessageGenerator();
-        } catch (err) {
-            console.log(err);
-            if (err instanceof HttpException) {
-                throw err;
-            }
-            
-            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    @UseGuards(JwtStrategyGuard)
     @Patch('/me/password')
-    async UpdateMyAccountPassword(@Request() req, @Body() passwordUpdateData: PasswordUpdateDto) {
+    async UpdateMyPassword(@Request() req, @Body() passwordUpdateData: PasswordUpdateDto) {
         try {
             const { id } = req.user;
             const { oldPassword, newPassword } = passwordUpdateData;
@@ -299,7 +299,7 @@ export class AccountController {
 
             const doesExistAccount = await this.accountService.getItemByEmail({ email });
             if (!doesExistAccount) { // TODO: redirect to not found page
-                throw new HttpException(failMessage.ERR_NOT_FOUND, HttpStatus.NOT_FOUND);
+                throw new HttpException(failMessage.ERR_ACCOUNT_NOT_FOUND, HttpStatus.NOT_FOUND);
             }
 
             await this.accountService.updateItemEmailOpenByEmail({ email, value: false });
@@ -339,7 +339,7 @@ export class AccountController {
 
     @UseGuards(JwtStrategyGuard)
     @Delete('/me')
-    async DeleteMyAccount(@Request() req) {
+    async Withdraw(@Request() req) {
         try {
             const { id } = req.user;
 

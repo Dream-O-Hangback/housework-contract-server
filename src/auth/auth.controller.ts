@@ -32,7 +32,7 @@ export class AuthController {
     }
 
     @Post('/sign-up')
-    async signUp(@Body() accountData: AccountDto) {
+    async SignUp(@Body() accountData: AccountDto) {
         try {
             const { email } = accountData;
 
@@ -60,8 +60,8 @@ export class AuthController {
     }
 
     @UseGuards(LocalStrategyGuard)
-    @Post('/login')
-    async login(@Request() req) {
+    @Post('/sign-in')
+    async SignIn(@Request() req) {
         try {
             if (!req.user) {
                 throw new HttpException(failMessage.ERR_NOT_VERIFIED, HttpStatus.CONFLICT);
@@ -79,10 +79,11 @@ export class AuthController {
     }
 
     @UseGuards(JwtStrategyGuard)
-    @Post('/logout')
-    async logout(@Request() req) {
+    @Post('/sign-out')
+    async SignOut(@Request() req) {
         try {
             await this.authService.resetRefreshToken(req.user)
+            
             return successMessageGenerator();
         } catch (err) {
             console.log(err);
@@ -95,18 +96,24 @@ export class AuthController {
     }
 
     @Post('/refresh-token')
-    async reissueToken(@Headers('authorization') accessToken: string) {
+    async ReissueAccessToken(@Headers('authorization') accessToken: string) {
         try {
             let payload = undefined;
 
             try {
-                if (!accessToken) throw new Error();
+                if (!accessToken) {
+                    throw new HttpException(undefined, HttpStatus.UNAUTHORIZED);
+                }
 
                 payload = this.authService.verifyAccessToken(accessToken.replace('Bearer ', ''));
-                if (!payload || !payload.id) throw new Error();
+                if (!payload || !payload.id) {
+                    throw new HttpException(undefined, HttpStatus.UNAUTHORIZED);
+                }
 
                 const account = await this.accountService.getActiveItem({ id: payload.id });
-                if (!account) throw new Error();
+                if (!account) {
+                    throw new HttpException(undefined, HttpStatus.UNAUTHORIZED);
+                }
             } catch (err) {
                 console.log(err);
                 throw new HttpException(undefined, HttpStatus.UNAUTHORIZED);
@@ -123,14 +130,14 @@ export class AuthController {
         }
     }
 
-    @Post('/email-code')
-    async sendEmailCode(@Body() emailData: EmailDto): Promise<object> {
+    @Post('/code')
+    async SendCertificationCodeEmail(@Body() emailData: EmailDto) {
         try {
             const { email } = emailData;
 
             const account = await this.accountService.getItemByEmail({ email });
             if (!account) {
-                throw new HttpException(failMessage.ERR_NOT_FOUND, HttpStatus.NOT_FOUND);
+                throw new HttpException(failMessage.ERR_ACCOUNT_NOT_FOUND, HttpStatus.NOT_FOUND);
             }
 
             const { id: accountId } = account;
@@ -151,8 +158,8 @@ export class AuthController {
         }
     }
 
-    @Post('/email-verify')
-    async verifyEmailCode(@Body() codeDto: CodeDto): Promise<object> {
+    @Post('/code-verify')
+    async VerifyCerficationCode(@Body() codeDto: CodeDto) {
         try {
             const certificationCode = await this.certificationCodeService.getItem(codeDto);
             if (!certificationCode) {
@@ -163,7 +170,7 @@ export class AuthController {
 
             const result = await this.accountService.updateItemActive({ id: accountId });
             if (result.affected === 0) {
-                throw new HttpException(failMessage.ERR_NOT_FOUND, HttpStatus.NOT_FOUND);
+                throw new HttpException(failMessage.ERR_ACCOUNT_NOT_FOUND, HttpStatus.NOT_FOUND);
             }
 
             return successMessageGenerator(); 
@@ -178,9 +185,11 @@ export class AuthController {
     }
 
     @Post('/email/exists')
-    async CheckEmailDuplication(@Body() emailDto: EmailDto): Promise<object> {
+    async CheckEmailDuplication(@Body() emailDto: EmailDto) {
         try {
-            const isDuplicated = !!(await this.accountService.getItemByEmail(emailDto));
+            const { email } = emailDto;
+
+            const isDuplicated = !!(await this.accountService.getItemByEmail({ email }));
             if (isDuplicated) {
                 throw new HttpException(failMessage.ERR_ALREADY_EXISTS, HttpStatus.CONFLICT);
             }

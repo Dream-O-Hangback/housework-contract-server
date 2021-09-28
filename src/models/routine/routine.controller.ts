@@ -15,7 +15,7 @@ export class RoutineController {
     constructor() {}
 
     @Get('/share-method/types')
-    async GetAwardType() {
+    async GetRoutineShareMethodType() {
         try {
             return successMessageGenerator(ShareMethodType);
         } catch (err) {
