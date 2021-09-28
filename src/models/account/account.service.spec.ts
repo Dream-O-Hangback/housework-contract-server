@@ -124,6 +124,7 @@ describe('AccountService', () => {
             select: ['id', 'email', 'name', 'nickname', 'profileImageUrl', 'profile'],
             skip: offset * limit,
             take: limit,
+            order: { createDate: -1 },
         });
     });
 
