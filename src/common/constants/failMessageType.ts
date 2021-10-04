@@ -40,6 +40,12 @@ export const ERR_NOT_FOUND: FailMessageType = {
     description: '...'
 }
 
+export const ERR_NOT_HAVE_PERMISSION: FailMessageType = {
+
+    errorCode: 'NOT_HAVE_PERMISSION',
+    description: '...'
+}
+
 export const ERR_ACCOUNT_NOT_FOUND: FailMessageType = {
     errorCode: 'ACCOUNT_NOT_FOUND',
     description: '...'

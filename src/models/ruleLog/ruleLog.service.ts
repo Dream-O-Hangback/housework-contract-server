@@ -43,8 +43,8 @@ export class RuleLogService {
             .orderBy('rlog.createDate', 'DESC')
             .getMany();
     }
-    getListByGroupMemberId({ groupId, groupMemberId }) {
-        return this.ruleLogRepository
+    async getListByGroupMemberId({ groupId, groupMemberId }, { skip, take }) {
+        const [list, count] = await this.ruleLogRepository
             .createQueryBuilder('rlog')
             .select([
                 'rlog.id',
@@ -64,11 +64,15 @@ export class RuleLogService {
                 // 'accuser.profileImageUrl',
             ])
             .where(`rlog.groupId = :groupId AND (rlog.targetId = :targetId OR rlog.accuserId = :accuserId)`, { groupId, targetId: groupMemberId, accuserId: groupMemberId })
+            .skip(skip)
+            .take(take)
             .leftJoin('rlog.rule', 'rule')
             .leftJoin('rlog.target', 'target')
             .leftJoin('rlog.accuser', 'accuser')
             .orderBy('rlog.createDate', 'DESC')
-            .getMany();
+            .getManyAndCount();
+        
+        return { list, count };
     }
     getItem({ id, accuserId }) {
         return this.ruleLogRepository.findOne({ id, accuserId });

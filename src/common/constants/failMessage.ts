@@ -9,6 +9,7 @@ export const ERR_ALREADY_EXISTS_GROUP_MEMBER = failMessageTypeGenerator(failMess
 export const ERR_ALREADY_CREATED = failMessageTypeGenerator(failMessageType.ERR_ALREADY_CREATED);
 export const ERR_MANAGER_CANNOT_WITHDRAW = failMessageTypeGenerator(failMessageType.ERR_MANAGER_CANNOT_WITHDRAW);
 export const ERR_NOT_FOUND = failMessageTypeGenerator(failMessageType.ERR_NOT_FOUND);
+export const ERR_NOT_HAVE_PERMISSION = failMessageTypeGenerator(failMessageType.ERR_NOT_HAVE_PERMISSION);
 export const ERR_ACCOUNT_NOT_FOUND = failMessageTypeGenerator(failMessageType.ERR_ACCOUNT_NOT_FOUND)
 export const ERR_AWARD_NOT_FOUND = failMessageTypeGenerator(failMessageType.ERR_AWARD_NOT_FOUND);
 export const ERR_HOUSEWORK_NOT_FOUND = failMessageTypeGenerator(failMessageType.ERR_HOUSEWORK_NOT_FOUND);

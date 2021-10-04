@@ -26,10 +26,12 @@ export class RoutineService {
     createFullChargeItem({ groupId, groupMemberId, houseworkId, startDate }) {
         return this.routineFullChargeRepository.save({ groupId, groupMemberId, houseworkId, startDate });
     }
-    async getFullChargeList({ groupId }) {
-        const [list, count] = await this.routineFullChargeRepository.findAndCount({
+    async getFullChargeList({ groupId }, { skip, take }) {
+        const [list, count] = await this.routineFullChargeRepository.findAndCount({ // TODO: join 처리
             where: { groupId },
-            order: { createDate: -1 }
+            order: { createDate: -1 },
+            skip,
+            take
         });
 
         return { list, count };

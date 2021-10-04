@@ -19,15 +19,15 @@ export class RuleService {
     deleteItem({ groupId, id }) {
         return this.ruleRepository.update({ groupId, id }, { active: false });
     }
-    async getList({ groupId }) {
-        const [list, count] = await this.ruleRepository.findAndCount({
-            where: { groupId, active: true },
-            order: { updateDate: -1 }
-        });
+    async getList({ groupId }, { skip, take, all }) {
+        const where: { groupId: string, active?: boolean } = { groupId };
+        if (all === true) where.active = true
+
+        const [list, count] = await this.ruleRepository.findAndCount({ where, order: { updateDate: -1 }, skip, take });
 
         return { list, count };
     }
     getItem({ id }) {
-        return this.ruleRepository.findOne({ id });
+        return this.ruleRepository.findOne({ id, isConfirm: true, active: true });
     }
 }

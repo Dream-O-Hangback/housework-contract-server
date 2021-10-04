@@ -68,10 +68,13 @@ export class GroupMemberService {
     updateItemActive({ accountId, groupId, value }) {
         return this.groupMemberRepository.update({ accountId, groupId }, { active: value, updateDate: new Date() });
     }
+    updateItemIsManager({ groupId, id, isManager }) {
+        return this.groupMemberRepository.update({ groupId, id }, { isManager });
+    }
     updateItemNickname({ accountId, groupId, nickname }) {
         return this.groupMemberRepository.update({ accountId, groupId }, { nickname, updateDate: new Date() });
     }
-    async getMyGroups({ accountId, skip, take }) {
+    async getMyGroupList({ accountId}, { skip, take }) {
         const [list, count] = await this.groupMemberRepository
             .createQueryBuilder('gm')
             .select([
