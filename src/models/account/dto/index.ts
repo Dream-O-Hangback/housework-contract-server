@@ -4,5 +4,6 @@ export * from './email.query';
 export * from './nickname.dto';
 export * from './nicknameUpdate.dto';
 export * from './passwordUpdate.dto';
+export * from './passwordVerify.dto';
 export * from './profileUpdate.dto';
 export * from './search.query';

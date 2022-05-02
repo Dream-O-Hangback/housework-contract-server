@@ -86,7 +86,7 @@ export const ERR_RULE_NOT_FOUND: FailMessageType = {
     description: '...'
 }
 
-export const ERR_INTERVER_SERVER: FailMessageType = {
+export const ERR_INTERNAL_SERVER: FailMessageType = {
     errorCode: 'INTERVER_SERVER',
     description: '...'
 }

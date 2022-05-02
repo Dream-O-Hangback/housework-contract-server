@@ -4,6 +4,7 @@ export * from './award.dto';
 export * from './awardOptionUpdate.dto';
 export * from './awardUpdate.dto';
 export * from './booleanUpdate.dto';
+export * from './confirmation.dto';
 export * from './group.dto';
 export * from './groupActiveUpdate.dto';
 export * from './groupManagerUpdate.dto';

@@ -15,7 +15,10 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import * as bcrypt from 'bcrypt';
 import { JwtStrategyGuard } from '@auth/guards/jwt.guard';
-import { successMessageGenerator } from '@common/lib';
+import {
+    successMessageGenerator,
+    testPasswordRegex,
+} from '@common/lib';
 import { failMessage } from '@common/constants';
 import { MailService } from '@mails/mails.service';
 import { WithdrawService } from '@models/withdraw/withdraw.service';
@@ -27,6 +30,7 @@ import {
     NicknameDto,
     NicknameUpdateDto,
     PasswordUpdateDto,
+    PasswordVerifyDto,
     ProfileUpdateDto,
     SearchQuery,
 } from './dto';
@@ -62,7 +66,7 @@ export class AccountController {
                 throw err;
             }
             
-            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new HttpException(failMessage.ERR_INTERNAL_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -81,7 +85,32 @@ export class AccountController {
                 throw err;
             }
             
-            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new HttpException(failMessage.ERR_INTERNAL_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @UseGuards(JwtStrategyGuard)
+    @Post('/me/password/verify')
+    async VerifyPassword(@Request() req, @Body() passwordDto: PasswordVerifyDto) {
+        try {
+            const { id } = req.user;
+            const { password } = passwordDto;
+
+            const account = await this.accountService.getActiveItem({ id });
+            const isDuplicated = await bcrypt.compare(password, account.password);
+            const isValid = testPasswordRegex(password);
+            if (isDuplicated || !isValid) {
+                throw new HttpException(failMessage.ERR_NOT_VERIFIED, HttpStatus.CONFLICT);
+            }
+
+            return successMessageGenerator();
+        } catch (err) {
+            console.log(err);
+            if (err instanceof HttpException) {
+                throw err;
+            }
+            
+            throw new HttpException(failMessage.ERR_INTERNAL_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -104,7 +133,7 @@ export class AccountController {
                 throw err;
             }
             
-            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new HttpException(failMessage.ERR_INTERNAL_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -134,7 +163,7 @@ export class AccountController {
                 throw err;
             }
             
-            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new HttpException(failMessage.ERR_INTERNAL_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -159,7 +188,7 @@ export class AccountController {
                 throw err;
             }
             
-            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new HttpException(failMessage.ERR_INTERNAL_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -178,7 +207,7 @@ export class AccountController {
                 throw err;
             }
             
-            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new HttpException(failMessage.ERR_INTERNAL_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -198,7 +227,7 @@ export class AccountController {
                 throw err;
             }
             
-            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new HttpException(failMessage.ERR_INTERNAL_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -223,7 +252,7 @@ export class AccountController {
                 throw err;
             }
             
-            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new HttpException(failMessage.ERR_INTERNAL_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -235,7 +264,11 @@ export class AccountController {
             const { oldPassword, newPassword } = passwordUpdateData;
 
             const account = await this.accountService.getActiveItem({ id });
-            if (!(await bcrypt.compare(oldPassword, account.password))) {
+            const isCorrectOldPassword = await bcrypt.compare(oldPassword, account.password);
+            const isDuplicated = await bcrypt.compare(newPassword, account.password);
+            const isValid = testPasswordRegex(newPassword);
+
+            if (!isCorrectOldPassword || isDuplicated || !isValid) {
                 throw new HttpException(failMessage.ERR_NOT_VERIFIED, HttpStatus.CONFLICT);
             }
 
@@ -248,7 +281,7 @@ export class AccountController {
                 throw err;
             }
             
-            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new HttpException(failMessage.ERR_INTERNAL_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -268,7 +301,7 @@ export class AccountController {
                 throw err;
             }
             
-            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new HttpException(failMessage.ERR_INTERNAL_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -288,7 +321,7 @@ export class AccountController {
                 throw err;
             }
             
-            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new HttpException(failMessage.ERR_INTERNAL_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -312,7 +345,7 @@ export class AccountController {
                 throw err;
             }
             
-            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new HttpException(failMessage.ERR_INTERNAL_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -333,7 +366,7 @@ export class AccountController {
                 throw err;
             }
             
-            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new HttpException(failMessage.ERR_INTERNAL_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -356,7 +389,7 @@ export class AccountController {
                 throw err;
             }
             
-            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new HttpException(failMessage.ERR_INTERNAL_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }
