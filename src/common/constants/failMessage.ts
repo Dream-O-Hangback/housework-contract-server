@@ -13,6 +13,7 @@ export const ERR_NOT_HAVE_PERMISSION = failMessageTypeGenerator(failMessageType.
 export const ERR_ACCOUNT_NOT_FOUND = failMessageTypeGenerator(failMessageType.ERR_ACCOUNT_NOT_FOUND)
 export const ERR_AWARD_NOT_FOUND = failMessageTypeGenerator(failMessageType.ERR_AWARD_NOT_FOUND);
 export const ERR_HOUSEWORK_NOT_FOUND = failMessageTypeGenerator(failMessageType.ERR_HOUSEWORK_NOT_FOUND);
+export const ERR_HOUSEWORK_PROGRESS_NOT_FOUND = failMessageTypeGenerator(failMessageType.ERR_HOUSEWORK_PROGRESS_NOT_FOUND);
 export const ERR_GROUP_NOT_FOUND = failMessageTypeGenerator(failMessageType.ERR_GROUP_NOT_FOUND);
 export const ERR_GROUP_MEMBER_NOT_FOUND = failMessageTypeGenerator(failMessageType.ERR_GROUP_MEMBER_NOT_FOUND);
 export const ERR_REPORT_NOT_FOUND = failMessageTypeGenerator(failMessageType.ERR_REPORT_NOT_FOUND);

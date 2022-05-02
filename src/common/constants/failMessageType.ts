@@ -61,6 +61,11 @@ export const ERR_HOUSEWORK_NOT_FOUND: FailMessageType = {
     description: '...'
 }
 
+export const ERR_HOUSEWORK_PROGRESS_NOT_FOUND: FailMessageType = {
+    errorCode: 'HOUSEWORK_PROGRESS_NOT_FOUND',
+    description: '...'
+}
+
 export const ERR_GROUP_NOT_FOUND: FailMessageType = {
     errorCode: 'GROUP_NOT_FOUND',
     description: '...'
