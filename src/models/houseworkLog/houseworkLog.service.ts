@@ -17,4 +17,10 @@ export class HouseworkLogService {
       { isComplete: true, completeTime: new Date() }
     );
   }
+  skipItem({ id, groupId, workerId }) {
+    return this.houseworkLogRepository.update(
+      { id, groupId, workerId },
+      { isSkip: true }
+    );
+  }
 }

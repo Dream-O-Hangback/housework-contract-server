@@ -83,12 +83,17 @@ export class HouseworkController {
     }
 
     @Patch('/groups/:id/housework/progress/skip')
-    SkipHouseworkProgress(@Request() req, @Param() params: ProgressIdParams) {
+    async SkipHouseworkProgress(@Request() req, @Param() params: ProgressIdParams) {
         try {
             const { id: workerId } = req.user;
             const { groupId, id: progressId } = params;
 
-            // TODO
+            // TODO skip limit
+
+            const result = await this.houseworkLogService.skipItem({ id: progressId, groupId, workerId });
+            if (result.affected === 0) {
+                throw new HttpException(failMessage.ERR_HOUSEWORK_PROGRESS_NOT_FOUND, HttpStatus.NOT_FOUND);
+            }
 
             return successMessageGenerator();
         } catch (err) {
