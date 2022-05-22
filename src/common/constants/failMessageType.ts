@@ -40,6 +40,17 @@ export const ERR_NOT_FOUND: FailMessageType = {
     description: '...'
 }
 
+export const ERR_NOT_HAVE_PERMISSION: FailMessageType = {
+
+    errorCode: 'NOT_HAVE_PERMISSION',
+    description: '...'
+}
+
+export const ERR_ACCOUNT_NOT_FOUND: FailMessageType = {
+    errorCode: 'ACCOUNT_NOT_FOUND',
+    description: '...'
+}
+
 export const ERR_AWARD_NOT_FOUND: FailMessageType = {
     errorCode: 'AWARD_NOT_FOUND',
     description: '...'
@@ -47,6 +58,11 @@ export const ERR_AWARD_NOT_FOUND: FailMessageType = {
 
 export const ERR_HOUSEWORK_NOT_FOUND: FailMessageType = {
     errorCode: 'HOUSEWORK_NOT_FOUND',
+    description: '...'
+}
+
+export const ERR_HOUSEWORK_PROGRESS_NOT_FOUND: FailMessageType = {
+    errorCode: 'HOUSEWORK_PROGRESS_NOT_FOUND',
     description: '...'
 }
 
@@ -75,7 +91,7 @@ export const ERR_RULE_NOT_FOUND: FailMessageType = {
     description: '...'
 }
 
-export const ERR_INTERVER_SERVER: FailMessageType = {
+export const ERR_INTERNAL_SERVER: FailMessageType = {
     errorCode: 'INTERVER_SERVER',
     description: '...'
 }

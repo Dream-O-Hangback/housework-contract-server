@@ -8,11 +8,11 @@ export class AccountDto {
 
     @IsNotEmpty()
     @IsString()
-    readonly name: string;
+    readonly password: string;
 
     @IsNotEmpty()
     @IsString()
-    readonly password: string;
+    readonly name: string;
 
     @IsNotEmpty()
     @IsString()
@@ -36,8 +36,8 @@ export class AccountDto {
 
     constructor(
         email: string,
-        name: string,
         password: string,
+        name: string,
         nickname: string,
         profile: string,
         type: string,
@@ -45,8 +45,8 @@ export class AccountDto {
         emailOpen: boolean,
     ) {
         this.email = email;
-        this.name = name;
         this.password = password;
+        this.name = name;
         this.nickname = nickname;
         this.profile = profile;
         this.type = type;

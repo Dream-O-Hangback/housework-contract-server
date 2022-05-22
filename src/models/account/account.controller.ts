@@ -15,7 +15,10 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import * as bcrypt from 'bcrypt';
 import { JwtStrategyGuard } from '@auth/guards/jwt.guard';
-import { successMessageGenerator } from '@common/lib';
+import {
+    successMessageGenerator,
+    testPasswordRegex,
+} from '@common/lib';
 import { failMessage } from '@common/constants';
 import { MailService } from '@mails/mails.service';
 import { WithdrawService } from '@models/withdraw/withdraw.service';
@@ -27,6 +30,7 @@ import {
     NicknameDto,
     NicknameUpdateDto,
     PasswordUpdateDto,
+    PasswordVerifyDto,
     ProfileUpdateDto,
     SearchQuery,
 } from './dto';
@@ -45,7 +49,7 @@ export class AccountController {
 
     @UseGuards(JwtStrategyGuard)
     @Get('/')
-    async GetAccountList(@Query() searchData: SearchQuery) {
+    async GetList(@Query() searchData: SearchQuery) {
         try {
             let { offset, limit } = searchData;
             const { search_word: searchWord } = searchData;
@@ -62,13 +66,13 @@ export class AccountController {
                 throw err;
             }
             
-            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new HttpException(failMessage.ERR_INTERNAL_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @UseGuards(JwtStrategyGuard)
     @Get('/me')
-    async GetMyAccountInfo(@Request() req) {
+    async GetMyInformation(@Request() req) {
         try {
             const { id } = req.user;
 
@@ -81,18 +85,43 @@ export class AccountController {
                 throw err;
             }
             
-            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new HttpException(failMessage.ERR_INTERNAL_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @UseGuards(JwtStrategyGuard)
+    @Post('/me/password/verify')
+    async VerifyPassword(@Request() req, @Body() passwordDto: PasswordVerifyDto) {
+        try {
+            const { id } = req.user;
+            const { password } = passwordDto;
+
+            const account = await this.accountService.getActiveItem({ id });
+            const isDuplicated = await bcrypt.compare(password, account.password);
+            const isValid = testPasswordRegex(password);
+            if (isDuplicated || !isValid) {
+                throw new HttpException(failMessage.ERR_NOT_VERIFIED, HttpStatus.CONFLICT);
+            }
+
+            return successMessageGenerator();
+        } catch (err) {
+            console.log(err);
+            if (err instanceof HttpException) {
+                throw err;
+            }
+            
+            throw new HttpException(failMessage.ERR_INTERNAL_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @Post('/password/reset')
-    async SendResetPassword(@Body() emailData: EmailDto) {
+    async SendResetPasswordEmail(@Body() emailData: EmailDto) {
         try {
             const { email } = emailData;
 
             const doesExistAccount = await this.accountService.getItemByEmail({ email });
             if (!doesExistAccount) {
-                throw new HttpException(failMessage.ERR_NOT_FOUND, HttpStatus.NOT_FOUND);
+                throw new HttpException(failMessage.ERR_ACCOUNT_NOT_FOUND, HttpStatus.NOT_FOUND);
             }
 
             this.mailService.sendResetPassword(email).catch(err => console.log(err));
@@ -104,7 +133,7 @@ export class AccountController {
                 throw err;
             }
             
-            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new HttpException(failMessage.ERR_INTERNAL_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -115,7 +144,7 @@ export class AccountController {
 
             const account = await this.accountService.getItemByEmail({ email });
             if (!account) { // TODO: redirect to not found page
-                throw new HttpException(failMessage.ERR_NOT_FOUND, HttpStatus.NOT_FOUND);
+                throw new HttpException(failMessage.ERR_ACCOUNT_NOT_FOUND, HttpStatus.NOT_FOUND);
             }
 
             const { id } = account;
@@ -134,7 +163,7 @@ export class AccountController {
                 throw err;
             }
             
-            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new HttpException(failMessage.ERR_INTERNAL_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -159,13 +188,13 @@ export class AccountController {
                 throw err;
             }
             
-            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new HttpException(failMessage.ERR_INTERNAL_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @UseGuards(JwtStrategyGuard)
     @Delete('/me/profile')
-    async DeleteMyProfileImage(@Request() req) {
+    async ResetMyProfileImage(@Request() req) {
         try {
             const { id } = req.user;
 
@@ -178,13 +207,33 @@ export class AccountController {
                 throw err;
             }
             
-            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new HttpException(failMessage.ERR_INTERNAL_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @UseGuards(JwtStrategyGuard)
+    @Patch('/me/profile')
+    async UpdateMyProfile(@Request() req, @Body() profileUpdateData: ProfileUpdateDto) {
+        try {
+            const { id } = req.user;
+            const { profile } = profileUpdateData;
+
+            await this.accountService.updateItemProfile({ id, profile });
+
+            return successMessageGenerator();
+        } catch (err) {
+            console.log(err);
+            if (err instanceof HttpException) {
+                throw err;
+            }
+            
+            throw new HttpException(failMessage.ERR_INTERNAL_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @UseGuards(JwtStrategyGuard)
     @Patch('/me/nickname')
-    async UpdateMyAccountNickname(@Request() req, @Body() nicknameUpdateData: NicknameUpdateDto) {
+    async UpdateMyNickname(@Request() req, @Body() nicknameUpdateData: NicknameUpdateDto) {
         try {
             const { id } = req.user;
             const { nickname } = nicknameUpdateData;
@@ -203,39 +252,23 @@ export class AccountController {
                 throw err;
             }
             
-            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    @UseGuards(JwtStrategyGuard)
-    @Patch('/me/profile')
-    async UpdateMyAccountProfile(@Request() req, @Body() profileUpdateData: ProfileUpdateDto) {
-        try {
-            const { id } = req.user;
-            const { profile } = profileUpdateData;
-
-            await this.accountService.updateItemProfile({ id, profile });
-
-            return successMessageGenerator();
-        } catch (err) {
-            console.log(err);
-            if (err instanceof HttpException) {
-                throw err;
-            }
-            
-            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new HttpException(failMessage.ERR_INTERNAL_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @UseGuards(JwtStrategyGuard)
     @Patch('/me/password')
-    async UpdateMyAccountPassword(@Request() req, @Body() passwordUpdateData: PasswordUpdateDto) {
+    async UpdateMyPassword(@Request() req, @Body() passwordUpdateData: PasswordUpdateDto) {
         try {
             const { id } = req.user;
             const { oldPassword, newPassword } = passwordUpdateData;
 
             const account = await this.accountService.getActiveItem({ id });
-            if (!(await bcrypt.compare(oldPassword, account.password))) {
+            const isCorrectOldPassword = await bcrypt.compare(oldPassword, account.password);
+            const isDuplicated = await bcrypt.compare(newPassword, account.password);
+            const isValid = testPasswordRegex(newPassword);
+
+            if (!isCorrectOldPassword || isDuplicated || !isValid) {
                 throw new HttpException(failMessage.ERR_NOT_VERIFIED, HttpStatus.CONFLICT);
             }
 
@@ -248,7 +281,7 @@ export class AccountController {
                 throw err;
             }
             
-            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new HttpException(failMessage.ERR_INTERNAL_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -268,7 +301,7 @@ export class AccountController {
                 throw err;
             }
             
-            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new HttpException(failMessage.ERR_INTERNAL_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -288,7 +321,7 @@ export class AccountController {
                 throw err;
             }
             
-            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new HttpException(failMessage.ERR_INTERNAL_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -299,7 +332,7 @@ export class AccountController {
 
             const doesExistAccount = await this.accountService.getItemByEmail({ email });
             if (!doesExistAccount) { // TODO: redirect to not found page
-                throw new HttpException(failMessage.ERR_NOT_FOUND, HttpStatus.NOT_FOUND);
+                throw new HttpException(failMessage.ERR_ACCOUNT_NOT_FOUND, HttpStatus.NOT_FOUND);
             }
 
             await this.accountService.updateItemEmailOpenByEmail({ email, value: false });
@@ -312,7 +345,7 @@ export class AccountController {
                 throw err;
             }
             
-            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new HttpException(failMessage.ERR_INTERNAL_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -333,13 +366,13 @@ export class AccountController {
                 throw err;
             }
             
-            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new HttpException(failMessage.ERR_INTERNAL_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @UseGuards(JwtStrategyGuard)
     @Delete('/me')
-    async DeleteMyAccount(@Request() req) {
+    async Withdraw(@Request() req) {
         try {
             const { id } = req.user;
 
@@ -356,7 +389,7 @@ export class AccountController {
                 throw err;
             }
             
-            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new HttpException(failMessage.ERR_INTERNAL_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }

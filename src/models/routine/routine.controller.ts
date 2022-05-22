@@ -15,7 +15,7 @@ export class RoutineController {
     constructor() {}
 
     @Get('/share-method/types')
-    async GetAwardType() {
+    async GetRoutineShareMethodType() {
         try {
             return successMessageGenerator(ShareMethodType);
         } catch (err) {
@@ -24,7 +24,7 @@ export class RoutineController {
                 throw err;
             }
             
-            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new HttpException(failMessage.ERR_INTERNAL_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }

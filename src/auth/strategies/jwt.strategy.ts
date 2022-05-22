@@ -21,7 +21,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         this.accountService = accountService;
     }
 
-    async validate(payload: any) {
+    async validate(payload: { id: string }) {
         const { id } = payload;
 
         const account = await this.accountService.getActiveItem({ id });

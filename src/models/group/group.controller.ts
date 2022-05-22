@@ -30,12 +30,14 @@ import {
     GroupDto,
     GroupUpdateDto,
     GroupActiveUpdateDto,
+    GroupManagerUpdateDto,
     GroupMemberUpdateDto,
     AlternativePaymentDto,
     AlternativePaymentUpdateDto,
     AwardDto,
     AwardOptionUpdateDto,
     AwardUpdateDto,
+    ConfirmationDto,
     ListQuery,
     IdParams,
     SpecificIdParams,
@@ -46,12 +48,14 @@ import {
     HouseworkUpdateDto,
     RoutineFullChargeDto,
     RuleDto,
+    RuleListQuery,
     RuleLogDto,
     RuleUpdateDto,
+    HouseworkListQuery,
 } from './dto';
 import { RedefinedGroupMemberInfo } from './interfaces';
 
-@Controller('groups')
+@Controller()
 @UseGuards(JwtStrategyGuard)
 export class GroupController {
     constructor(
@@ -59,6 +63,8 @@ export class GroupController {
         private groupMemberService: GroupMemberService,
         private alternativePaymentService: AlternativePaymentService,
         private awardService: AwardService,
+        // private confirmationService: ConfirmationService,
+        // private cnofirmationLogService: ConfirmationLogService,
         private houseworkService: HouseworkService,
         private routineService: RoutineService,
         private ruleService: RuleService,
@@ -74,7 +80,7 @@ export class GroupController {
         this.ruleLogService = ruleLogService;
     }
 
-    @Post('/')
+    @Post('/group')
     async CreateGroup(@Request() req, @Body() groupData: GroupDto) {
         try {
             const { id } = req.user;
@@ -95,18 +101,18 @@ export class GroupController {
             }
             await Promise.all(groupMemberCreatePromises);
 
-            return successMessageGenerator();
+            return successMessageGenerator({ groupId: group.id });
         } catch (err) {
             console.log(err);
             if (err instanceof HttpException) {
                 throw err;
             }
             
-            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new HttpException(failMessage.ERR_INTERNAL_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @Get('/me')
+    @Get('/groups/me')
     async GetMyGroupList(@Request() req, @Query() listData: ListQuery) {
         try {
             const { id } = req.user;
@@ -115,7 +121,7 @@ export class GroupController {
             offset = isNaN(offset) ? 0 : offset;
             limit = isNaN(limit) ? 5 : limit;
 
-            let { list, count } = await this.groupMemberService.getMyGroups({ accountId: id, skip: offset * limit, take: limit });
+            let { list, count } = await this.groupMemberService.getMyGroupList({ accountId: id }, { skip: offset * limit, take: limit });
 
             return successMessageGenerator({ list, count });
         } catch (err) {
@@ -124,11 +130,11 @@ export class GroupController {
                 throw err;
             }
             
-            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new HttpException(failMessage.ERR_INTERNAL_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @Get('/:id')
+    @Get('/groups/:id')
     async GetGroupInfo(@Param() params: IdParams, @Request() req) {
         try {
             const { id: userId } = req.user;
@@ -158,12 +164,12 @@ export class GroupController {
                 throw err;
             }
             
-            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new HttpException(failMessage.ERR_INTERNAL_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @Patch('/:id')
-    async UpdateGroupInfo(@Param() params: IdParams, @Body() groupUpdateData: GroupUpdateDto) {
+    @Patch('/groups/:id')
+    async UpdateGroupSettings(@Param() params: IdParams, @Body() groupUpdateData: GroupUpdateDto) {
         try {
             // TODO: permission 처리
             // TODO: 추가된, 삭제된 멤버의 housework log 처리
@@ -200,12 +206,12 @@ export class GroupController {
                 throw err;
             }
             
-            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new HttpException(failMessage.ERR_INTERNAL_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @Patch('/:id/active')
-    async UpdateGroupLogo(@Param() params: IdParams, @Body() groupActiveUpdateData: GroupActiveUpdateDto) {
+    @Patch('/groups/:id/active')
+    async SwitchGroupActive(@Param() params: IdParams, @Body() groupActiveUpdateData: GroupActiveUpdateDto) {
         try {
             // TODO: permission 처리
             // TODO: housework log 처리
@@ -224,12 +230,12 @@ export class GroupController {
                 throw err;
             }
             
-            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new HttpException(failMessage.ERR_INTERNAL_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @Patch('/:id/manager-permission')
-    async UpdateGroupManagerPermissionActive(@Param() params: IdParams, @Body() groupManagerPermisssionUpdateData: BooleanUpdateDto, @Request() req) {
+    @Patch('/groups/:id/manager-permission')
+    async SwitchGroupManagerPermissionActive(@Param() params: IdParams, @Body() groupManagerPermisssionUpdateData: BooleanUpdateDto, @Request() req) {
         try {
             // TODO: permission 처리
             const { id: userId } = req.user;
@@ -253,11 +259,51 @@ export class GroupController {
                 throw err;
             }
             
-            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new HttpException(failMessage.ERR_INTERNAL_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @Patch('/:id/options/housework')
+    @Patch('/groups/:id/manager')
+    async UpdateGroupManager(@Param() params: IdParams, @Body() groupManagerUpdateData: GroupManagerUpdateDto, @Request() req) {
+        try {
+            // TODO: permission 처리
+            const { id: userId } = req.user;
+            const { id: groupId } = params;
+            const { targetId } = groupManagerUpdateData;
+
+            const group = await this.groupService.getInfo({ id: groupId });
+            if (!group) {
+                throw new HttpException(failMessage.ERR_GROUP_NOT_FOUND, HttpStatus.NOT_FOUND);
+            }
+
+            const groupMember = await this.groupMemberService.getInfoByAccountId({ groupId, accountId: userId });
+            if (!groupMember) {
+                throw new HttpException(failMessage.ERR_GROUP_MEMBER_NOT_FOUND, HttpStatus.NOT_FOUND);
+            }
+            if (groupMember.isManager !== true){
+                throw new HttpException(failMessage.ERR_NOT_HAVE_PERMISSION, HttpStatus.BAD_REQUEST);
+            }
+
+            const target = await this.groupMemberService.getItem({ groupId, id: targetId });
+            if (!target) {
+                throw new HttpException(failMessage.ERR_GROUP_MEMBER_NOT_FOUND, HttpStatus.NOT_FOUND);
+            }
+
+            await this.groupMemberService.updateItemIsManager({ groupId, id: groupMember.id, isManager: false });
+            await this.groupMemberService.updateItemIsManager({ groupId, id: targetId, isManager: true });
+            
+            return successMessageGenerator();
+        } catch (err) {
+            console.log(err);
+            if (err instanceof HttpException) {
+                throw err;
+            }
+            
+            throw new HttpException(failMessage.ERR_INTERNAL_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Patch('/groups/:id/options/housework')
     async UpdateGroupHouseworkOptions(@Param() params: IdParams, @Body() houseworkOptionUpdateData: HouseworkOptionUpdateDto, @Request() req) {
         try {
             // TODO: permission 처리
@@ -284,7 +330,7 @@ export class GroupController {
                 // TODO add lastValue update condition
                 const routineUpdateResult = await this.routineService.updateItem({ groupId, startDay, shareMethod, startDayLastValue: routine.startDay, shareMethodLastValue: routine.shareMethod });
                 if (routineUpdateResult.affected === 0) {
-                    throw new HttpException(failMessage.ERR_GROUP_NOT_FOUND, HttpStatus.NOT_FOUND);
+                    throw new HttpException(failMessage.ERR_ROUTINE_NOT_FOUND, HttpStatus.NOT_FOUND);
                 }
             } else {
                 await this.routineService.createItem({ groupId, startDay, shareMethod });
@@ -297,11 +343,11 @@ export class GroupController {
                 throw err;
             }
             
-            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new HttpException(failMessage.ERR_INTERNAL_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @Patch('/:id/options/award')
+    @Patch('/groups/:id/options/award')
     async UpdateGroupAwardOptions(@Param() params: IdParams, @Body() awardOptionUpdateData: AwardOptionUpdateDto, @Request() req) {
         try {
             // TODO: permission 처리
@@ -355,13 +401,13 @@ export class GroupController {
                 throw err;
             }
             
-            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new HttpException(failMessage.ERR_INTERNAL_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @UseInterceptors(FileInterceptor('files'))
-    @Post('/:id/logo/upload')
-    async UpdateGroupLogoImage(@Param() params: IdParams, @Request() req) {
+    @Post('/groups/:id/logo/upload')
+    async UploadGroupLogoImage(@Param() params: IdParams, @Request() req) {
         try {
             const { id: userId } = req.user;
             const { id: groupId } = params;
@@ -388,11 +434,11 @@ export class GroupController {
                 throw err;
             }
             
-            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new HttpException(failMessage.ERR_INTERNAL_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @Delete('/:id/logo/reset')
+    @Delete('/groups/:id/logo/reset')
     async ResetGroupLogoImage(@Param() params: IdParams, @Request() req) {
         try {
             const { id: userId } = req.user;
@@ -415,11 +461,11 @@ export class GroupController {
                 throw err;
             }
             
-            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new HttpException(failMessage.ERR_INTERNAL_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @Get('/:id/me')
+    @Get('/groups/:id/me')
     async GetMyGroupMemberInfo(@Param() params: IdParams, @Request() req) {
         try {
             const { id: userId } = req.user;
@@ -458,12 +504,12 @@ export class GroupController {
                 throw err;
             }
             
-            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new HttpException(failMessage.ERR_INTERNAL_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @Patch('/:id/me')
-    async UpdateMyGroupMemberInfo(@Param() params: IdParams, @Body() groupMemberUpdatedata: GroupMemberUpdateDto, @Request() req) {
+    @Patch('/groups/:id/me')
+    async UpdatGroupMemberSettings(@Param() params: IdParams, @Body() groupMemberUpdatedata: GroupMemberUpdateDto, @Request() req) {
         try {
             const { id: userId } = req.user;
             const { id: groupId } = params;
@@ -492,12 +538,12 @@ export class GroupController {
                 throw err;
             }
             
-            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new HttpException(failMessage.ERR_INTERNAL_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @Delete('/:id/me')
-    async DeleteMyGroupMember(@Param() params: IdParams, @Request() req) {
+    @Delete('/groups/:id/me')
+    async WithdrawFromGroup(@Param() params: IdParams, @Request() req) {
         try {
             // TODO: housework log 처리
             const { id: userId } = req.user;
@@ -525,12 +571,12 @@ export class GroupController {
                 throw err;
             }
             
-            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new HttpException(failMessage.ERR_INTERNAL_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @Patch('/:id/me/active')
-    async UpdateMyGroupMemberActive(@Param() params: IdParams, @Body() booleanUpdatedata: BooleanUpdateDto, @Request() req) {
+    @Patch('/groups/:id/me/active')
+    async SwitchMyGroupMemberActive(@Param() params: IdParams, @Body() booleanUpdatedata: BooleanUpdateDto, @Request() req) {
         try {
             const { id: userId } = req.user;
             const { id: groupId } = params;
@@ -553,11 +599,11 @@ export class GroupController {
                 throw err;
             }
             
-            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new HttpException(failMessage.ERR_INTERNAL_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @Patch('/:id/me/nickname')
+    @Patch('/groups/:id/me/nickname')
     async UpdateMyGroupMemberNickname(@Param() params: IdParams, @Body() nicknameData: NicknameDto, @Request() req) {
         try {
             const { id: userId } = req.user;
@@ -581,12 +627,12 @@ export class GroupController {
                 throw err;
             }
             
-            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new HttpException(failMessage.ERR_INTERNAL_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @Post('/:id/nickname/exists')
-    async CheckNicknameDuplication(@Param() params: IdParams, @Body() nicknameData: NicknameDto) {
+    @Post('/groups/:id/nickname/exists')
+    async CheckGroupMemberNicknameDuplication(@Param() params: IdParams, @Body() nicknameData: NicknameDto) {
         try {
             const { id: groupId } = params;
             const { nickname } = nicknameData;
@@ -608,11 +654,11 @@ export class GroupController {
                 throw err;
             }
             
-            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new HttpException(failMessage.ERR_INTERNAL_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @Post('/:id/alternative-payments')
+    @Post('/groups/:id/alternative-payment')
     async CreateGroupAlternativePayment(@Param() params: IdParams, @Body() alternativePaymentData: AlternativePaymentDto, @Request() req) {
         try {
             const { id: userId } = req.user;
@@ -629,6 +675,8 @@ export class GroupController {
                 throw new HttpException(failMessage.ERR_GROUP_MEMBER_NOT_FOUND, HttpStatus.NOT_FOUND);
             }
 
+            // TODO: limit - only acive standard
+
             await this.alternativePaymentService.createItem({ groupId, type, name, reason });
 
             return successMessageGenerator();
@@ -638,11 +686,11 @@ export class GroupController {
                 throw err;
             }
             
-            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new HttpException(failMessage.ERR_INTERNAL_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @Get('/:id/alternative-payments')
+    @Get('/groups/:id/alternative-payments')
     async GetGroupAlternativePaymentList(@Param() params: IdParams, @Request() req) {
         try {
             const { id: userId } = req.user;
@@ -667,11 +715,11 @@ export class GroupController {
                 throw err;
             }
             
-            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new HttpException(failMessage.ERR_INTERNAL_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @Patch('/:groupid/alternative-payments/:id')
+    @Patch('/groups/:groupid/alternative-payments/:id')
     async UpdateGroupAlternativePayment(@Param() params: SpecificIdParams, @Body() alternativePaymentUpdateData: AlternativePaymentUpdateDto, @Request() req) {
         try {
             const { id: userId } = req.user;
@@ -700,11 +748,11 @@ export class GroupController {
                 throw err;
             }
             
-            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new HttpException(failMessage.ERR_INTERNAL_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @Delete('/:groupid/alternative-payments/:id')
+    @Delete('/groups/:groupid/alternative-payments/:id')
     async DeleteGroupAlternativePayment(@Param() params: SpecificIdParams, @Request() req) {
         try {
             const { id: userId } = req.user;
@@ -729,11 +777,11 @@ export class GroupController {
                 throw err;
             }
             
-            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new HttpException(failMessage.ERR_INTERNAL_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @Post('/:id/awards')
+    @Post('/groups/:id/award')
     async CreateGroupAward(@Param() params: IdParams, @Body() awardData: AwardDto, @Request() req) {
         try {
             const { id: userId } = req.user;
@@ -750,6 +798,8 @@ export class GroupController {
                 throw new HttpException(failMessage.ERR_GROUP_MEMBER_NOT_FOUND, HttpStatus.NOT_FOUND);
             }
 
+            // TODO: limit - only acive standard
+
             await this.awardService.createItem({ groupId, type, title, description, defaultAwardId, includeContent });
 
             return successMessageGenerator();
@@ -759,11 +809,11 @@ export class GroupController {
                 throw err;
             }
             
-            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new HttpException(failMessage.ERR_INTERNAL_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @Get('/:id/awards')
+    @Get('/groups/:id/awards')
     async GetGroupAwardList(@Param() params: IdParams, @Request() req) {
         try {
             const { id: userId } = req.user;
@@ -788,11 +838,11 @@ export class GroupController {
                 throw err;
             }
             
-            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new HttpException(failMessage.ERR_INTERNAL_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @Patch('/:groupid/awards/:id')
+    @Patch('/groups/:groupid/awards/:id')
     async UpdateGroupAward(@Param() params: SpecificIdParams, @Body() awardUpdateData: AwardUpdateDto, @Request() req) {
         try {
             const { id: userId } = req.user;
@@ -818,11 +868,11 @@ export class GroupController {
                 throw err;
             }
             
-            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new HttpException(failMessage.ERR_INTERNAL_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @Delete('/:groupid/awards/:id')
+    @Delete('/groups/:groupid/awards/:id')
     async DeleteGroupAward(@Param() params: SpecificIdParams, @Request() req) {
         try {
             const { id: userId } = req.user;
@@ -847,12 +897,12 @@ export class GroupController {
                 throw err;
             }
             
-            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new HttpException(failMessage.ERR_INTERNAL_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @Post('/:id/routines/full-charge')
-    async CreateGroupRoutineFullCharge(@Param() params: IdParams, @Body() routineFullChargeData: RoutineFullChargeDto, @Request() req) {
+    @Post('/groups/:id/routines/full-charge')
+    async CreateGroupRoutineFullChargeSettings(@Param() params: IdParams, @Body() routineFullChargeData: RoutineFullChargeDto, @Request() req) {
         try {
             const { id: userId } = req.user;
             const { id: groupId } = params;
@@ -897,15 +947,19 @@ export class GroupController {
                 throw err;
             }
             
-            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new HttpException(failMessage.ERR_INTERNAL_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @Get('/:id/routines/full-charge')
-    async GetGroupRoutineFullChargeList(@Param() params: IdParams, @Request() req) {
+    @Get('/groups/:id/routines/full-charge')
+    async GetGroupRoutineFullChargeList(@Param() params: IdParams, @Query() listData: ListQuery, @Request() req) {
         try {
             const { id: userId } = req.user;
             const { id: groupId } = params;
+            let { offset, limit } = listData;
+
+            offset = isNaN(offset) ? 0 : offset;
+            limit = isNaN(limit) ? 30 : limit;
 
             const group = await this.groupService.getItem({ id: groupId });
             if (!group) {
@@ -917,7 +971,7 @@ export class GroupController {
                 throw new HttpException(failMessage.ERR_GROUP_MEMBER_NOT_FOUND, HttpStatus.NOT_FOUND);
             }
 
-            const result = await this.routineService.getFullChargeList({ groupId });
+            const result = await this.routineService.getFullChargeList({ groupId }, { skip: offset * limit, take: limit });
 
             return successMessageGenerator(result);
         } catch (err) {
@@ -926,11 +980,11 @@ export class GroupController {
                 throw err;
             }
             
-            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new HttpException(failMessage.ERR_INTERNAL_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @Patch('/:groupid/routines/full-charge/:id/complete')
+    @Patch('/groups/:groupid/routines/full-charge/:id/complete')
     async UpdateGroupRoutineFullChargeComplete(@Param() params: SpecificIdParams, @Request() req) {
         try {
             const { id: userId } = req.user;
@@ -955,11 +1009,11 @@ export class GroupController {
                 throw err;
             }
             
-            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new HttpException(failMessage.ERR_INTERNAL_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @Delete('/:groupid/routines/full-charge/:id')
+    @Delete('/groups/:groupid/routines/full-charge/:id')
     async DeleteGroupRoutineFullCharge(@Param() params: SpecificIdParams, @Request() req) {
         try {
             const { id: userId } = req.user;
@@ -986,11 +1040,11 @@ export class GroupController {
                 throw err;
             }
             
-            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new HttpException(failMessage.ERR_INTERNAL_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @Post('/:id/rules')
+    @Post('/groups/:id/rule')
     async CreateGroupRule(@Param() params: IdParams, @Body() ruleData: RuleDto, @Request() req) {
         try {
             // TODO max 10 rules
@@ -1008,6 +1062,8 @@ export class GroupController {
                 throw new HttpException(failMessage.ERR_GROUP_MEMBER_NOT_FOUND, HttpStatus.NOT_FOUND);
             }
 
+            // TODO: limit - only acive standard
+
             const promises = [];
             for (let i = 0; i < rules.length; i++) {
                 promises.push(this.ruleService.createItem({ groupId, content: rules[i], createDate: new Date() }))
@@ -1021,15 +1077,19 @@ export class GroupController {
                 throw err;
             }
             
-            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new HttpException(failMessage.ERR_INTERNAL_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @Get('/:id/rules')
-    async GetGroupRuleList(@Param() params: IdParams, @Request() req) {
+    @Get('/groups/:id/rules')
+    async GetGroupRuleList(@Param() params: IdParams, @Query() ruleListData: RuleListQuery, @Request() req) {
         try {
             const { id: userId } = req.user;
             const { id: groupId } = params;
+            let { offset, limit, all } = ruleListData;
+
+            offset = isNaN(offset) ? 0 : offset;
+            limit = isNaN(limit) ? 10 : limit;
 
             const group = await this.groupService.getItem({ id: groupId });
             if (!group) {
@@ -1041,7 +1101,7 @@ export class GroupController {
                 throw new HttpException(failMessage.ERR_GROUP_MEMBER_NOT_FOUND, HttpStatus.NOT_FOUND);
             }
 
-            const result = await this.ruleService.getList({ groupId });
+            const result = await this.ruleService.getList({ groupId }, { skip: offset * limit, take: limit, all });
 
             return successMessageGenerator(result);
         } catch (err) {
@@ -1050,13 +1110,16 @@ export class GroupController {
                 throw err;
             }
             
-            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new HttpException(failMessage.ERR_INTERNAL_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @Patch('/:groupid/rules/:id')
+    @Patch('/groups/:groupid/rules/:id')
     async UpdateGroupRule(@Param() params: SpecificIdParams, @Body() ruleUpdateData: RuleUpdateDto, @Request() req) {
         try {
+            // TODO
+            // if a rule was confirmed, report process is more complicated
+            // kine of confirmation -> not including 'award'...
             const { id: userId } = req.user;
             const { groupid: groupId, id } = params;
             const { content } = ruleUpdateData;
@@ -1083,11 +1146,11 @@ export class GroupController {
                 throw err;
             }
             
-            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new HttpException(failMessage.ERR_INTERNAL_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @Delete('/:groupid/rules/:id')
+    @Delete('/groups/:groupid/rules/:id')
     async DeleteGroupRule(@Param() params: SpecificIdParams, @Request() req) {
         try {
             const { id: userId } = req.user;
@@ -1103,7 +1166,7 @@ export class GroupController {
                 throw new HttpException(failMessage.ERR_GROUP_MEMBER_NOT_FOUND, HttpStatus.NOT_FOUND);
             }
 
-            const result = await this.ruleService.deleteItem({ groupId, id });
+            await this.ruleService.deleteItem({ groupId, id });
 
             return successMessageGenerator();
         } catch (err) {
@@ -1112,11 +1175,11 @@ export class GroupController {
                 throw err;
             }
             
-            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new HttpException(failMessage.ERR_INTERNAL_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @Post('/:id/rules/report')
+    @Post('/groups/:id/rules/report')
     async ReportGroupRule(@Param() params: IdParams, @Body() ruleLogData: RuleLogDto, @Request() req) {
         try {
             // TODO check not confirmed
@@ -1155,11 +1218,11 @@ export class GroupController {
                 throw err;
             }
             
-            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new HttpException(failMessage.ERR_INTERNAL_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @Delete('/:groupid/rules/report/:id')
+    @Delete('/groups/:groupid/rules/report/:id')
     async CancelReport(@Param() params: SpecificIdParams, @Request() req) {
         try {
             const { id: userId } = req.user;
@@ -1187,15 +1250,19 @@ export class GroupController {
                 throw err;
             }
             
-            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new HttpException(failMessage.ERR_INTERNAL_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @Get('/:id/rules/progress')
-    async GetGroupRuleProgressList(@Param() params: IdParams, @Request() req) {
+    @Get('/groups/:id/rules/progress')
+    async GetGroupRuleProgressList(@Param() params: IdParams, @Query() listData: ListQuery, @Request() req) {
         try {
             const { id: userId } = req.user;
             const { id: groupId } = params;
+            let { offset, limit } = listData;
+
+            offset = isNaN(offset) ? 0 : offset;
+            limit = isNaN(limit) ? 10 : limit;
 
             const group = await this.groupService.getItem({ id: groupId });
             if (!group) {
@@ -1207,7 +1274,7 @@ export class GroupController {
                 throw new HttpException(failMessage.ERR_GROUP_MEMBER_NOT_FOUND, HttpStatus.NOT_FOUND);
             }
 
-            const result = await this.ruleLogService.getListByGroupMemberId({ groupId, groupMemberId: groupMember.id });
+            const result = await this.ruleLogService.getListByGroupMemberId({ groupId, groupMemberId: groupMember.id }, { skip: offset * limit, take: limit });
 
             return successMessageGenerator(result);
         } catch (err) {
@@ -1216,15 +1283,19 @@ export class GroupController {
                 throw err;
             }
             
-            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new HttpException(failMessage.ERR_INTERNAL_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @Get('/:id/rules/progress/me')
-    async GetMyGroupRuleProgressList(@Param() params: IdParams, @Request() req) {
+    @Get('/groups/:id/rules/progress/me')
+    async GetMyGroupRuleProgressList(@Param() params: IdParams, @Query() listData: ListQuery, @Request() req) {
         try {
             const { id: userId } = req.user;
             const { id: groupId } = params;
+            let { offset, limit } = listData;
+
+            offset = isNaN(offset) ? 0 : offset;
+            limit = isNaN(limit) ? 10 : limit;
 
             const group = await this.groupService.getItem({ id: groupId });
             if (!group) {
@@ -1236,7 +1307,7 @@ export class GroupController {
                 throw new HttpException(failMessage.ERR_GROUP_MEMBER_NOT_FOUND, HttpStatus.NOT_FOUND);
             }
 
-            const result = await this.ruleLogService.getListByGroupMemberId({ groupId, groupMemberId: groupMember.id });
+            const result = await this.ruleLogService.getListByGroupMemberId({ groupId, groupMemberId: groupMember.id }, { skip: offset * limit, take: limit });
 
             return successMessageGenerator(result);
         } catch (err) {
@@ -1245,15 +1316,19 @@ export class GroupController {
                 throw err;
             }
             
-            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new HttpException(failMessage.ERR_INTERNAL_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @Get('/:groupid/rules/progress/:id')
-    async GetGroupRuleProgressListOfGroupMember(@Param() params: SpecificIdParams, @Request() req) {
+    @Get('/groups/:groupid/rules/progress/:id')
+    async GetGroupRuleProgressListOfGroupMember(@Param() params: SpecificIdParams, @Query() listData: ListQuery, @Request() req) {
         try {
             const { id: userId } = req.user;
             const { groupid: groupId, id: groupMemberId } = params;
+            let { offset, limit } = listData;
+
+            offset = isNaN(offset) ? 0 : offset;
+            limit = isNaN(limit) ? 10 : limit;
 
             const group = await this.groupService.getItem({ id: groupId });
             if (!group) {
@@ -1270,7 +1345,7 @@ export class GroupController {
                 throw new HttpException(failMessage.ERR_GROUP_MEMBER_NOT_FOUND, HttpStatus.NOT_FOUND);
             }
 
-            const result = await this.ruleLogService.getListByGroupMemberId({ groupId, groupMemberId: groupMember.id });
+            const result = await this.ruleLogService.getListByGroupMemberId({ groupId, groupMemberId: groupMember.id }, { skip: offset * limit, take: limit });
 
             return successMessageGenerator(result);
         } catch (err) {
@@ -1279,11 +1354,11 @@ export class GroupController {
                 throw err;
             }
             
-            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new HttpException(failMessage.ERR_INTERNAL_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @Post('/:id/housework')
+    @Post('/groups/:id/housework')
     async CreateGroupHousework(@Param() params: IdParams, @Body() houseworkData: HouseworkDto, @Request() req) {
         try {
             const { id: userId } = req.user;
@@ -1300,6 +1375,8 @@ export class GroupController {
                 throw new HttpException(failMessage.ERR_GROUP_MEMBER_NOT_FOUND, HttpStatus.NOT_FOUND);
             }
 
+            // TODO: limit - only acive standard
+
             await this.houseworkService.createItem({ groupId, type, title, description, deployCount, frequency });
 
             return successMessageGenerator();
@@ -1309,15 +1386,19 @@ export class GroupController {
                 throw err;
             }
             
-            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new HttpException(failMessage.ERR_INTERNAL_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @Get('/:id/housework')
-    async GetGroupHouseworkList(@Param() params: IdParams, @Request() req) {
+    @Get('/groups/:id/housework')
+    async GetGroupHouseworkList(@Param() params: IdParams, @Query() houseworkListData: HouseworkListQuery, @Request() req) {
         try {
             const { id: userId } = req.user;
             const { id: groupId } = params;
+            let { offset, limit, all } = houseworkListData;
+
+            offset = isNaN(offset) ? 0 : offset;
+            limit = isNaN(limit) ? 10 : limit;
 
             const group = await this.groupService.getItem({ id: groupId });
             if (!group) {
@@ -1329,7 +1410,7 @@ export class GroupController {
                 throw new HttpException(failMessage.ERR_GROUP_MEMBER_NOT_FOUND, HttpStatus.NOT_FOUND);
             }
 
-            const result = await this.houseworkService.getList({ groupId });
+            const result = await this.houseworkService.getList({ groupId }, { skip: offset * limit, take: limit, all });
 
             return successMessageGenerator(result);
         } catch (err) {
@@ -1338,11 +1419,11 @@ export class GroupController {
                 throw err;
             }
             
-            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new HttpException(failMessage.ERR_INTERNAL_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @Patch('/:groupid/housework/:id')
+    @Patch('/groups/:groupid/housework/:id')
     async UpdateGroupHousework(@Param() params: SpecificIdParams, @Body() houseworkUpdateData: HouseworkUpdateDto, @Request() req) {
         try {
             const { id: userId } = req.user;
@@ -1368,12 +1449,12 @@ export class GroupController {
                 throw err;
             }
             
-            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new HttpException(failMessage.ERR_INTERNAL_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @Delete('/:groupid/housework/:id')
-    async DeleteGroupHouseworkList(@Param() params: SpecificIdParams, @Request() req) {
+    @Delete('/groups/:groupid/housework/:id')
+    async DeleteGroupHousework(@Param() params: SpecificIdParams, @Request() req) {
         try {
             const { id: userId } = req.user;
             const { groupid: groupId, id } = params;
@@ -1397,7 +1478,39 @@ export class GroupController {
                 throw err;
             }
             
-            throw new HttpException(failMessage.ERR_INTERVER_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new HttpException(failMessage.ERR_INTERNAL_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Post('/groups/:id/confirmation')
+    async CreateGroupConfirmation(@Param() params: IdParams, @Body() confirmationData: ConfirmationDto, @Request() req) {
+        try {
+            const { id: userId } = req.user;
+            const { id: groupId } = params;
+            const { type, title, description, deployCount, frequency } = confirmationData;
+
+            const group = await this.groupService.getItem({ id: groupId });
+            if (!group) {
+                throw new HttpException(failMessage.ERR_GROUP_NOT_FOUND, HttpStatus.NOT_FOUND);
+            }
+
+            const groupMember = await this.groupMemberService.getItemByAccountId({ groupId, accountId: userId });
+            if (!groupMember) {
+                throw new HttpException(failMessage.ERR_GROUP_MEMBER_NOT_FOUND, HttpStatus.NOT_FOUND);
+            }
+
+            // TODO: limit - only acive standard
+
+            await this.houseworkService.createItem({ groupId, type, title, description, deployCount, frequency });
+
+            return successMessageGenerator();
+        } catch (err) {
+            console.log(err);
+            if (err instanceof HttpException) {
+                throw err;
+            }
+            
+            throw new HttpException(failMessage.ERR_INTERNAL_SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }

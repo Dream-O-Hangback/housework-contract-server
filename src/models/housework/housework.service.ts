@@ -19,10 +19,15 @@ export class HouseworkService {
     deleteItem({ groupId, id }) {
         return this.houseworkRepository.update({ groupId, id }, { active: false });
     }
-    async getList({ groupId }) {
+    async getList({ groupId }, { skip, take, all }) {
+        const where: { groupId: string, active?: boolean } = { groupId };
+        if (all === true) where.active = true;
+        
         const [list, count] = await this.houseworkRepository.findAndCount({
-            where: { groupId, active: true },
+            where,
             order: { updateDate: -1 },
+            skip,
+            take
         });
 
         return { list, count };

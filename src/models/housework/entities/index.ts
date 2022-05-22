@@ -26,7 +26,7 @@ export default class Housework {
     deployCount: number;
 
     @Column({ type: 'int' })
-    frequency: string;
+    frequency: number;
 
     @Column({ name: 'expire_date', nullable: true })
     expireDate: Date;

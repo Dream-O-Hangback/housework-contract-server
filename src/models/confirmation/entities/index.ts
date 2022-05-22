@@ -14,6 +14,13 @@ export default class Confirmation {
     @Column({ name: 'group_id', nullable: true })
     groupId: string;
 
+    @ManyToOne(type => Group, { onDelete: 'SET NULL', nullable: true })
+    @JoinColumn({ name: 'group_id' })
+    target: Group;
+
+    @Column({ name: 'group_id', nullable: true })
+    targetId: string;
+
     @Column({ type: 'varchar', length: 30 })
     type: string;
     
